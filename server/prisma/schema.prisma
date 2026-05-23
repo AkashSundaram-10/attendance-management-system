@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum WorkerStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum WageType {
+  DAILY
+  MONTHLY
+  HOURLY
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  HALF_DAY
+  OVERTIME
+}
+
+enum PaymentStatus {
+  PAID
+  PARTIAL
+  PENDING
+  OVERDUE
+}
+
+model User {
+  id        String   @id @default(uuid())
+  fullName  String
+  email     String   @unique
+  password  String
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Worker {
+  id           String   @id @default(uuid())
+  workerCode   String   @unique
+  fullName     String
+  phone        String?
+  address      String?
+  role         String?
+  wageType     WageType @default(DAILY)
+  dailyWage    Float
+  overtimeRate Float?
+  joiningDate  DateTime
+  status       WorkerStatus @default(ACTIVE)
+  isDeleted    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  attendances  Attendance[]
+  salaries     SalaryRecord[]
+  advances     Advance[]
+  payments     Payment[]
+}
+
+model Attendance {
+  id            String   @id @default(uuid())
+  workerId      String
+  date          DateTime @db.Date
+  checkIn       DateTime?
+  checkOut      DateTime?
+  overtimeHours Float?   @default(0)
+  status        AttendanceStatus
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  worker        Worker   @relation(fields: [workerId], references: [id])
+
+  @@unique([workerId, date]) // Prevent duplicate attendance per day
+}
+
+model SalaryRecord {
+  id               String   @id @default(uuid())
+  workerId         String
+  month            Int
+  year             Int
+  totalDays        Float
+  overtimeHours    Float    @default(0)
+  grossSalary      Float
+  advanceDeduction Float    @default(0)
+  finalSalary      Float
+  paymentStatus    PaymentStatus @default(PENDING)
+  generatedAt      DateTime @default(now())
+
+  worker           Worker   @relation(fields: [workerId], references: [id])
+  payments         Payment[]
+
+  @@unique([workerId, month, year]) // One salary record per worker per month
+}
+
+model Advance {
+  id        String   @id @default(uuid())
+  workerId  String
+  amount    Float
+  note      String?
+  createdAt DateTime @default(now())
+
+  worker    Worker   @relation(fields: [workerId], references: [id])
+}
+
+model Payment {
+  id             String   @id @default(uuid())
+  workerId       String
+  salaryRecordId String?
+  amountPaid     Float
+  paymentDate    DateTime @default(now())
+  paymentMethod  String?
+  note           String?
+  status         PaymentStatus @default(PAID)
+  createdAt      DateTime @default(now())
+
+  worker         Worker   @relation(fields: [workerId], references: [id])
+  salaryRecord   SalaryRecord? @relation(fields: [salaryRecordId], references: [id])
+}

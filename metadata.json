@@ -1,0 +1,6 @@
+{
+  "name": "WorkTrack Pro",
+  "description": "Executive workforce administration software for loging worker rosters, daily attendance hours, salary ledger clearances, and requested advances.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
