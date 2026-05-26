@@ -61,7 +61,7 @@ export default function WorkerProfileView({
 
         <div>
           <h2 className="text-xl font-display font-bold text-slate-900">{worker.name}</h2>
-          <p className="text-xs text-slate-500 flex items-center justify-center gap-1.5 mt-1 font-medium">
+          <p className="text-sm text-slate-500 flex items-center justify-center gap-1.5 mt-1 font-medium">
             {worker.role}
             <span className="w-1.5 h-1.5 bg-slate-400 rounded-full" />
             ID: {worker.id}
@@ -71,26 +71,26 @@ export default function WorkerProfileView({
         {/* Status Badge */}
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#e2dfff] text-[#0f0069] border border-[#c3c0ff]">
           <span className="w-2 h-2 rounded-full bg-[var(--primary-color)]" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">{worker.status}</span>
+          <span className="text-sm font-bold uppercase tracking-wider">{worker.status}</span>
         </div>
       </section>
 
       {/* Analytics Summary Row Dashboard Bento-style */}
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col items-center justify-center text-center">
-          <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+          <span className="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">
             Attendance
           </span>
           <span className="text-base font-display font-black text-[var(--primary-color)]">{attendanceRate}%</span>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col items-center justify-center text-center">
-          <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+          <span className="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">
             Days Worked
           </span>
           <span className="text-base font-display font-black text-slate-800">{daysWorked}</span>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col items-center justify-center text-center">
-          <span className="text-emerald-500 text-[10px] font-bold uppercase tracking-wider mb-1">
+          <span className="text-emerald-500 text-sm font-bold uppercase tracking-wider mb-1">
             Paid
           </span>
           <span className="text-base font-display font-black text-emerald-600">
@@ -98,7 +98,7 @@ export default function WorkerProfileView({
           </span>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col items-center justify-center text-center">
-          <span className="text-red-500 text-[10px] font-bold uppercase tracking-wider mb-1">
+          <span className="text-red-500 text-sm font-bold uppercase tracking-wider mb-1">
             Unpaid
           </span>
           <span className="text-base font-display font-black text-red-500">
@@ -134,7 +134,7 @@ export default function WorkerProfileView({
       <section>
         {activeTab === 'Overview' && (
           <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-5">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">
               Worker Details
             </h3>
 
@@ -144,8 +144,8 @@ export default function WorkerProfileView({
                   <Phone className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase">Phone</p>
-                  <p className="text-xs font-bold text-slate-800">{worker.phone}</p>
+                  <p className="text-sm font-bold text-slate-400 uppercase">Phone</p>
+                  <p className="text-sm font-bold text-slate-800">{worker.phone}</p>
                 </div>
               </div>
 
@@ -154,8 +154,8 @@ export default function WorkerProfileView({
                   <Mail className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase">Email</p>
-                  <p className="text-xs font-bold text-slate-800 truncate max-w-[180px]">
+                  <p className="text-sm font-bold text-slate-400 uppercase">Email</p>
+                  <p className="text-sm font-bold text-slate-800 truncate max-w-[180px]">
                     {worker.email}
                   </p>
                 </div>
@@ -166,8 +166,8 @@ export default function WorkerProfileView({
                   <Calendar className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase">Joined Date</p>
-                  <p className="text-xs font-bold text-slate-800">{worker.joinedDate}</p>
+                  <p className="text-sm font-bold text-slate-400 uppercase">Joined Date</p>
+                  <p className="text-sm font-bold text-slate-800">{worker.joinedDate}</p>
                 </div>
               </div>
 
@@ -176,8 +176,8 @@ export default function WorkerProfileView({
                   <Coins className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase">Daily Wage</p>
-                  <p className="text-xs font-bold text-slate-850">₹{worker.dailyWage}.00 / day</p>
+                  <p className="text-sm font-bold text-slate-400 uppercase">Daily Wage</p>
+                  <p className="text-sm font-bold text-slate-850">₹{worker.dailyWage}.00 / day</p>
                 </div>
               </div>
             </div>
@@ -187,15 +187,15 @@ export default function WorkerProfileView({
         {activeTab === 'Attendance' && (
           <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">
                 Attendance Register
               </h3>
-              <span className="text-xs text-[var(--primary-color)] font-bold">{presentDaysCount} days present</span>
+              <span className="text-sm text-[var(--primary-color)] font-bold">{presentDaysCount} days present</span>
             </div>
 
             <div className="space-y-2.5">
               {myAttendance.length === 0 ? (
-                <p className="text-xs text-slate-400">No attendance registered for this worker.</p>
+                <p className="text-sm text-slate-400">No attendance registered for this worker.</p>
               ) : (
                 myAttendance.map((rec, i) => (
                   <div
@@ -203,13 +203,13 @@ export default function WorkerProfileView({
                     className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl"
                   >
                     <div>
-                      <p className="text-xs font-bold text-slate-850">{rec.date}</p>
-                      <p className="text-[10px] text-slate-450">
+                      <p className="text-sm font-bold text-slate-850">{rec.date}</p>
+                      <p className="text-sm text-slate-450">
                         Check In: {rec.checkIn} | Check Out: {rec.checkOut}
                       </p>
                     </div>
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${rec.status === 'Present' || rec.status === 'Overtime'
+                      className={`px-2 py-0.5 rounded-full text-sm font-bold ${rec.status === 'Present' || rec.status === 'Overtime'
                           ? 'bg-emerald-50 text-emerald-700'
                           : rec.status === 'Absent'
                             ? 'bg-red-50 text-red-700'
@@ -227,7 +227,7 @@ export default function WorkerProfileView({
 
         {activeTab === 'Salary' && (
           <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
-            <h3 className="text-xs font-bold text-[#7c839b] uppercase tracking-widest">
+            <h3 className="text-sm font-bold text-[#7c839b] uppercase tracking-widest">
               Financial Compensation Ledger
             </h3>
 
@@ -235,27 +235,27 @@ export default function WorkerProfileView({
               <div className="space-y-4">
                 {workerSalaries.map((salary) => (
                   <div key={salary.id} className="border border-slate-100 p-4 rounded-xl bg-slate-50">
-                    <p className="text-xs font-bold text-slate-800 mb-3 border-b border-slate-200 pb-2">{salary.period}</p>
-                    <div className="grid grid-cols-2 gap-4 text-xs mb-3">
+                    <p className="text-sm font-bold text-slate-800 mb-3 border-b border-slate-200 pb-2">{salary.period}</p>
+                    <div className="grid grid-cols-2 gap-4 text-sm mb-3">
                       <div>
-                        <p className="text-[10px] text-slate-400 uppercase font-semibold">Basic Salary</p>
+                        <p className="text-sm text-slate-400 uppercase font-semibold">Basic Salary</p>
                         <p className="font-bold text-slate-800">₹{salary.grossPay}.00</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-slate-400 uppercase font-semibold">Overtime</p>
+                        <p className="text-sm text-slate-400 uppercase font-semibold">Overtime</p>
                         <p className="font-bold text-emerald-600">+₹{salary.overtimePay}.00</p>
                       </div>
                     </div>
 
                     <div className="border-t border-slate-200 pt-3 flex justify-between items-center">
                       <div>
-                        <p className="text-xs text-slate-400">Total Net Payout</p>
+                        <p className="text-sm text-slate-400">Total Net Payout</p>
                         <p className="text-[#0f172a] font-display text-lg font-black">
                           ₹{(salary.grossPay + salary.overtimePay).toLocaleString()}.00
                         </p>
                       </div>
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold ${salary.status === 'Paid'
+                        className={`px-3 py-1 rounded-full text-sm font-bold ${salary.status === 'Paid'
                             ? 'bg-emerald-100 text-emerald-800'
                             : 'bg-amber-100 text-amber-800 hover:scale-105 transition-all cursor-pointer'
                           }`}
@@ -281,9 +281,9 @@ export default function WorkerProfileView({
               </div>
             ) : (
               <div>
-                <p className="text-xs text-slate-500 mb-2">No custom ledger created for this worker yet.</p>
+                <p className="text-sm text-slate-500 mb-2">No custom ledger created for this worker yet.</p>
                 <div className="bg-slate-50 p-3 rounded-xl border border-dashed border-slate-200">
-                  <p className="text-[10px] font-bold uppercase text-slate-400">Comp estimate</p>
+                  <p className="text-sm font-bold uppercase text-slate-400">Comp estimate</p>
                   <p className="text-sm font-bold text-slate-800">
                     ₹{(daysWorked * worker.dailyWage).toLocaleString()}.00
                   </p>

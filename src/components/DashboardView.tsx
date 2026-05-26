@@ -147,7 +147,7 @@ export default function DashboardView({
               <div className="text-sm text-slate-500 font-medium leading-none">Total Workers</div>
             </div>
           </div>
-          <button onClick={() => setView('workers')} className="text-xs font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
+          <button onClick={() => setView('workers')} className="text-sm font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View all workers
           </button>
         </div>
@@ -163,7 +163,7 @@ export default function DashboardView({
               <div className="text-sm text-slate-500 font-medium leading-none">Today Present</div>
             </div>
           </div>
-          <button onClick={() => setView('attendance')} className="text-xs font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
+          <button onClick={() => setView('attendance')} className="text-sm font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View attendance
           </button>
         </div>
@@ -179,7 +179,7 @@ export default function DashboardView({
               <div className="text-sm text-slate-500 font-medium leading-none">{`Total Salary (${new Intl.DateTimeFormat('en-US', { month: 'short' }).format(new Date())})`}</div>
             </div>
           </div>
-          <button onClick={() => setView('salary')} className="text-xs font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
+          <button onClick={() => setView('salary')} className="text-sm font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View salary
           </button>
         </div>
@@ -195,7 +195,7 @@ export default function DashboardView({
               <div className="text-sm text-slate-500 font-medium leading-none">Pending Payments</div>
             </div>
           </div>
-          <button onClick={() => setView('salary')} className="text-xs font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
+          <button onClick={() => setView('salary')} className="text-sm font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View payments
           </button>
         </div>
@@ -209,7 +209,7 @@ export default function DashboardView({
             <h2 className="text-[15px] font-bold text-slate-900">Today's Attendance</h2>
             <button
               onClick={() => setView('attendance')}
-              className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
+              className="text-sm font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
             >
               Mark Attendance <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -257,7 +257,7 @@ export default function DashboardView({
                         </div>
                       </td>
                       <td className="px-5 py-3">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${getBadgeStyle(status)}`}>
+                        <span className={`px-2 py-0.5 rounded text-sm font-semibold ${getBadgeStyle(status)}`}>
                           {status}
                         </span>
                       </td>
@@ -277,7 +277,7 @@ export default function DashboardView({
           <div className="p-4 mt-auto text-right">
             <button
               onClick={() => setView('attendance')}
-              className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 ml-auto"
+              className="text-sm font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 ml-auto"
             >
               View all attendance <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -300,7 +300,7 @@ export default function DashboardView({
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-xl font-bold text-slate-900">{totalPaymentWorkers}</span>
-                <span className="text-[10px] text-slate-500 font-medium">Total</span>
+                <span className="text-sm text-slate-500 font-medium">Total</span>
               </div>
             </div>
 
@@ -346,7 +346,7 @@ export default function DashboardView({
           <h2 className="text-[15px] font-bold text-slate-900">Recent Payments</h2>
           <button
             onClick={() => setView('salary')}
-            className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
+            className="text-sm font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
           >
             View all payments <ArrowRight className="w-3.5 h-3.5" />
           </button>
@@ -390,7 +390,7 @@ export default function DashboardView({
                     <td className="px-5 py-3 text-slate-600">{formatINR(payment.paid)}</td>
                     <td className="px-5 py-3 text-slate-600">{formatINR(payment.balance)}</td>
                     <td className="px-5 py-3">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${getStatusStyle(payment.status)}`}>
+                      <span className={`px-2 py-0.5 rounded text-sm font-semibold ${getStatusStyle(payment.status)}`}>
                         {payment.status}
                       </span>
                     </td>

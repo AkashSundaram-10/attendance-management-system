@@ -31,16 +31,15 @@ export default function Sidebar({ currentView, setView }: SidebarProps) {
         {navItems.map((item, index) => {
           const isActive = getIsActive(item.id);
           const Icon = item.icon;
-          
+
           return (
             <button
               key={`${item.id}-${index}`}
               onClick={() => setView(item.id)}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl transition-colors shrink-0 ${
-                isActive 
-                  ? 'bg-[var(--primary-color)] text-white' 
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl transition-colors shrink-0 ${isActive
+                  ? 'bg-[var(--primary-color)] text-white'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
+                }`}
             >
               <Icon className="w-4 h-4" />
               <span className="whitespace-nowrap">{item.label}</span>

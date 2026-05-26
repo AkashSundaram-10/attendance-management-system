@@ -77,7 +77,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
               <button
                 key={m}
                 onClick={() => setSelectedMonth(m)}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${
                   selectedMonth === m
                     ? 'bg-[var(--primary-color)] text-white shadow-md shadow-[var(--primary-color)]/20'
                     : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'
@@ -90,7 +90,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
         </div>
         <button
           onClick={() => alert('Demo Notice: Exporting ledger records as CSV/Sheets...')}
-          className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer select-none"
+          className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer select-none"
         >
           <Download className="w-4 h-4 text-slate-500" /> Export
         </button>
@@ -104,13 +104,13 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
           <div>
             <div className="flex items-center gap-1.5 text-slate-505 text-slate-500">
               <ClipboardList className="w-5 h-5 text-[var(--primary-color)]" />
-              <span className="text-xs font-semibold">Total Projected</span>
+              <span className="text-sm font-semibold">Total Projected</span>
             </div>
             <div className="text-2xl font-black font-display text-slate-900 mt-2">
               ₹{totalProjected.toLocaleString()}
             </div>
           </div>
-          <p className="text-[10px] font-bold text-slate-400">
+          <p className="text-sm font-bold text-slate-400">
             +5.2% vs last month
           </p>
         </div>
@@ -120,7 +120,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
           <div>
             <div className="flex items-center gap-1.5 text-slate-550 text-slate-500">
               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-              <span className="text-xs font-semibold">Disbursed (Paid)</span>
+              <span className="text-sm font-semibold">Disbursed (Paid)</span>
             </div>
             <div className="text-2xl font-black font-display text-slate-800 mt-2">
               ₹{totalDisbursed.toLocaleString()}
@@ -133,7 +133,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                 style={{ width: `${disbursedPct}%` }}
               />
             </div>
-            <p className="text-[10px] font-bold text-slate-450 text-right">{disbursedPct}% Complete</p>
+            <p className="text-sm font-bold text-slate-450 text-right">{disbursedPct}% Complete</p>
           </div>
         </div>
 
@@ -142,13 +142,13 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
           <div>
             <div className="flex items-center gap-1.5 text-[#ba1a1a]">
               <AlertCircle className="w-5 h-5 text-red-600" />
-              <span className="text-xs font-semibold">Pending Clearance</span>
+              <span className="text-sm font-semibold">Pending Clearance</span>
             </div>
             <div className="text-2xl font-black font-display text-slate-800 mt-2">
               ₹{totalPending.toLocaleString()}
             </div>
           </div>
-          <span className="text-[10px] font-bold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full select-none self-start mt-2">
+          <span className="text-sm font-bold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full select-none self-start mt-2">
             Requires Approval
           </span>
         </div>
@@ -159,7 +159,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
-            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] outline-none transition-all shadow-sm"
+            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] outline-none transition-all shadow-sm"
             placeholder="Search worker name or ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -174,7 +174,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
               <button
                 key={t}
                 onClick={() => setFilter(t)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap border cursor-pointer ${isSel
+                className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap border cursor-pointer ${isSel
                     ? 'bg-[var(--primary-color)] text-white border-[var(--primary-color)] shadow-sm shadow-[var(--primary-color)]/20'
                     : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
                   }`}
@@ -189,7 +189,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
       {/* Worker Salary lists cards container grouped by week */}
       <section className="space-y-8">
         {weeks.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400 text-xs">
+          <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400 text-sm">
             No salary records match filters.
           </div>
         ) : (
@@ -208,14 +208,14 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
               <div key={week} className="space-y-3.5">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                   <h3 className="text-lg font-black font-display text-slate-800">{week.includes(' | ') ? week.split(' | ')[1] : week}</h3>
-                  <div className="flex items-center gap-4 text-xs font-bold">
+                  <div className="flex items-center gap-4 text-sm font-bold">
                     <span className="text-emerald-600">Paid: ₹{weekDisbursed.toLocaleString()}</span>
                     <span className="text-red-500">Unpaid: ₹{weekPending.toLocaleString()}</span>
                     <span className="text-slate-500">Total: ₹{weekProjected.toLocaleString()}</span>
                   </div>
                 </div>
                 {weekSalaries.length === 0 ? (
-                  <div className="text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-slate-400 text-xs italic">
+                  <div className="text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-slate-400 text-sm italic">
                     No records for this week
                   </div>
                 ) : weekSalaries.map((s) => {
@@ -246,7 +246,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                       <h3 className="text-sm font-display font-bold text-slate-800">
                         {worker.name}
                       </h3>
-                      <p className="text-xs text-slate-500 font-medium">
+                      <p className="text-sm text-slate-500 font-medium">
                         {worker.role} • ID: {worker.id}
                       </p>
                     </div>
@@ -254,10 +254,10 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
 
                   <div className="flex items-center justify-between w-full md:w-auto gap-6">
                     <div className="hidden md:block text-right">
-                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                      <div className="text-sm text-slate-400 font-bold uppercase tracking-wider">
                         Days
                       </div>
-                      <div className="text-xs font-bold text-slate-800">
+                      <div className="text-sm font-bold text-slate-800">
                         {s.daysWorked}/{s.totalDays}
                       </div>
                     </div>
@@ -269,11 +269,11 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                         ₹{netPay.toLocaleString()}
                       </div>
                       {s.status === 'Paid' ? (
-                        <div className="text-[10px] font-bold text-emerald-600 flex items-center justify-end gap-0.5">
+                        <div className="text-sm font-bold text-emerald-600 flex items-center justify-end gap-0.5">
                           <Check className="w-3.5 h-3.5" /> {s.paidAmount && s.paidAmount < netPay ? `Paid ₹${s.paidAmount}` : 'Paid'} {s.disbursementDate || 'recently'}
                         </div>
                       ) : (
-                        <div className="text-[10px] font-bold text-amber-500 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full inline-flex items-center justify-end gap-1 mt-1 font-sans">
+                        <div className="text-sm font-bold text-amber-500 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full inline-flex items-center justify-end gap-1 mt-1 font-sans">
                           {s.paidAmount && s.paidAmount > 0 ? `Partial (Paid ₹${s.paidAmount})` : 'Pending'}
                         </div>
                       )}
@@ -295,7 +295,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                       transition={{ duration: 0.2 }}
                       className="border-t border-slate-150 bg-slate-50 p-4 font-sans select-none"
                     >
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                         <div>
                           <div className="text-slate-400 font-semibold mb-1">
                             Basic Salary ({Math.max(0, s.daysWorked - Math.round(s.overtimePay / 1500))} days)
@@ -306,7 +306,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                               step="1"
                               value={editGrossPay} 
                               onChange={(e) => setEditGrossPay(parseInt(e.target.value, 10) || 0)}
-                              className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs"
+                              className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-sm"
                             />
                           ) : (
                             <div className="font-bold text-slate-800">₹{s.grossPay}</div>
@@ -320,7 +320,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                               step="1"
                               value={editOvertimePay} 
                               onChange={(e) => setEditOvertimePay(parseInt(e.target.value, 10) || 0)}
-                              className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs"
+                              className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-sm"
                             />
                           ) : (
                             <div className="font-bold text-emerald-600">+₹{s.overtimePay}</div>
@@ -334,7 +334,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                         <div className="flex gap-2">
                           <button
                             onClick={() => alert(`Payslip generated for ${worker.name}. Saved to admin cloud reports.`)}
-                            className="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-100 text-slate-600 font-bold text-xs rounded-lg transition-colors cursor-pointer select-none"
+                            className="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-100 text-slate-600 font-bold text-sm rounded-lg transition-colors cursor-pointer select-none"
                           >
                             View Payslip
                           </button>
@@ -345,7 +345,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                                 onEditSalary(worker.id, editGrossPay, editOvertimePay, s.period);
                                 setEditingId(null);
                               }}
-                              className="px-3.5 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-bold text-xs rounded-lg transition-colors cursor-pointer select-none"
+                              className="px-3.5 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-bold text-sm rounded-lg transition-colors cursor-pointer select-none"
                             >
                               Save Edit
                             </button>
@@ -356,7 +356,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                                 setEditGrossPay(s.grossPay);
                                 setEditOvertimePay(s.overtimePay);
                               }}
-                              className="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-100 text-slate-600 font-bold text-xs rounded-lg transition-colors cursor-pointer select-none"
+                              className="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-100 text-slate-600 font-bold text-sm rounded-lg transition-colors cursor-pointer select-none"
                             >
                               Edit Salary
                             </button>
@@ -364,7 +364,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
 
                           {s.status === 'Paid' ? (
                             <span
-                              className="px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1 bg-slate-100 text-slate-800 hover:bg-slate-200"
+                              className="px-3 py-1.5 rounded-lg text-sm font-bold cursor-pointer transition-all flex items-center gap-1 bg-slate-100 text-slate-800 hover:bg-slate-200"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onToggleSalaryStatus(s.id as string, undefined, true);
@@ -376,7 +376,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                             <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                               {(s.paidAmount && s.paidAmount > 0) ? (
                                 <span
-                                  className="px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1 bg-slate-100 text-slate-800 hover:bg-slate-200"
+                                  className="px-3 py-1.5 rounded-lg text-sm font-bold cursor-pointer transition-all flex items-center gap-1 bg-slate-100 text-slate-800 hover:bg-slate-200"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     onToggleSalaryStatus(s.id as string, undefined, true);
@@ -387,14 +387,14 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                               ) : null}
                               <input
                                 type="number"
-                                className="w-24 bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs focus:border-[var(--primary-color)] outline-none"
+                                className="w-24 bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:border-[var(--primary-color)] outline-none"
                                 placeholder={`Max: ${netPay - (s.paidAmount || 0)}`}
                                 id={`pay-${s.id}`}
                                 defaultValue={netPay - (s.paidAmount || 0)}
                                 step="1"
                               />
                               <span
-                                className="px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1 bg-[var(--primary-color)] text-white hover:bg-[#6c61f2] shadow-md shadow-[var(--primary-color)]/20"
+                                className="px-3 py-1.5 rounded-lg text-sm font-bold cursor-pointer transition-all flex items-center gap-1 bg-[var(--primary-color)] text-white hover:bg-[#6c61f2] shadow-md shadow-[var(--primary-color)]/20"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   const el = document.getElementById(`pay-${s.id}`) as HTMLInputElement;

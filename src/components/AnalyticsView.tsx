@@ -148,7 +148,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
 
   const getStatusIcon = (status: string | null, dateStr: string) => {
     if (status === 'Present') return <Check className="w-5 h-5 text-emerald-500 stroke-[4]" />;
-    if (status === 'Overtime') return <span className="text-xs font-black text-indigo-600">OT</span>;
+    if (status === 'Overtime') return <span className="text-sm font-black text-indigo-600">OT</span>;
     
     const todayStr = new Date().toISOString().split('T')[0];
     if (dateStr > todayStr) {
@@ -274,7 +274,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
           <div>
             <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Present</div>
             <div className="text-xl font-black text-slate-800">
-              {tableData.topKPI.present} <span className="text-xs text-emerald-600 font-bold">({tableData.topKPI.presentPct}%)</span>
+              {tableData.topKPI.present} <span className="text-sm text-emerald-600 font-bold">({tableData.topKPI.presentPct}%)</span>
             </div>
           </div>
         </div>
@@ -285,7 +285,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
           <div>
             <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Absent</div>
             <div className="text-xl font-black text-slate-800">
-              {tableData.topKPI.absent} <span className="text-xs text-red-600 font-bold">({tableData.topKPI.absentPct}%)</span>
+              {tableData.topKPI.absent} <span className="text-sm text-red-600 font-bold">({tableData.topKPI.absentPct}%)</span>
             </div>
           </div>
         </div>
@@ -296,7 +296,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
           <div>
             <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Overtime</div>
             <div className="text-xl font-black text-slate-800">
-              {tableData.topKPI.overtime} <span className="text-xs text-slate-500 font-medium">Days</span>
+              {tableData.topKPI.overtime} <span className="text-sm text-slate-500 font-medium">Days</span>
             </div>
           </div>
         </div>
@@ -364,7 +364,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
       </div>
       
       {/* Legend */}
-      <div className="flex items-center gap-6 px-2 text-xs font-bold text-slate-600">
+      <div className="flex items-center gap-6 px-2 text-sm font-bold text-slate-600">
         <span>Legend:</span>
         <div className="flex items-center gap-2 text-emerald-600"><Check className="w-4 h-4 stroke-[3]" /> Present</div>
         <div className="flex items-center gap-2 text-red-600"><X className="w-4 h-4 stroke-[3]" /> Absent</div>

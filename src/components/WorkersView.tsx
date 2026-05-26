@@ -105,7 +105,7 @@ export default function WorkersView({
               <button
                 key={filter}
                 onClick={() => setStatusFilter(filter)}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer ${isSelected
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all border cursor-pointer ${isSelected
                     ? 'bg-[#131b2e] text-white border-[#131b2e] shadow-sm'
                     : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
                   }`}
@@ -149,8 +149,8 @@ export default function WorkersView({
                     <h2 className="text-sm font-display font-bold text-slate-800 group-hover:text-[var(--primary-color)] transition-colors leading-snug">
                       {w.name}
                     </h2>
-                    <span className="text-xs text-[#7c839b]">{w.role}</span>
-                    <span className="text-xs font-bold text-[var(--primary-color)] mt-1">
+                    <span className="text-sm text-[#7c839b]">{w.role}</span>
+                    <span className="text-sm font-bold text-[var(--primary-color)] mt-1">
                       ₹{w.dailyWage} / day
                     </span>
                   </div>
@@ -164,25 +164,25 @@ export default function WorkersView({
                         setSelectedWorkerId(w.id);
                         setView('worker-profile');
                       }}
-                      className="text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 px-2 py-1 rounded transition-colors cursor-pointer text-xs font-semibold"
+                      className="text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 px-2 py-1 rounded transition-colors cursor-pointer text-sm font-semibold"
                     >
                       View
                     </button>
                     <button 
                       onClick={(e) => { e.stopPropagation(); setEditingWorker(w); }}
-                      className="text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition-colors cursor-pointer text-xs font-semibold"
+                      className="text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition-colors cursor-pointer text-sm font-semibold"
                     >
                       Edit
                     </button>
                     <button 
                       onClick={(e) => { e.stopPropagation(); onDeleteWorker(w.id); }}
-                      className="text-red-400 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded transition-colors cursor-pointer text-xs font-semibold"
+                      className="text-red-400 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded transition-colors cursor-pointer text-sm font-semibold"
                     >
                       Delete
                     </button>
                   </div>
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${isDisabled
+                    className={`px-2 py-0.5 rounded-full text-sm font-bold ${isDisabled
                         ? 'bg-red-50 text-red-650'
                         : isOnLeave
                           ? 'bg-amber-50 text-amber-700'
@@ -229,7 +229,7 @@ export default function WorkersView({
 
               <form onSubmit={handleFormSubmit} className="p-6 space-y-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500">FullName</label>
+                  <label className="text-sm font-bold text-slate-500">FullName</label>
                   <input
                     type="text"
                     required
@@ -242,7 +242,7 @@ export default function WorkersView({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500">Role / Trade</label>
+                    <label className="text-sm font-bold text-slate-500">Role / Trade</label>
                     <select
                       value={newWorkerRole}
                       onChange={(e) => setNewWorkerRole(e.target.value)}
@@ -255,7 +255,7 @@ export default function WorkersView({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500">Daily Wage (₹)</label>
+                    <label className="text-sm font-bold text-slate-500">Daily Wage (₹)</label>
                     <input
                       type="number"
                       required
@@ -268,7 +268,7 @@ export default function WorkersView({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500">Phone</label>
+                  <label className="text-sm font-bold text-slate-500">Phone</label>
                   <input
                     type="tel"
                     required
@@ -280,7 +280,7 @@ export default function WorkersView({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500">Email (Optional)</label>
+                    <label className="text-sm font-bold text-slate-500">Email (Optional)</label>
                     <input
                       type="email"
                       placeholder="e.g. jmiller@site.com"
@@ -291,7 +291,7 @@ export default function WorkersView({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500">Status</label>
+                    <label className="text-sm font-bold text-slate-500">Status</label>
                     <select
                       value={newWorkerStatus}
                       onChange={(e) => setNewWorkerStatus(e.target.value as 'Active' | 'On Leave')}
@@ -350,7 +350,7 @@ export default function WorkersView({
                 setEditingWorker(null);
               }} className="p-6 space-y-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500">FullName</label>
+                  <label className="text-sm font-bold text-slate-500">FullName</label>
                   <input
                     type="text"
                     required
@@ -362,7 +362,7 @@ export default function WorkersView({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500">Role / Trade</label>
+                    <label className="text-sm font-bold text-slate-500">Role / Trade</label>
                     <select
                       value={editingWorker.role}
                       onChange={(e) => setEditingWorker({ ...editingWorker, role: e.target.value })}
@@ -375,7 +375,7 @@ export default function WorkersView({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500">Daily Wage (₹)</label>
+                    <label className="text-sm font-bold text-slate-500">Daily Wage (₹)</label>
                     <input
                       type="number"
                       required
@@ -388,7 +388,7 @@ export default function WorkersView({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500">Phone</label>
+                  <label className="text-sm font-bold text-slate-500">Phone</label>
                   <input
                     type="tel"
                     required
@@ -400,7 +400,7 @@ export default function WorkersView({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500">Email (Optional)</label>
+                    <label className="text-sm font-bold text-slate-500">Email (Optional)</label>
                     <input
                       type="email"
                       value={editingWorker.email}
@@ -410,7 +410,7 @@ export default function WorkersView({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500">Status</label>
+                    <label className="text-sm font-bold text-slate-500">Status</label>
                     <select
                       value={editingWorker.status}
                       onChange={(e) => setEditingWorker({ ...editingWorker, status: e.target.value as 'Active' | 'On Leave' | 'Disabled' })}

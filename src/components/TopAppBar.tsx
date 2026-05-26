@@ -68,14 +68,13 @@ export default function TopAppBar({
   return (
     <header className="sticky top-0 z-50 flex justify-between items-center px-4 md:px-8 h-20 bg-white border-b border-slate-200 transition-colors shrink-0">
       <div className="flex items-center gap-3">
-        <img src="/logo.png?v=3" alt="WorkTrack Pro Logo" className="w-10 h-10 object-contain rounded-lg shadow-sm" />
         <div className="hidden sm:block">
-            <h1 className="text-sm font-bold leading-tight">WorkTrack Pro</h1>
+          <h1 className="text-sm font-bold leading-tight">WorkTrack Pro</h1>
         </div>
       </div>
 
       <div className="relative">
-        <div 
+        <div
           className="flex items-center gap-4 cursor-pointer hover:bg-slate-50 p-2 rounded-xl transition-colors"
           onClick={() => setIsProfileOpen(!isProfileOpen)}
         >
@@ -104,7 +103,7 @@ export default function TopAppBar({
                 <p className="text-xs text-[var(--primary-color)] font-bold uppercase tracking-widest mt-0.5">Supervisor</p>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-3 text-slate-500 font-medium">
