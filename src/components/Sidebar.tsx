@@ -4,9 +4,11 @@ import { AppView } from '../types';
 interface SidebarProps {
   currentView: AppView;
   setView: (view: AppView) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export default function Sidebar({ currentView, setView }: SidebarProps) {
+export default function Sidebar({ currentView, setView, isOpen, onClose }: SidebarProps) {
   const getIsActive = (tab: AppView) => {
     if (tab === 'workers' && currentView === 'worker-profile') return true;
     if (tab === 'salary' && currentView === 'advance-payments') return true;
@@ -24,16 +26,33 @@ export default function Sidebar({ currentView, setView }: SidebarProps) {
   ];
 
   return (
-    <aside className="w-64 bg-[#111827] text-white flex flex-col h-screen fixed left-0 top-0 overflow-y-auto">
-      <div className="p-6 flex items-center gap-3">
-        <div className="w-8 h-8 bg-[#4b41e1] rounded-lg flex items-center justify-center">
-          <div className="w-4 h-4 border-2 border-white rounded-sm rotate-45"></div>
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden" 
+          onClick={onClose} 
+        />
+      )}
+      
+      <aside className={`w-64 bg-[#111827] text-white flex flex-col h-screen fixed left-0 top-0 overflow-y-auto z-50 transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
+        <div className="p-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-[#4b41e1] rounded-lg flex items-center justify-center">
+              <div className="w-4 h-4 border-2 border-white rounded-sm rotate-45"></div>
+            </div>
+            <div>
+              <h1 className="text-sm font-bold leading-tight">WorkTrack Pro</h1>
+              <p className="text-[10px] text-slate-400">Attendance & Wage</p>
+            </div>
+          </div>
+          {/* Mobile close button */}
+          <button className="md:hidden p-1 text-slate-400 hover:text-white" onClick={onClose}>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
         </div>
-        <div>
-          <h1 className="text-sm font-bold leading-tight">WorkTrack Pro</h1>
-          <p className="text-[10px] text-slate-400">Attendance & Wage Management</p>
-        </div>
-      </div>
+
+
 
       <nav className="flex-1 px-4 space-y-1">
         {navItems.map((item, index) => {
@@ -86,6 +105,7 @@ export default function Sidebar({ currentView, setView }: SidebarProps) {
           </div>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }

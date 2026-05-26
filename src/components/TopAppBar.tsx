@@ -9,6 +9,7 @@ interface TopAppBarProps {
   onEditProfile?: () => void;
   notificationsCount: number;
   onClearNotifications: () => void;
+  onMenuToggle?: () => void;
 }
 
 export default function TopAppBar({
@@ -18,6 +19,7 @@ export default function TopAppBar({
   onEditProfile,
   notificationsCount,
   onClearNotifications,
+  onMenuToggle,
 }: TopAppBarProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
@@ -64,9 +66,12 @@ export default function TopAppBar({
   const avatarUrl = '/admin%20image.png';
 
   return (
-    <header className="sticky top-0 z-50 flex justify-between items-center px-8 h-20 bg-white border-b border-slate-200 transition-colors">
+    <header className="sticky top-0 z-50 flex justify-between items-center px-4 md:px-8 h-20 bg-white border-b border-slate-200 transition-colors">
       <div className="flex items-center gap-3">
-        <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-500 cursor-pointer">
+        <button 
+          onClick={onMenuToggle}
+          className="md:hidden w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-500 cursor-pointer"
+        >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
       </div>

@@ -38,6 +38,7 @@ export default function App() {
   // Security Pin Prompt Modal State
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const [secureAction, setSecureAction] = useState<(() => void) | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const requestSecureAction = (action: () => void) => {
     setSecureAction(() => action);
@@ -324,16 +325,16 @@ export default function App() {
       )}
       {/* Sidebar */}
       {!hideShell && (
-        <Sidebar currentView={currentView} setView={setCurrentView} />
+        <Sidebar currentView={currentView} setView={(v) => { setCurrentView(v); setIsSidebarOpen(false); }} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       )}
 
       {/* Main Content Area */}
-      <div className={`flex-1 flex flex-col ${!hideShell ? 'ml-64' : ''}`}>
+      <div className={`flex-1 flex flex-col ${!hideShell ? 'md:ml-64 w-full md:w-auto overflow-hidden' : 'w-full'}`}>
         {/* Dynamic Header container */}
         {!hideShell && (
           <TopAppBar
             currentView={currentView}
-            setView={setCurrentView}
+            setView={setCurrentView} onMenuToggle={() => setIsSidebarOpen(true)}
             onBack={() => {
               // Context aware back triggers
               if (currentView === 'worker-profile') {
