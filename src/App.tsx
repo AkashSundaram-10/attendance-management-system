@@ -82,6 +82,7 @@ export default function App() {
         totalDays: 0,
         grossPay: 0,
         overtimePay: 0,
+        overtimeDays: 0,
         advanceDeduction: 0,
         status: 'Pending',
       };
@@ -149,6 +150,7 @@ export default function App() {
               daysWorked: pDays + oDays,
               grossPay: pDays * 1000,
               overtimePay: oDays * 1500,
+              overtimeDays: oDays,
             };
           }
           return s;
@@ -199,9 +201,12 @@ export default function App() {
   const handleEditSalary = (workerId: string, grossPay: number, overtimePay: number, period?: string) => {
     const s = period ? salaries.find(sal => sal.workerId === workerId && sal.period === period) : salaries.find(sal => sal.workerId === workerId);
     if (s && s.id) {
-      // Overtime logic mapping to backend
-      const overtimeHours = overtimePay / 1500;
-      api.updateSalary(s.id, { grossSalary: grossPay + overtimePay, overtimeHours })
+      // Save manual edit as basicSalary and overtimeSalary
+      api.updateSalary(s.id, { 
+        grossSalary: grossPay + overtimePay, 
+        basicSalary: grossPay,
+        overtimeSalary: overtimePay 
+      })
         .then(() => api.getSalaries())
         .then(setSalaries)
         .catch(() => alert('Failed to edit salary in DB'));

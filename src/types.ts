@@ -27,6 +27,7 @@ export interface SalaryRecord {
   totalDays: number; // e.g. 22 or 24
   grossPay: number; // dailyWage * daysWorked
   overtimePay: number; // bonus or OT pay
+  overtimeDays: number; // count of overtime days from attendance
   advanceDeduction: number;
   status: 'Pending' | 'Paid';
   disbursementDate?: string;

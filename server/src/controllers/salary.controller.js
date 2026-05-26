@@ -107,7 +107,6 @@ const generateSalary = async (req, res, next) => {
 
       if (existingRecord && existingRecord.isManuallyEdited) {
         grossSalary = existingRecord.grossSalary;
-        totalOvertimeHours = existingRecord.overtimeHours;
         finalSalary = existingRecord.finalSalary;
       }
 
@@ -189,31 +188,33 @@ const getWorkerSalary = async (req, res, next) => {
   }
 };
 
-const updateSalary = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { grossSalary, overtimeHours, advanceDeduction, paymentAmount, revertPayments } = req.body;
-    
-    let record = await prisma.salaryRecord.findUnique({ where: { id }, include: { payments: true } });
-    if (!record) return res.status(404).json({ success: false, message: 'Salary record not found' });
-
-    if (grossSalary !== undefined || overtimeHours !== undefined || advanceDeduction !== undefined) {
-      const newGross = grossSalary !== undefined ? grossSalary : record.grossSalary;
-      const newAdvance = advanceDeduction !== undefined ? advanceDeduction : record.advanceDeduction;
-      const finalSalary = Math.max(0, newGross - newAdvance);
-
-      record = await prisma.salaryRecord.update({
-        where: { id },
-        data: {
-          ...(grossSalary !== undefined ? { grossSalary } : {}),
-          ...(overtimeHours !== undefined ? { overtimeHours } : {}),
-          ...(advanceDeduction !== undefined ? { advanceDeduction } : {}),
-          finalSalary,
-          isManuallyEdited: true
-        },
-        include: { payments: true }
-      });
-    }
+  const updateSalary = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { grossSalary, overtimeHours, advanceDeduction, basicSalary, overtimeSalary, paymentAmount, revertPayments } = req.body;
+      
+      let record = await prisma.salaryRecord.findUnique({ where: { id }, include: { payments: true } });
+      if (!record) return res.status(404).json({ success: false, message: 'Salary record not found' });
+  
+      if (grossSalary !== undefined || overtimeHours !== undefined || advanceDeduction !== undefined || basicSalary !== undefined) {
+        const newGross = grossSalary !== undefined ? grossSalary : record.grossSalary;
+        const newAdvance = advanceDeduction !== undefined ? advanceDeduction : record.advanceDeduction;
+        const finalSalary = Math.max(0, newGross - newAdvance);
+  
+        record = await prisma.salaryRecord.update({
+          where: { id },
+          data: {
+            ...(grossSalary !== undefined ? { grossSalary } : {}),
+            ...(overtimeHours !== undefined ? { overtimeHours } : {}),
+            ...(advanceDeduction !== undefined ? { advanceDeduction } : {}),
+            ...(basicSalary !== undefined ? { basicSalary } : {}),
+            ...(overtimeSalary !== undefined ? { overtimeSalary } : {}),
+            finalSalary,
+            isManuallyEdited: true
+          },
+          include: { payments: true }
+        });
+      }
 
     if (revertPayments) {
       await prisma.payment.deleteMany({ where: { salaryRecordId: id } });

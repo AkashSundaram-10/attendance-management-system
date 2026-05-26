@@ -248,8 +248,8 @@ export const api = {
       
       return data.data.map((s: any) => {
         const paidAmount = s.payments ? s.payments.reduce((acc: number, curr: any) => acc + curr.amountPaid, 0) : 0;
-        const grossPay = Math.round((s.grossSalary || 0) - ((s.overtimeHours || 0) * 1500));
-        const overtimePay = Math.round((s.overtimeHours || 0) * 1500);
+        const grossPay = s.basicSalary ?? Math.round((s.grossSalary || 0) - ((s.overtimeHours || 0) * 1500));
+        const overtimePay = s.overtimeSalary ?? Math.round((s.overtimeHours || 0) * 1500);
         const advanceDeduction = Math.round(s.advanceDeduction || 0);
         const netPay = grossPay + overtimePay - advanceDeduction;
         
@@ -258,6 +258,7 @@ export const api = {
           workerId: s.workerId,
           period: getMonthWeekLabel(s.month, s.year),
           daysWorked: s.totalDays,
+          overtimeDays: s.overtimeHours || 0,
           totalDays: 7,
           grossPay,
           overtimePay,

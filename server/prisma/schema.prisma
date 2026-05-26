@@ -88,6 +88,8 @@ model SalaryRecord {
   totalDays        Float
   overtimeHours    Float    @default(0)
   grossSalary      Float
+  basicSalary      Float?
+  overtimeSalary   Float?
   advanceDeduction Float    @default(0)
   finalSalary      Float
   paymentStatus    PaymentStatus @default(PENDING)

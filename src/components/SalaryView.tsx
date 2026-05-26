@@ -298,7 +298,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-base">
                         <div>
                           <div className="text-slate-400 font-semibold mb-1">
-                            Basic Salary ({Math.max(0, s.daysWorked - Math.round(s.overtimePay / 1500))} days)
+                            Basic Salary ({Math.max(0, s.daysWorked - s.overtimeDays)} days)
                           </div>
                           {editingId === s.id ? (
                             <input 
@@ -313,7 +313,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                           )}
                         </div>
                         <div>
-                          <div className="text-slate-400 font-semibold mb-1">Overtime ({Math.round(s.overtimePay / 1500)} days)</div>
+                          <div className="text-slate-400 font-semibold mb-1">Overtime ({s.overtimeDays} days)</div>
                           {editingId === s.id ? (
                             <input 
                               type="number" 
