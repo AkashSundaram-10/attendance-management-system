@@ -198,12 +198,17 @@ const updateSalary = async (req, res, next) => {
     if (!record) return res.status(404).json({ success: false, message: 'Salary record not found' });
 
     if (grossSalary !== undefined || overtimeHours !== undefined || advanceDeduction !== undefined) {
+      const newGross = grossSalary !== undefined ? grossSalary : record.grossSalary;
+      const newAdvance = advanceDeduction !== undefined ? advanceDeduction : record.advanceDeduction;
+      const finalSalary = Math.max(0, newGross - newAdvance);
+
       record = await prisma.salaryRecord.update({
         where: { id },
         data: {
           ...(grossSalary !== undefined ? { grossSalary } : {}),
           ...(overtimeHours !== undefined ? { overtimeHours } : {}),
           ...(advanceDeduction !== undefined ? { advanceDeduction } : {}),
+          finalSalary,
           isManuallyEdited: true
         },
         include: { payments: true }

@@ -54,8 +54,9 @@ export default function DashboardView({
     const workerSalaries = currentMonthSalaries.filter(s => s.workerId === worker.id);
     const totalGross = workerSalaries.reduce((acc, curr) => acc + curr.grossPay, 0);
     const totalOvertime = workerSalaries.reduce((acc, curr) => acc + curr.overtimePay, 0);
-    const totalNetPay = totalGross + totalOvertime;
-    const totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? (curr.grossPay + curr.overtimePay) : 0)), 0);
+    const totalAdvance = workerSalaries.reduce((acc, curr) => acc + curr.advanceDeduction, 0);
+    const totalNetPay = totalGross + totalOvertime - totalAdvance;
+    const totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? (curr.grossPay + curr.overtimePay - curr.advanceDeduction) : 0)), 0);
     
     // Status Logic
     let status = 'Pending';
@@ -70,7 +71,7 @@ export default function DashboardView({
       workerName: worker.name,
       avatar: worker.avatar,
       role: worker.role,
-      totalSalary: totalGross + totalOvertime,
+      totalSalary: totalNetPay,
       paid: totalPaid,
       balance: Math.max(0, totalNetPay - totalPaid),
       status,
@@ -108,8 +109,9 @@ export default function DashboardView({
     if (workerSalaries.length === 0) return;
     const totalGross = workerSalaries.reduce((acc, curr) => acc + curr.grossPay, 0);
     const totalOvertime = workerSalaries.reduce((acc, curr) => acc + curr.overtimePay, 0);
-    const totalNetPay = totalGross + totalOvertime;
-    const totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? (curr.grossPay + curr.overtimePay) : 0)), 0);
+    const totalAdvance = workerSalaries.reduce((acc, curr) => acc + curr.advanceDeduction, 0);
+    const totalNetPay = totalGross + totalOvertime - totalAdvance;
+    const totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? (curr.grossPay + curr.overtimePay - curr.advanceDeduction) : 0)), 0);
 
     if (totalNetPay > 0 && totalPaid >= totalNetPay) paidCount++;
     else if (totalPaid > 0) partialCount++;
