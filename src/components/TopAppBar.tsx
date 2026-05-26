@@ -68,23 +68,24 @@ export default function TopAppBar({
   return (
     <header className="sticky top-0 z-50 flex justify-between items-center px-4 md:px-8 h-20 bg-white border-b border-slate-200 transition-colors shrink-0">
       <div className="flex items-center gap-3">
-        <div className="hidden sm:block">
-          <h1 className="text-sm font-bold leading-tight">WorkTrack Pro</h1>
+        <img src="/logo.png?v=3" alt="WorkTrack Pro Logo" className="w-12 h-12 object-contain rounded-xl shadow-sm" />
+        <div className="block">
+          <h1 className="text-lg md:text-xl font-black text-slate-900 leading-tight tracking-tight">WorkTrack Pro</h1>
         </div>
       </div>
 
       <div className="relative">
-        <div
+        <div 
           className="flex items-center gap-4 cursor-pointer hover:bg-slate-50 p-2 rounded-xl transition-colors"
           onClick={() => setIsProfileOpen(!isProfileOpen)}
         >
           <div className="text-right hidden md:block">
-            <h1 className="text-sm font-bold text-[#0f172a]">Mani</h1>
-            <p className="text-[11px] text-slate-500">Supervisor</p>
+            <h1 className="text-base font-bold text-[#0f172a]">Mani</h1>
+            <p className="text-sm font-bold text-[var(--primary-color)]">Supervisor</p>
           </div>
           <img
             alt="User Profile"
-            className="w-10 h-10 rounded-full bg-slate-200 object-cover hover:ring-2 hover:ring-[var(--primary-color)] transition-all"
+            className="w-14 h-14 rounded-full bg-slate-200 object-cover hover:ring-4 hover:ring-[var(--primary-color)] transition-all shadow-md"
             style={{ objectPosition: 'center 20%' }}
             src={avatarUrl}
             referrerPolicy="no-referrer"

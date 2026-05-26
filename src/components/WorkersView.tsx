@@ -198,15 +198,17 @@ export default function WorkersView({
         )}
       </section>
 
-      {/* Floating Add Button */}
-      <button
-        onClick={() => setIsAddModalOpen(true)}
-        className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[var(--primary-color)] hover:bg-[#645efb] text-white px-8 py-4 rounded-full shadow-[0px_8px_20px_rgba(75,65,225,0.3)] flex items-center justify-center gap-2 cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95 z-40 whitespace-nowrap"
-        title="Add New Worker"
-      >
-        <span className="text-lg font-bold">Add Worker</span>
-        <Plus className="w-6 h-6 stroke-[3px]" />
-      </button>
+      {/* Inline Add Button */}
+      <div className="flex justify-center mt-8 pb-8">
+        <button
+          onClick={() => setIsAddModalOpen(true)}
+          className="w-full md:w-auto bg-[var(--primary-color)] hover:bg-[#645efb] text-white px-10 py-4 rounded-xl shadow-md flex items-center justify-center gap-3 cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95"
+          title="Add New Worker"
+        >
+          <span className="text-xl font-black">Add Worker</span>
+          <Plus className="w-8 h-8 stroke-[3px]" />
+        </button>
+      </div>
 
       {/* Add Worker Dialog Modal */}
       <AnimatePresence>
