@@ -1,4 +1,5 @@
-import { Bell, ArrowLeft, Edit } from 'lucide-react';
+import { useState } from 'react';
+import { Bell, ArrowLeft, Edit, Calendar, User, Phone, Mail } from 'lucide-react';
 import { AppView } from '../types';
 
 interface TopAppBarProps {
@@ -18,6 +19,8 @@ export default function TopAppBar({
   notificationsCount,
   onClearNotifications,
 }: TopAppBarProps) {
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
   // If we are in detailed sub-pages, show back arrow headers
   const isProfile = currentView === 'worker-profile';
   const isAdvances = currentView === 'advance-payments';
@@ -58,8 +61,7 @@ export default function TopAppBar({
     );
   }
 
-  const avatarUrl =
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuCCaDg4uI4Ij-5v8oYE3_GXBw8ALNgkEaRJfTs3l3EsE1ib-riUVWLidKH5Jss4r8N93ZwzzAsxNDejhZjn3rdUBjfWJcAsngJqxWSvlof1TlOn-cvRFH6AXgZ5L2Wzwddw_sz49THaGoHLfL4B28hvxQ0XLK3ex_NCMg6TfyI0MRhlZSiOUL0FtDgE1jfbdyLIgmLZofiLVcEv_8Dn0wckyUHAIuqC_574lU93LmYN6IKCXVRIs_6d0OT6M9N6etL4NDvevtL91ug';
+  const avatarUrl = '/admin%20image.png';
 
   return (
     <header className="sticky top-0 z-50 flex justify-between items-center px-8 h-20 bg-white border-b border-slate-200 transition-colors">
@@ -68,19 +70,69 @@ export default function TopAppBar({
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
       </div>
-      
-      <div className="flex items-center gap-4">
-        <div className="text-right hidden md:block">
-          <h1 className="text-sm font-bold text-[#0f172a]">Admin</h1>
-          <p className="text-[11px] text-slate-500">Administrator</p>
+
+      <div className="relative">
+        <div 
+          className="flex items-center gap-4 cursor-pointer hover:bg-slate-50 p-2 rounded-xl transition-colors"
+          onClick={() => setIsProfileOpen(!isProfileOpen)}
+        >
+          <div className="text-right hidden md:block">
+            <h1 className="text-sm font-bold text-[#0f172a]">Mani</h1>
+            <p className="text-[11px] text-slate-500">Supervisor</p>
+          </div>
+          <img
+            alt="User Profile"
+            className="w-10 h-10 rounded-full bg-slate-200 object-cover hover:ring-2 hover:ring-[#4b41e1] transition-all"
+            style={{ objectPosition: 'center 20%' }}
+            src={avatarUrl}
+            referrerPolicy="no-referrer"
+          />
         </div>
-        <img
-          alt="User Profile"
-          className="w-10 h-10 rounded-full bg-slate-200 object-cover cursor-pointer hover:ring-2 hover:ring-[#4b41e1] transition-all"
-          src={avatarUrl}
-          referrerPolicy="no-referrer"
-          onClick={() => setView('analytics')}
-        />
+
+        {isProfileOpen && (
+          <div className="absolute right-0 top-14 w-72 bg-white border border-slate-200 shadow-2xl rounded-2xl p-6 z-50 animate-in fade-in slide-in-from-top-2">
+            <div className="flex flex-col items-center gap-3 border-b border-slate-100 pb-5 mb-4">
+              <div className="relative">
+                <img src={avatarUrl} className="w-28 h-28 rounded-full border-4 border-white shadow-lg object-cover ring-2 ring-indigo-50" style={{ objectPosition: 'center 20%' }} />
+                <div className="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full"></div>
+              </div>
+              <div className="text-center">
+                <h3 className="font-black text-xl text-slate-900 tracking-tight">Mani</h3>
+                <p className="text-xs text-[#4b41e1] font-bold uppercase tracking-widest mt-0.5">Supervisor</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-3 text-slate-500 font-medium">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <span>Born</span>
+                </div>
+                <span className="font-bold text-slate-900">1982</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-3 text-slate-500 font-medium">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <span>Age</span>
+                </div>
+                <span className="font-bold text-[#4b41e1] bg-indigo-50/80 px-2.5 py-1 rounded-md">{new Date().getFullYear() - 1982} Years</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-3 text-slate-500 font-medium">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center">
+                    <Phone className="w-4 h-4" />
+                  </div>
+                  <span>Contact</span>
+                </div>
+                <span className="font-bold text-slate-900">+91 98844 09329</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );

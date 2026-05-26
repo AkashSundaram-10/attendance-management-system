@@ -7,7 +7,7 @@ interface AdvancePaymentsViewProps {
   workers: Worker[];
   advances: AdvancePayment[];
   onAddAdvance: (advance: Omit<AdvancePayment, 'id' | 'requestedDate' | 'balance'>) => void;
-  onUpdateAdvanceStatus: (id: string, status: 'Approved' | 'Pending' | 'Recovered') => void;
+  onUpdateAdvanceStatus: (id: string, status: 'Given' | 'Recovered') => void;
   setView: (view: AppView) => void;
 }
 
@@ -28,7 +28,7 @@ export default function AdvancePaymentsView({
   // Totals calculations
   const totalAdvances = advances.reduce((acc, curr) => acc + curr.amount, 0);
   const totalPending = advances
-    .filter((a) => a.status === 'Pending' || a.status === 'Approved')
+    .filter((a) => a.status === 'Given')
     .reduce((acc, curr) => acc + curr.balance, 0);
   const totalRecovered = totalAdvances - totalPending;
 
@@ -56,7 +56,7 @@ export default function AdvancePaymentsView({
       workerName: worker.name,
       workerAvatar: worker.avatar,
       amount: amount,
-      status: 'Pending',
+      status: 'Given',
     });
 
     // Reset Form
@@ -82,7 +82,7 @@ export default function AdvancePaymentsView({
               Total Advances
             </span>
             <h2 className="text-3xl font-black font-display mt-1">
-              ${totalAdvances.toLocaleString()}.00
+              ₹{totalAdvances.toLocaleString()}.00
             </h2>
           </div>
           <div className="flex items-center gap-1.5 mt-4 text-white text-xs select-none">
@@ -96,10 +96,10 @@ export default function AdvancePaymentsView({
         {/* Pending Recovery */}
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col gap-2">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
-            <RefreshCw className="w-3.5 h-3.5 text-indigo-600 animate-spin" style={{ animationDuration: '6s' }} /> Pending Recovery
+            <RefreshCw className="w-3.5 h-3.5 text-indigo-600 animate-spin" style={{ animationDuration: '6s' }} /> Given Advances
           </span>
           <span className="text-lg font-black font-display text-slate-800">
-            ${totalPending.toLocaleString()}.00
+            ₹{totalPending.toLocaleString()}.00
           </span>
           <div className="w-full bg-slate-100 rounded-full h-1.5 mt-auto">
             <div
@@ -115,7 +115,7 @@ export default function AdvancePaymentsView({
             <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> Recovered
           </span>
           <span className="text-lg font-black font-display text-slate-850">
-            ${totalRecovered.toLocaleString()}.00
+            ₹{totalRecovered.toLocaleString()}.00
           </span>
           <div className="w-full bg-slate-100 rounded-full h-1.5 mt-auto">
             <div
@@ -150,7 +150,7 @@ export default function AdvancePaymentsView({
         </h3>
 
         {filteredAdvances.map((adv) => {
-          const isPending = adv.status === 'Pending';
+          const isPending = adv.status === 'Given';
           const isRecovered = adv.status === 'Recovered';
 
           return (
@@ -185,11 +185,9 @@ export default function AdvancePaymentsView({
                   onClick={() => {
                     // Click to cycle status for testing conveniency
                     const nextSt =
-                      adv.status === 'Pending'
-                        ? 'Approved'
-                        : adv.status === 'Approved'
+                      adv.status === 'Given'
                         ? 'Recovered'
-                        : 'Pending';
+                        : 'Given';
                     onUpdateAdvanceStatus(adv.id, nextSt);
                   }}
                   className={`px-3 py-0.5 rounded-full text-[10px] font-bold tracking-wide cursor-pointer transition-all ${
@@ -213,12 +211,12 @@ export default function AdvancePaymentsView({
                     Advance Amount
                   </span>
                   <span className={`text-base font-display font-black text-slate-900 mt-1 ${isRecovered ? 'line-through opacity-50' : ''}`}>
-                    ${adv.amount.toLocaleString()}.00
+                    ₹{adv.amount.toLocaleString()}.00
                   </span>
                 </div>
                 <div className="flex flex-col text-right">
                   <span className="text-xs font-bold text-slate-600">
-                    Bal: ${adv.balance.toFixed(2)}
+                    Bal: ₹{adv.balance.toFixed(2)}
                   </span>
                   <span className="text-[10px] text-slate-400 font-semibold font-sans mt-0.5">
                     {adv.requestedDate}
@@ -235,7 +233,7 @@ export default function AdvancePaymentsView({
         onClick={() => setIsAddOpen(true)}
         className="fixed bottom-24 right-5 bg-[#4b41e1] hover:bg-[#6c61f2] text-white px-5 py-3.5 rounded-xl shadow-[0px_8px_20px_rgba(75,65,225,0.25)] flex items-center gap-2 active:scale-95 transition-all z-40 text-xs font-bold font-display tracking-wide cursor-pointer"
       >
-        <Plus className="w-5 h-5 stroke-[2.5px]" /> Request Advance
+        <Plus className="w-5 h-5 stroke-[2.5px]" /> Give Advance
       </button>
 
       {/* Add Advance Request Dialog Modal Overlay */}
@@ -250,7 +248,7 @@ export default function AdvancePaymentsView({
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-display font-extrabold text-slate-900 text-sm uppercase tracking-wide flex items-center gap-1.5 p-1">
-                  <AlertOctagon className="w-5 h-5 text-[#4b41e1]" /> File Advance Request
+                  <AlertOctagon className="w-5 h-5 text-[#4b41e1]" /> Give Advance
                 </h3>
                 <button
                   onClick={() => setIsAddOpen(false)}
@@ -282,7 +280,7 @@ export default function AdvancePaymentsView({
 
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                    Advance Amount ($)
+                    Advance Amount (₹)
                   </label>
                   <input
                     type="number"
@@ -294,7 +292,7 @@ export default function AdvancePaymentsView({
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none"
                   />
                   <p className="text-[10px] text-slate-400 leading-normal p-1">
-                    Advance payments are deducted automatically on the next salary release cycle. Limit $1,500.
+                    Advance payments are deducted automatically on the next salary release cycle. Limit ₹1,500.
                   </p>
                 </div>
 
@@ -310,7 +308,7 @@ export default function AdvancePaymentsView({
                     type="submit"
                     className="flex-1 py-3 bg-[#4b41e1] hover:bg-[#6c61f2] text-white font-bold text-xs rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-1"
                   >
-                    <UserCheck className="w-4 h-4" /> Request Payout
+                    <UserCheck className="w-4 h-4" /> Give Advance
                   </button>
                 </div>
               </form>

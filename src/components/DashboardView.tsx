@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { Users, UserCheck, IndianRupee, Wallet, MoreVertical, ArrowRight } from 'lucide-react';
 import { AppView, Worker, AttendanceRecord, SalaryRecord } from '../types';
+import { getCurrentPeriod } from '../api';
 
 interface DashboardViewProps {
   workers: Worker[];
@@ -26,8 +27,11 @@ export default function DashboardView({
     (a) => a.date === new Date().toISOString().split('T')[0] && (a.status === 'Present' || a.status === 'Overtime')
   ).length;
 
-  const totalSalaryProjected = salaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
-  const pendingSalaries = salaries.filter(s => s.status === 'Pending').reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
+  const currentMonthStr = getCurrentPeriod().split(' | ')[0];
+  const currentMonthSalaries = salaries.filter(s => s.period.startsWith(currentMonthStr) && workers.some(w => w.id === s.workerId));
+
+  const totalSalaryProjected = currentMonthSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
+  const pendingSalaries = currentMonthSalaries.filter(s => s.status === 'Pending').reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay - (curr.paidAmount || 0), 0);
 
   // Format Indian Rupee
   const formatINR = (amount: number) => {
@@ -45,22 +49,77 @@ export default function DashboardView({
     };
   }).slice(0, 5); // To show a bit more in the table
 
-  // Recent payments
-  const recentPaymentsList = salaries.map(s => {
-    const worker = workers.find(w => w.id === s.workerId);
+  // Recent payments aggregated by worker for the current month
+  const recentPaymentsList = workers.map(worker => {
+    const workerSalaries = currentMonthSalaries.filter(s => s.workerId === worker.id);
+    const totalGross = workerSalaries.reduce((acc, curr) => acc + curr.grossPay, 0);
+    const totalOvertime = workerSalaries.reduce((acc, curr) => acc + curr.overtimePay, 0);
+    const totalNetPay = totalGross + totalOvertime;
+    const totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? (curr.grossPay + curr.overtimePay) : 0)), 0);
+    
+    // Status Logic
+    let status = 'Pending';
+    if (totalNetPay > 0 && totalPaid >= totalNetPay) status = 'Paid';
+    else if (totalPaid > 0) status = 'Partial';
+
+    // Find latest payment date
+    const latestPayment = workerSalaries.find(s => s.disbursementDate)?.disbursementDate || '-';
+
     return {
-      id: s.workerId,
-      workerName: worker?.name || 'Unknown',
-      avatar: worker?.avatar,
-      role: worker?.role,
-      totalSalary: s.grossPay + s.overtimePay,
-      advance: s.advanceDeduction,
-      paid: s.status === 'Paid' ? s.grossPay + s.overtimePay - s.advanceDeduction : 0,
-      balance: s.status === 'Pending' ? s.grossPay + s.overtimePay - s.advanceDeduction : 0,
-      status: s.status,
-      paymentDate: s.disbursementDate || '-',
+      id: worker.id,
+      workerName: worker.name,
+      avatar: worker.avatar,
+      role: worker.role,
+      totalSalary: totalGross + totalOvertime,
+      paid: totalPaid,
+      balance: Math.max(0, totalNetPay - totalPaid),
+      status,
+      paymentDate: latestPayment,
     };
-  }).slice(0, 4); // Show 4 to match image style
+  }).filter(p => p.totalSalary > 0).slice(0, 4);
+  // Dynamic Greeting
+  const hour = new Date().getHours();
+  let greeting = 'Good evening';
+  if (hour >= 5 && hour < 12) greeting = 'Good morning';
+  else if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
+  else if (hour >= 21 || hour < 5) greeting = 'Good night';
+
+  // Dynamic Quotes
+  const quotes = [
+    "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+    "The secret of getting ahead is getting started.",
+    "It always seems impossible until it's done.",
+    "Don't watch the clock; do what it does. Keep going.",
+    "The future depends on what you do today.",
+    "Great things are done by a series of small things brought together.",
+    "Believe you can and you're halfway there.",
+    "Quality is not an act, it is a habit.",
+    "Opportunities don't happen. You create them.",
+    "Do what you can, with what you have, where you are."
+  ];
+  const quoteOfDay = quotes[new Date().getDate() % quotes.length];
+
+  let paidCount = 0;
+  let partialCount = 0;
+  let pendingCount = 0;
+
+  workers.forEach(worker => {
+    const workerSalaries = currentMonthSalaries.filter(s => s.workerId === worker.id);
+    if (workerSalaries.length === 0) return;
+    const totalGross = workerSalaries.reduce((acc, curr) => acc + curr.grossPay, 0);
+    const totalOvertime = workerSalaries.reduce((acc, curr) => acc + curr.overtimePay, 0);
+    const totalNetPay = totalGross + totalOvertime;
+    const totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? (curr.grossPay + curr.overtimePay) : 0)), 0);
+
+    if (totalNetPay > 0 && totalPaid >= totalNetPay) paidCount++;
+    else if (totalPaid > 0) partialCount++;
+    else pendingCount++;
+  });
+
+  const totalPaymentWorkers = paidCount + partialCount + pendingCount;
+  const paidPct = totalPaymentWorkers > 0 ? Math.round((paidCount / totalPaymentWorkers) * 100) : 0;
+  const partialPct = totalPaymentWorkers > 0 ? Math.round((partialCount / totalPaymentWorkers) * 100) : 0;
+  const pendingPct = totalPaymentWorkers > 0 ? 100 - paidPct - partialPct : 0;
 
   return (
     <motion.div
@@ -71,8 +130,8 @@ export default function DashboardView({
       className="space-y-6 pb-12 font-sans"
     >
       <div>
-        <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">Welcome back, Admin!</h1>
-        <p className="text-sm text-slate-500 mt-1">Here's what's happening today.</p>
+        <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">{greeting}, Mani!</h1>
+        <p className="text-sm text-slate-500 mt-1 italic">"{quoteOfDay}"</p>
       </div>
 
       {/* Statistic Cards Grid */}
@@ -235,12 +294,12 @@ export default function DashboardView({
             {/* Donut Chart visual */}
             <div className="relative w-36 h-36 flex-shrink-0">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                <circle cx="18" cy="18" r="14" fill="none" stroke="#ef4444" strokeWidth="8" className="opacity-100" />
-                <circle cx="18" cy="18" r="14" fill="none" stroke="#f59e0b" strokeWidth="8" strokeDasharray="60 40" strokeDashoffset="0" />
-                <circle cx="18" cy="18" r="14" fill="none" stroke="#10b981" strokeWidth="8" strokeDasharray="35 65" strokeDashoffset="0" />
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#ef4444" strokeWidth="8" className="opacity-100" pathLength="100" />
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#f59e0b" strokeWidth="8" strokeDasharray={`${paidPct + partialPct} ${100 - (paidPct + partialPct)}`} strokeDashoffset="0" pathLength="100" />
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#10b981" strokeWidth="8" strokeDasharray={`${paidPct} ${100 - paidPct}`} strokeDashoffset="0" pathLength="100" />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-xl font-bold text-slate-900">{totalWorkers}</span>
+                <span className="text-xl font-bold text-slate-900">{totalPaymentWorkers}</span>
                 <span className="text-[10px] text-slate-500 font-medium">Total</span>
               </div>
             </div>
@@ -252,8 +311,8 @@ export default function DashboardView({
                   Paid
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-bold text-slate-900 text-sm">10</span>
-                  <span className="text-slate-400 text-[11px]">(35.7%)</span>
+                  <span className="font-bold text-slate-900 text-sm">{paidCount}</span>
+                  <span className="text-slate-400 text-[11px]">({paidPct}%)</span>
                 </div>
               </div>
               <div className="flex items-center justify-between gap-6">
@@ -262,8 +321,8 @@ export default function DashboardView({
                   Partial
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-bold text-slate-900 text-sm">7</span>
-                  <span className="text-slate-400 text-[11px]">(25.0%)</span>
+                  <span className="font-bold text-slate-900 text-sm">{partialCount}</span>
+                  <span className="text-slate-400 text-[11px]">({partialPct}%)</span>
                 </div>
               </div>
               <div className="flex items-center justify-between gap-6">
@@ -272,8 +331,8 @@ export default function DashboardView({
                   Pending
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-bold text-slate-900 text-sm">11</span>
-                  <span className="text-slate-400 text-[11px]">(39.3%)</span>
+                  <span className="font-bold text-slate-900 text-sm">{pendingCount}</span>
+                  <span className="text-slate-400 text-[11px]">({pendingPct}%)</span>
                 </div>
               </div>
             </div>
@@ -298,7 +357,7 @@ export default function DashboardView({
               <tr className="border-y border-slate-100 text-[11px] uppercase tracking-wider font-semibold text-slate-500">
                 <th className="px-5 py-3">Worker Name</th>
                 <th className="px-5 py-3">Total Salary</th>
-                <th className="px-5 py-3">Advance</th>
+
                 <th className="px-5 py-3">Paid</th>
                 <th className="px-5 py-3">Balance</th>
                 <th className="px-5 py-3">Status</th>
@@ -327,7 +386,7 @@ export default function DashboardView({
                       </div>
                     </td>
                     <td className="px-5 py-3 text-slate-600">{formatINR(payment.totalSalary)}</td>
-                    <td className="px-5 py-3 text-slate-600">{formatINR(payment.advance)}</td>
+
                     <td className="px-5 py-3 text-slate-600">{formatINR(payment.paid)}</td>
                     <td className="px-5 py-3 text-slate-600">{formatINR(payment.balance)}</td>
                     <td className="px-5 py-3">

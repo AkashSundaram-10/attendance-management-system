@@ -21,10 +21,38 @@ async function main() {
 
   console.log('Admin created:', admin.email);
 
-  // You can optionally add sample workers and attendance here
-  // For production, just seeding the admin is usually enough.
+  await prisma.payment.deleteMany({});
+  await prisma.salaryRecord.deleteMany({});
+  await prisma.attendance.deleteMany({});
+  await prisma.advance.deleteMany({});
+  await prisma.worker.deleteMany({});
 
-  console.log('Database seeded successfully.');
+  console.log('Cleared all existing data.');
+
+  // Create Sample Workers
+  const w1 = await prisma.worker.create({
+    data: {
+      workerCode: 'WRK-001',
+      fullName: 'John Doe',
+      dailyWage: 1000,
+      overtimeRate: 1500,
+      joiningDate: new Date(),
+      role: 'Foreman'
+    }
+  });
+
+  const w2 = await prisma.worker.create({
+    data: {
+      workerCode: 'WRK-002',
+      fullName: 'Jane Smith',
+      dailyWage: 1000,
+      overtimeRate: 1500,
+      joiningDate: new Date(),
+      role: 'Operator'
+    }
+  });
+
+  console.log('Created clean test workers.');
 }
 
 main()

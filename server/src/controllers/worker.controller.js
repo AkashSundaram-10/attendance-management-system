@@ -124,10 +124,77 @@ const deleteWorker = async (req, res, next) => {
   }
 };
 
+const getDeletedWorkers = async (req, res, next) => {
+  try {
+    // 1. Fetch all deleted workers
+    const deletedWorkers = await prisma.worker.findMany({
+      where: { isDeleted: true },
+      include: {
+        salaries: {
+          include: { payments: true }
+        }
+      }
+    });
+
+    const twentyFiveDaysAgo = new Date();
+    twentyFiveDaysAgo.setDate(twentyFiveDaysAgo.getDate() - 25);
+
+    const validDeleted = [];
+
+    // 2. Cleanup old ones, keep valid ones
+    for (const worker of deletedWorkers) {
+      if (worker.updatedAt < twentyFiveDaysAgo) {
+        // Permanently delete dependencies then worker
+        await prisma.payment.deleteMany({ where: { workerId: worker.id } });
+        await prisma.advance.deleteMany({ where: { workerId: worker.id } });
+        await prisma.attendance.deleteMany({ where: { workerId: worker.id } });
+        await prisma.salaryRecord.deleteMany({ where: { workerId: worker.id } });
+        await prisma.worker.delete({ where: { id: worker.id } });
+      } else {
+        validDeleted.push(worker);
+      }
+    }
+
+    sendSuccess(res, 200, 'Deleted workers fetched successfully', validDeleted);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const restoreWorker = async (req, res, next) => {
+  try {
+    await prisma.worker.update({
+      where: { id: req.params.id },
+      data: { isDeleted: false },
+    });
+    sendSuccess(res, 200, 'Worker restored successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+const hardDeleteWorker = async (req, res, next) => {
+  try {
+    const workerId = req.params.id;
+    await prisma.payment.deleteMany({ where: { workerId } });
+    await prisma.advance.deleteMany({ where: { workerId } });
+    await prisma.attendance.deleteMany({ where: { workerId } });
+    await prisma.salaryRecord.deleteMany({ where: { workerId } });
+    await prisma.worker.delete({ where: { id: workerId } });
+
+    sendSuccess(res, 200, 'Worker permanently deleted');
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createWorker,
   getWorkers,
   getWorkerById,
   updateWorker,
   deleteWorker,
+  getDeletedWorkers,
+  restoreWorker,
+  hardDeleteWorker,
 };

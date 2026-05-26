@@ -18,7 +18,7 @@ export default function BottomNavBar({ currentView, setView }: BottomNavBarProps
         return currentView === 'attendance';
       case 'salary':
         return currentView === 'salary' || currentView === 'advance-payments';
-      case 'reports':
+      case 'analytics':
         return currentView === 'analytics';
       default:
         return false;
@@ -51,8 +51,8 @@ export default function BottomNavBar({ currentView, setView }: BottomNavBarProps
       targetView: 'salary' as AppView,
     },
     {
-      id: 'reports' as const,
-      label: 'Reports',
+      id: 'analytics' as const,
+      label: 'Analytics',
       icon: BarChart3,
       targetView: 'analytics' as AppView,
     },

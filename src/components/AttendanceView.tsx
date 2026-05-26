@@ -6,7 +6,13 @@ import { Worker, AttendanceRecord } from '../types';
 interface AttendanceViewProps {
   workers: Worker[];
   attendance: AttendanceRecord[];
-  onUpdateAttendance: (workerId: string, status: 'Present' | 'Absent' | 'Overtime') => void;
+  onUpdateAttendance: (
+    workerId: string,
+    status: 'Present' | 'Absent' | 'Overtime' | 'UpdateTimes',
+    checkInTimeStr?: string,
+    checkOutTimeStr?: string,
+    targetDateStr?: string
+  ) => void;
 }
 
 export default function AttendanceView({
@@ -17,85 +23,81 @@ export default function AttendanceView({
   const today = new Date();
   const [search, setSearch] = useState('');
   const [selectedDate, setSelectedDate] = useState(today.toISOString().split('T')[0]);
-  const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
-  // Calendar generation logic
+  // Calendar generation logic - Weekly view
   const renderCalendar = () => {
-    const year = currentMonth.getFullYear();
-    const month = currentMonth.getMonth();
+    const activeObj = new Date(selectedDate);
+    const dayOfWeek = activeObj.getDay();
+    const startOfWeek = new Date(activeObj);
+    startOfWeek.setDate(activeObj.getDate() - dayOfWeek);
     
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
+    const shiftWeek = (direction: -1 | 1) => {
+       const d = new Date(selectedDate);
+       d.setDate(d.getDate() + (direction * 7));
+       setSelectedDate(d.toISOString().split('T')[0]);
+    };
+
     const days = [];
-    for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="w-8 h-8 md:w-10 md:h-10" />);
-    }
-    for (let i = 1; i <= daysInMonth; i++) {
-      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(startOfWeek);
+      d.setDate(startOfWeek.getDate() + i);
+      const dateStr = d.toISOString().split('T')[0];
       const isSelected = selectedDate === dateStr;
       const isToday = dateStr === today.toISOString().split('T')[0];
+      
+      const attendanceForDay = attendance.filter(a => a.date === dateStr && workers.some(w => w.id === a.workerId));
+      const hasPresent = attendanceForDay.some(a => a.status === 'Present');
+      const hasOvertime = attendanceForDay.some(a => a.status === 'Overtime');
+      const hasAbsent = attendanceForDay.some(a => a.status === 'Absent');
+      let dayColorClass = '';
+      if (hasOvertime) {
+        dayColorClass = isSelected ? 'bg-[#4b41e1] text-white shadow-md shadow-[#4b41e1]/25 border border-transparent' : 'bg-indigo-50 text-[#4b41e1] border border-indigo-200 hover:bg-indigo-100';
+      } else if (hasPresent) {
+        dayColorClass = isSelected ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/25 border border-transparent' : 'bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100';
+      } else {
+        dayColorClass = isSelected ? 'bg-red-500 text-white shadow-md shadow-red-500/25 border border-transparent' : 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100';
+      }
+
+      if (isToday && !isSelected) {
+        dayColorClass += ' ring-2 ring-slate-200 ring-offset-1';
+      }
       
       days.push(
         <button
           key={dateStr}
           onClick={() => setSelectedDate(dateStr)}
-          className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all cursor-pointer ${
-            isSelected 
-              ? 'bg-[#4b41e1] text-white shadow-md shadow-[#4b41e1]/25 scale-100' 
-              : isToday 
-                ? 'bg-slate-100 text-[#4b41e1] border border-slate-200 font-bold hover:bg-slate-200' 
-                : 'text-slate-700 hover:bg-slate-100'
-          }`}
+          className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex flex-col items-center justify-center text-sm font-medium transition-all cursor-pointer ${dayColorClass}`}
         >
-          {i}
+          <span className="font-bold">{d.getDate()}</span>
         </button>
       );
     }
     
     return (
       <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm w-full lg:max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex gap-1">
-            <button 
-              onClick={() => setCurrentMonth(new Date(year - 1, month, 1))} 
-              className="p-1.5 hover:bg-slate-100 rounded-full text-slate-500 cursor-pointer transition-colors"
-              title="Previous Year"
-            >
-              <ChevronsLeft className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={() => setCurrentMonth(new Date(year, month - 1, 1))} 
-              className="p-1.5 hover:bg-slate-100 rounded-full text-slate-500 cursor-pointer transition-colors"
-              title="Previous Month"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-          </div>
+        <div className="flex justify-between items-center mb-6">
+          <button 
+            onClick={() => shiftWeek(-1)} 
+            className="p-1.5 hover:bg-slate-100 rounded-full text-slate-500 cursor-pointer transition-colors"
+            title="Previous Week"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
           
           <div className="font-bold font-display text-slate-800 text-lg flex items-center gap-2">
             <CalendarIcon className="w-4 h-4 text-[#4b41e1]" />
-            {new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentMonth)}
+            {new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(activeObj)}
           </div>
           
-          <div className="flex gap-1">
-            <button 
-              onClick={() => setCurrentMonth(new Date(year, month + 1, 1))} 
-              className="p-1.5 hover:bg-slate-100 rounded-full text-slate-500 cursor-pointer transition-colors"
-              title="Next Month"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={() => setCurrentMonth(new Date(year + 1, month, 1))} 
-              className="p-1.5 hover:bg-slate-100 rounded-full text-slate-500 cursor-pointer transition-colors"
-              title="Next Year"
-            >
-              <ChevronsRight className="w-5 h-5" />
-            </button>
-          </div>
+          <button 
+            onClick={() => shiftWeek(1)} 
+            className="p-1.5 hover:bg-slate-100 rounded-full text-slate-500 cursor-pointer transition-colors"
+            title="Next Week"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
-        <div className="grid grid-cols-7 gap-1 text-center mb-2">
+        <div className="grid grid-cols-7 gap-1 text-center mb-3">
           {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
             <div key={d} className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{d}</div>
           ))}
@@ -239,21 +241,29 @@ export default function AttendanceView({
               {/* Check in timers */}
               <div className="flex items-center gap-6 bg-slate-50 p-2.5 rounded-xl md:bg-transparent md:p-0">
                 <div className="flex flex-col">
-                  <span className="text-[9px] uppercase font-bold tracking-wider text-[#798097]">
+                  <span className="text-[9px] uppercase font-bold tracking-wider text-[#798097] mb-1">
                     Check In
                   </span>
-                  <span className="text-xs font-bold text-slate-800 leading-tight">
-                    {record ? record.checkIn : '--:--'}
-                  </span>
+                  <input 
+                    type="time"
+                    value={record ? record.checkIn : ''}
+                    disabled={!record}
+                    className="text-xs font-bold text-slate-800 bg-transparent border border-slate-200 rounded px-1 min-w-[70px] outline-none focus:border-[#4b41e1]"
+                    onChange={(e) => onUpdateAttendance(w.id, 'UpdateTimes', e.target.value, undefined, selectedDate)}
+                  />
                 </div>
                 <div className="w-px h-6 bg-slate-250 hidden md:block" />
                 <div className="flex flex-col">
-                  <span className="text-[9px] uppercase font-bold tracking-wider text-[#798097]">
+                  <span className="text-[9px] uppercase font-bold tracking-wider text-[#798097] mb-1">
                     Check Out
                   </span>
-                  <span className="text-xs font-bold text-slate-850 leading-tight">
-                    {record ? record.checkOut : '--:--'}
-                  </span>
+                  <input
+                    type="time" 
+                    value={record ? record.checkOut : ''}
+                    disabled={!record}
+                    className="text-xs font-bold text-slate-850 bg-transparent border border-slate-200 rounded px-1 min-w-[70px] outline-none focus:border-[#4b41e1]"
+                    onChange={(e) => onUpdateAttendance(w.id, 'UpdateTimes', undefined, e.target.value, selectedDate)}
+                  />
                 </div>
               </div>
 
@@ -270,7 +280,7 @@ export default function AttendanceView({
                           : record.status === 'Absent'
                             ? 'Overtime'
                             : 'Present';
-                      onUpdateAttendance(w.id, nextStat);
+                      onUpdateAttendance(w.id, nextStat, undefined, undefined, selectedDate);
                     }}
                   >
                     {record.status === 'Present' && <Check className="w-3.5 h-3.5" />}
@@ -282,13 +292,13 @@ export default function AttendanceView({
                 /* Unrecorded staff ghost indicators */
                 <div className="flex gap-2 w-full md:w-auto">
                   <button
-                    onClick={() => onUpdateAttendance(w.id, 'Present')}
+                    onClick={() => onUpdateAttendance(w.id, 'Present', undefined, undefined, selectedDate)}
                     className="flex-1 md:flex-none px-3 py-1.5 rounded-lg border border-slate-350 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-350 text-slate-500 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
                   >
                     <Check className="w-3 h-3" /> Present
                   </button>
                   <button
-                    onClick={() => onUpdateAttendance(w.id, 'Absent')}
+                    onClick={() => onUpdateAttendance(w.id, 'Absent', undefined, undefined, selectedDate)}
                     className="flex-1 md:flex-none px-3 py-1.5 rounded-lg border border-slate-350 hover:bg-red-50 hover:text-red-700 hover:border-red-350 text-slate-500 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
                   >
                     <X className="w-3 h-3" /> Absent

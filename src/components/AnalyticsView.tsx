@@ -1,296 +1,424 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Download, Calendar, DollarSign, Bolt, TrendingUp, BarChart3, Activity, PieChart, FileText, CheckCircle, ChevronDown, Check } from 'lucide-react';
-import { AppView, Worker } from '../types';
+import React, { useState, useMemo } from 'react';
+import { motion } from 'motion/react';
+import { Worker, SalaryRecord, AttendanceRecord } from '../types';
+import { Download, Users, CheckCircle2, XCircle, Clock, Calendar as CalendarIcon, BarChart2, IndianRupee, Info, Check, X } from 'lucide-react';
 
 interface AnalyticsViewProps {
   workers: Worker[];
-  setView: (view: AppView) => void;
+  salaries: SalaryRecord[];
+  attendance: AttendanceRecord[];
+  onUpdateAttendance: (workerId: string, status: 'Present' | 'Absent' | 'Overtime', checkInTimeStr?: string, checkOutTimeStr?: string, targetDateStr?: string) => void;
 }
 
-export default function AnalyticsView({ workers, setView }: AnalyticsViewProps) {
-  const [selectedMonth, setSelectedMonth] = useState('Oct 2023');
-  const [hoveredBar, setHoveredBar] = useState<number | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+export default function AnalyticsView({ workers, salaries, attendance, onUpdateAttendance }: AnalyticsViewProps) {
+  // Setup Month selection
+  const currentDate = new Date();
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth()); // 0-11
 
-  // Sparklines weekly attendance logs
-  const weeklyAttendance = [
-    { label: 'W1', value: 85 },
-    { label: 'W2', value: 95 },
-    { label: 'W3', value: 88 },
-    { label: 'W4', value: 92 },
-    { label: 'W5', value: 98 },
-  ];
-
-  const handleExport = () => {
-    setToastMessage('Preparing CSV, Attendance Sheets and Audit logs. Export download started!');
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 4500);
+  // Month navigation helpers
+  const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedMonth(parseInt(e.target.value, 10));
   };
 
-  const categories = [
-    { title: 'Attendance Reports', icon: Calendar, color: 'bg-emerald-50 text-emerald-600' },
-    { title: 'Salary Sheets', icon: FileText, color: 'bg-indigo-50 text-[#4b41e1]' },
-    { title: 'Worker Performance', icon: Activity, color: 'bg-indigo-50 text-[#4b41e1]' },
-    { title: 'Operational Costs', icon: PieChart, color: 'bg-[#eaddff] text-[#25005a]' },
-  ];
+  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedYear(parseInt(e.target.value, 10));
+  };
+
+  // Generate exactly 28 days starting from the FIRST Monday of the selected month
+  const { daysArray, weeks } = useMemo(() => {
+    let firstMonday = 1;
+    while (new Date(selectedYear, selectedMonth, firstMonday).getDay() !== 1) {
+      firstMonday++;
+    }
+
+    const arr = [];
+    const startDayObj = new Date(selectedYear, selectedMonth, firstMonday);
+    
+    for (let i = 0; i < 28; i++) {
+      const d = new Date(startDayObj);
+      d.setDate(startDayObj.getDate() + i);
+      arr.push({
+        day: d.getDate(),
+        month: d.getMonth(),
+        year: d.getFullYear(),
+        dateStr: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+        dateObj: d
+      });
+    }
+
+    const wks = [
+      arr.slice(0, 7),
+      arr.slice(7, 14),
+      arr.slice(14, 21),
+      arr.slice(21, 28)
+    ];
+
+    return { daysArray: arr, weeks: wks };
+  }, [selectedMonth, selectedYear]);
+
+  // Calculate Data for the Table
+  const tableData = useMemo(() => {
+    let totalPresentCount = 0;
+    let totalAbsentCount = 0;
+    let totalOvertimeCount = 0;
+    let overallTotalSalary = 0;
+    let overallDaysWorked = 0;
+
+    const selectedMonthName = new Date(selectedYear, selectedMonth, 1).toLocaleString('en-US', { month: 'long' });
+    const selectedMonthStr = `${selectedMonthName} ${selectedYear}`;
+    const currentMonthSalaries = salaries.filter(s => s.period.startsWith(selectedMonthStr));
+
+    const rows = workers.map(worker => {
+      const dayMarks: Record<string, 'Present' | 'Absent' | 'Overtime' | null> = {};
+      let daysWorked = 0;
+      
+      for (const dObj of daysArray) {
+        const record = attendance.find(a => a.workerId === worker.id && a.date.startsWith(dObj.dateStr));
+        if (record) {
+          dayMarks[dObj.dateStr] = record.status;
+          if (record.status === 'Present') {
+            daysWorked += 1;
+            totalPresentCount++;
+          }
+          else if (record.status === 'Overtime') {
+            daysWorked += 1; 
+            totalOvertimeCount++;
+            totalPresentCount++; 
+          }
+          else if (record.status === 'Absent') {
+            totalAbsentCount++;
+          }
+        } else {
+          dayMarks[dObj.dateStr] = null;
+        }
+      }
+
+      overallDaysWorked += daysWorked;
+      
+      const workerSalaries = currentMonthSalaries.filter(s => s.workerId === worker.id);
+      let totalAmount = 0;
+      if (workerSalaries.length > 0) {
+        totalAmount = workerSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
+      } else {
+        const otDays = Object.values(dayMarks).filter(s => s === 'Overtime').length;
+        const presentDays = daysWorked - otDays;
+        totalAmount = (presentDays * worker.dailyWage) + (otDays * 1500);  
+      }
+      
+      overallTotalSalary += totalAmount;
+
+      return {
+        worker,
+        dayMarks,
+        daysWorked,
+        otDays: Object.values(dayMarks).filter(s => s === 'Overtime').length,
+        totalAmount
+      };
+    });
+
+    // Calculate Top KPI logic based on rows
+    const totalWorkers = workers.length;
+    const totalStatusCount = totalPresentCount + totalAbsentCount;
+    const presentPct = totalStatusCount > 0 ? Math.round((totalPresentCount / totalStatusCount) * 100) : 0;
+    const absentPct = totalStatusCount > 0 ? Math.round((totalAbsentCount / totalStatusCount) * 100) : 0;
+
+    // Average Attendance
+    const totalPossibleDays = totalWorkers * 28; // strictly 28 days matrix
+    const averageAttendance = totalPossibleDays > 0 ? ((overallDaysWorked / totalPossibleDays) * 100).toFixed(1) : '0';
+
+    return {
+      rows,
+      topKPI: {
+        totalWorkers,
+        present: totalPresentCount,
+        presentPct,
+        absent: totalAbsentCount,
+        absentPct,
+        overtime: totalOvertimeCount
+      },
+      bottomKPI: {
+        overallDaysWorked,
+        overallOvertime: totalOvertimeCount,
+        averageAttendance,
+        overallTotalSalary
+      }
+    };
+  }, [workers, attendance, daysArray]);
+
+  const getStatusIcon = (status: string | null, dateStr: string) => {
+    if (status === 'Present') return <Check className="w-5 h-5 text-emerald-500 stroke-[4]" />;
+    if (status === 'Overtime') return <span className="text-xs font-black text-indigo-600">OT</span>;
+    
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (dateStr > todayStr) {
+      return <span className="text-slate-300 text-lg">-</span>;
+    }
+    
+    // Default to Absent (X) instead of dash for past/today
+    return <X className="w-5 h-5 text-red-500 stroke-[4]" />;
+  };
+
+  const exportToExcel = () => {
+    const headers = ['No.', 'Worker Name', ...daysArray.map(d => `${d.dateObj.getDate()} ${new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(d.dateObj)}`), 'Days Worked', 'Total Amount'];
+    
+    const csvRows = [];
+    csvRows.push(headers.join(','));
+
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    tableData.rows.forEach((row, idx) => {
+      const rowData = [
+        idx + 1,
+        `"${row.worker.name}"`
+      ];
+
+      daysArray.forEach(d => {
+        const status = row.dayMarks[d.dateStr];
+        let val = '';
+        if (status === 'Present') val = 'P';
+        else if (status === 'Overtime') val = 'OT';
+        else if (d.dateStr > todayStr) val = '-';
+        else val = 'A';
+        rowData.push(val);
+      });
+
+      rowData.push(row.daysWorked);
+      rowData.push(row.totalAmount);
+      csvRows.push(rowData.join(','));
+    });
+
+    const footerData = ['Total', ''];
+    daysArray.forEach(() => footerData.push(''));
+    footerData.push(tableData.bottomKPI.overallDaysWorked);
+    footerData.push(tableData.bottomKPI.overallTotalSalary);
+    csvRows.push(footerData.join(','));
+
+    const csvString = csvRows.join('\n');
+    const blob = new Blob(['\uFEFF' + csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const monthName = new Date(selectedYear, selectedMonth, 1).toLocaleString('en-US', { month: 'long' });
+    a.setAttribute('download', `Analytics_${monthName}_${selectedYear}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="space-y-6 pb-24 select-none font-sans"
+      className="space-y-6 pb-20 select-none font-sans"
     >
-      {/* Toast Alert Feedback */}
-      <AnimatePresence>
-        {toastMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-4 left-4 right-4 z-50 bg-[#131b2e] text-white p-3.5 rounded-xl shadow-2xl flex items-center gap-3 border border-indigo-500/20 text-xs font-semibold"
-          >
-            <div className="w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center flex-shrink-0">
-              <Check className="w-3.5 h-3.5 stroke-[3px]" />
-            </div>
-            <p className="flex-1 text-slate-100">{toastMessage}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Header Month Filter Row */}
-      <section className="flex justify-between items-center">
+      {/* Header */}
+      <section className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-display font-black text-[#0f172a] leading-tight">
-            Reports &amp; Analytics
+          <h2 className="text-[22px] font-display font-black text-[#1e293b] leading-tight">
+            Weekly Attendance
           </h2>
-          <p className="text-xs text-slate-500 font-semibold mt-0.5">Monthly Overview</p>
+          <p className="text-sm text-slate-500 font-medium">View weekly wise attendance of all workers in a month</p>
         </div>
-
-        <div className="relative">
-          <button className="flex items-center gap-1.5 bg-white border border-slate-200 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm cursor-pointer select-none">
-            {selectedMonth} <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+        
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm">
+            <CalendarIcon className="w-4 h-4 text-slate-500" />
+            <select 
+              value={selectedMonth} 
+              onChange={handleMonthChange}
+              className="text-sm font-bold text-slate-700 bg-transparent outline-none cursor-pointer"
+            >
+              {Array.from({ length: 12 }).map((_, i) => (
+                <option key={i} value={i}>
+                  {new Date(0, i).toLocaleString('en', { month: 'short' })}
+                </option>
+              ))}
+            </select>
+            <select 
+              value={selectedYear} 
+              onChange={handleYearChange}
+              className="text-sm font-bold text-slate-700 bg-transparent outline-none cursor-pointer"
+            >
+              {[currentDate.getFullYear() - 1, currentDate.getFullYear(), currentDate.getFullYear() + 1].map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </div>
+          
+          <button 
+            onClick={exportToExcel}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-sm cursor-pointer"
+          >
+            <Download className="w-4 h-4" /> Export Excel
           </button>
         </div>
       </section>
 
-      {/* Overview Bento Sections grid */}
-      <section className="grid grid-cols-2 gap-4">
-        {/* Total Expenses full-width */}
-        <div className="col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#4b41e1] opacity-5 rounded-full blur-xl pointer-events-none" />
-          <div className="flex justify-between items-start mb-4 relative z-10">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-red-100 text-red-650 flex items-center justify-center">
-                <DollarSign className="w-4.5 h-4.5" />
-              </div>
-              <span className="text-xs font-semibold text-slate-500">Total Expenses</span>
-            </div>
-            <span className="bg-slate-50 text-red-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-0.5 border border-slate-200">
-              <TrendingUp className="w-3 h-3" /> +4.2%
-            </span>
+      {/* Top KPI Cards */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-emerald-100/50 flex items-center justify-center text-emerald-600">
+            <Users className="w-6 h-6" />
           </div>
-
-          <h3 className="text-3xl font-display font-black text-slate-900 leading-none">$142,500</h3>
-        </div>
-
-        {/* Average Attendance */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#e2e8f0] flex flex-col justify-between h-[125px]">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center">
-              <CheckCircle className="w-4 h-4 text-emerald-600" />
-            </div>
-            <span className="text-xs font-semibold text-slate-500 truncate">Avg Attendance</span>
-          </div>
-          <div className="mt-auto">
-            <h3 className="text-xl font-display font-black text-slate-800 mb-1 leading-none">94%</h3>
-            <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-              <div className="bg-[#4b41e1] h-full rounded-full" style={{ width: '94%' }} />
-            </div>
-          </div>
-        </div>
-
-        {/* Efficiency Score */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#e2e8f0] flex flex-col justify-between h-[125px]">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center">
-              <Bolt className="w-4 h-4 text-[#4b41e1]" />
-            </div>
-            <span className="text-xs font-semibold text-slate-500 truncate">Efficiency Score</span>
-          </div>
-          <div className="mt-auto">
-            <h3 className="text-xl font-display font-black text-slate-800 mb-1 leading-none">A-</h3>
-            <span className="text-[10px] text-slate-450 font-bold uppercase tracking-wide">
-              Top 15% regional
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* SVG Custom Charts Container */}
-      <section className="space-y-4">
-        {/* Attendance Trends */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
-          <div className="flex justify-between items-center mb-5">
-            <h3 className="font-display font-bold text-slate-850 text-sm tracking-wide">
-              Attendance Trends
-            </h3>
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Active log</span>
-          </div>
-
-          {/* Bar columns */}
-          <div className="h-40 w-full relative flex items-end gap-1.5 pt-4">
-            {/* Grid background lines */}
-            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-6">
-              <div className="border-t border-slate-100 w-full border-dashed" />
-              <div className="border-t border-slate-100 w-full border-dashed" />
-              <div className="border-t border-slate-100 w-full border-dashed" />
-            </div>
-
-            {/* Simulated bars with inline React hover hooks */}
-            <div className="w-full h-full flex items-end justify-between z-10 pb-6 pt-2 select-none">
-              {weeklyAttendance.map((bar, idx) => {
-                const isHovered = hoveredBar === idx;
-                return (
-                  <div
-                    key={idx}
-                    onMouseEnter={() => setHoveredBar(idx)}
-                    onMouseLeave={() => setHoveredBar(null)}
-                    className="w-1/6 flex flex-col items-center relative group select-none cursor-pointer"
-                  >
-                    {/* Tooltip */}
-                    <AnimatePresence>
-                      {isHovered && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: -10 }}
-                          exit={{ opacity: 0 }}
-                          className="absolute -top-10 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md pointer-events-none select-none z-50 whitespace-nowrap"
-                        >
-                          {bar.value}% Present
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    {/* Column Pillar */}
-                    <div
-                      className={`w-full rounded-t-lg transition-all duration-300 ${
-                        idx === 1 || isHovered ? 'bg-[#4b41e1] h-[85%]' : 'bg-slate-200 h-[65%]'
-                      }`}
-                      style={{ height: `${bar.value}%` }}
-                    />
-                    <span className="text-[10px] font-bold text-slate-400 mt-2 block font-sans">
-                      {bar.label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Salary Distribution chart */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center justify-between">
           <div>
-            <h3 className="font-display font-bold text-slate-850 text-sm tracking-wide mb-1">
-              Salary Distribution
-            </h3>
-            <p className="text-xs text-slate-450 font-bold mb-4">Total: $124.5k</p>
-
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#4b41e1]" /> Base Pay (70%)
-              </li>
-              <li className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#c3c0ff]" /> Overtime (20%)
-              </li>
-              <li className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-300" /> Bonuses (10%)
-              </li>
-            </ul>
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Workers</div>
+            <div className="text-xl font-black text-slate-800">{tableData.topKPI.totalWorkers}</div>
           </div>
-
-          {/* svg circle donut chart */}
-          <div className="relative w-28 h-28 flex items-center justify-center">
-            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-              {/* Base track (Bonuses 10%) */}
-              <circle
-                cx="18"
-                cy="18"
-                r="15.915"
-                fill="none"
-                stroke="#cbd5e1"
-                strokeWidth="4"
-                strokeDasharray="10 90"
-                strokeDashoffset="0"
-              />
-              {/* Overtime track (20%) */}
-              <circle
-                cx="18"
-                cy="18"
-                r="15.915"
-                fill="none"
-                stroke="#c3c0ff"
-                strokeWidth="4"
-                strokeDasharray="20 80"
-                strokeDashoffset="-10"
-              />
-              {/* Base Pay track (70%) */}
-              <circle
-                cx="18"
-                cy="18"
-                r="15.915"
-                fill="none"
-                stroke="#4b41e1"
-                strokeWidth="4"
-                strokeDasharray="70 30"
-                strokeDashoffset="-30"
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <span className="text-[10px] font-bold text-slate-500 tracking-wider">Breakdown</span>
+        </div>
+        <div className="bg-[#f0fdf4] border border-[#dcfce7] rounded-xl p-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center text-white">
+            <CheckCircle2 className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Present</div>
+            <div className="text-xl font-black text-slate-800">
+              {tableData.topKPI.present} <span className="text-xs text-emerald-600 font-bold">({tableData.topKPI.presentPct}%)</span>
+            </div>
+          </div>
+        </div>
+        <div className="bg-[#fef2f2] border border-[#fee2e2] rounded-xl p-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white">
+            <XCircle className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Absent</div>
+            <div className="text-xl font-black text-slate-800">
+              {tableData.topKPI.absent} <span className="text-xs text-red-600 font-bold">({tableData.topKPI.absentPct}%)</span>
+            </div>
+          </div>
+        </div>
+        <div className="bg-[#eff6ff] border border-[#dbeafe] rounded-xl p-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-[#4b41e1] flex items-center justify-center text-white font-black text-sm">
+            OT
+          </div>
+          <div>
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Overtime</div>
+            <div className="text-xl font-black text-slate-800">
+              {tableData.topKPI.overtime} <span className="text-xs text-slate-500 font-medium">Days</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Grid of Report Categories */}
-      <section>
-        <h3 className="font-display font-bold text-[#0f172a] text-sm mb-3.5">
-          Report Categories
-        </h3>
-        <div className="grid grid-cols-2 gap-3 pb-8">
-          {categories.map((cat, i) => {
-            const Icon = cat.icon;
-            return (
-              <div
-                key={i}
-                onClick={handleExport}
-                className="bg-white p-3.5 rounded-2xl border border-slate-200 flex items-center gap-3.5 hover:bg-slate-50 hover:border-[#4b41e1] hover:scale-[1.02] active:scale-[0.99] transition-all cursor-pointer shadow-sm select-none"
-              >
-                <div className={`w-10 h-10 rounded-xl ${cat.color} flex items-center justify-center flex-shrink-0`}>
-                  <Icon className="w-5 h-5 stroke-[2.2px]" />
-                </div>
-                <span className="text-xs font-bold text-[#0f172a] leading-tight font-display">
-                  {cat.title}
-                </span>
-              </div>
-            );
-          })}
+      {/* Attendance Matrix Table */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden overflow-x-auto no-scrollbar">
+        <table className="w-full text-left border-collapse min-w-[1200px]">
+          <thead>
+            {/* Week Groupings Header */}
+            <tr className="border-b border-slate-200 bg-slate-50">
+              <th className="px-4 py-4 font-semibold text-sm text-slate-800 border-r border-slate-200 w-12 text-center sticky left-0 bg-slate-50 z-20" rowSpan={2}>No.</th>
+              <th className="px-5 py-4 font-semibold text-sm text-slate-800 border-r border-slate-200 min-w-[220px] sticky left-[48px] bg-slate-50 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" rowSpan={2}>Worker Name</th>
+              
+              {weeks.map((weekDays, idx) => {
+                const firstDay = weekDays[0];
+                const lastDay = weekDays[weekDays.length - 1];
+                return (
+                  <th key={idx} className="py-3 font-bold text-sm text-slate-800 border-r border-slate-200 text-center" colSpan={7}>
+                    Week {idx + 1} <div className="text-[11px] text-slate-500 font-medium mt-0.5">({firstDay.day} {new Date(0, firstDay.month).toLocaleString('en', { month: 'short' })} - {lastDay.day} {new Date(0, lastDay.month).toLocaleString('en', { month: 'short' })})</div>
+                  </th>
+                )
+              })}
+              
+              <th className="px-4 py-4 font-semibold text-sm text-slate-800 border-r border-slate-200 text-center leading-tight" rowSpan={2}>Days<br/>Worked</th>
+              <th className="px-4 py-4 font-semibold text-sm text-slate-800 text-center leading-tight" rowSpan={2}>Total<br/>Amount</th>
+            </tr>
+            {/* Days Header */}
+            <tr className="border-b border-slate-200 bg-white">
+              {daysArray.map((dObj, idx) => {
+                const isWeekend = dObj.dateObj.getDay() === 0;
+                const dayName = dObj.dateObj.toLocaleString('en-US', { weekday: 'short' });
+                return (
+                  <th key={dObj.dateStr} className={`py-2 min-w-[38px] font-semibold text-center border-r ${isWeekend ? 'bg-red-50/50 text-red-500' : 'text-slate-600'} ${idx === 6 || idx === 13 || idx === 20 || idx === 27 ? 'border-r-slate-200' : 'border-slate-100'}`}>
+                    <div className="text-sm">{dObj.day}</div>
+                    <div className="text-[9px] font-bold opacity-60 uppercase tracking-tighter -mt-0.5">{dayName}</div>
+                  </th>
+                )
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {tableData.rows.map((row, index) => (
+              <tr key={row.worker.id} className="group border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                <td className="py-4 px-2 text-sm font-medium text-slate-500 text-center border-r border-slate-100 sticky left-0 bg-white group-hover:bg-slate-50 z-10 transition-colors">{index + 1}</td>
+                <td className="py-4 px-5 text-sm font-bold text-slate-800 border-r border-slate-100 whitespace-nowrap sticky left-[48px] bg-white group-hover:bg-slate-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] transition-colors">{row.worker.name}</td>
+                
+                {daysArray.map((dObj, idx) => (
+                  <td 
+                    key={dObj.dateStr} 
+                    className={`p-1.5 border-r text-center transition-colors ${idx === 6 || idx === 13 || idx === 20 || idx === 27 ? 'border-r-slate-200' : 'border-slate-100'}`}
+                  >
+                    <div className="w-8 h-8 mx-auto flex items-center justify-center rounded">
+                      {getStatusIcon(row.dayMarks[dObj.dateStr], dObj.dateStr)}
+                    </div>
+                  </td>
+                ))}
+                
+                <td className="py-4 px-4 text-sm font-bold text-slate-700 text-center border-r border-slate-100">{row.daysWorked}</td>
+                <td className="py-4 px-4 text-sm font-black text-slate-900 text-center">₹{row.totalAmount.toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      
+      {/* Legend */}
+      <div className="flex items-center gap-6 px-2 text-xs font-bold text-slate-600">
+        <span>Legend:</span>
+        <div className="flex items-center gap-2 text-emerald-600"><Check className="w-4 h-4 stroke-[3]" /> Present</div>
+        <div className="flex items-center gap-2 text-red-600"><X className="w-4 h-4 stroke-[3]" /> Absent</div>
+        <div className="flex items-center gap-2 text-indigo-600">OT Overtime</div>
+      </div>
+
+      {/* Bottom KPI Cards */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+        <div className="bg-[#f0fdf4] border border-[#dcfce7] rounded-xl p-5 flex items-center gap-4">
+          <div className="text-emerald-600">
+            <CalendarIcon className="w-8 h-8" />
+          </div>
+          <div>
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Days Worked</div>
+            <div className="text-xl font-black text-slate-800">
+              {tableData.bottomKPI.overallDaysWorked} <span className="text-sm text-slate-500 font-medium">Days</span>
+            </div>
+          </div>
+        </div>
+        <div className="bg-[#eff6ff] border border-[#dbeafe] rounded-xl p-5 flex items-center gap-4">
+          <div className="w-10 h-10 rounded-full bg-[#4b41e1] flex items-center justify-center text-white font-black shrink-0">
+            OT
+          </div>
+          <div>
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Overtime Days</div>
+            <div className="text-xl font-black text-slate-800">
+              {tableData.bottomKPI.overallOvertime} <span className="text-sm text-slate-500 font-medium">Days</span>
+            </div>
+          </div>
+        </div>
+        <div className="bg-[#fffbeb] border border-[#fef3c7] rounded-xl p-5 flex items-center gap-4">
+          <div className="text-amber-500">
+            <BarChart2 className="w-8 h-8" />
+          </div>
+          <div>
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Average Attendance</div>
+            <div className="text-xl font-black text-slate-800">
+              {tableData.bottomKPI.averageAttendance}%
+            </div>
+          </div>
+        </div>
+        <div className="bg-[#f5f3ff] border border-[#ede9fe] rounded-xl p-5 flex items-center gap-4">
+          <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white shrink-0">
+            <IndianRupee className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Salary</div>
+            <div className="text-xl font-black text-indigo-700">
+              ₹{tableData.bottomKPI.overallTotalSalary.toLocaleString()}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Export FAB pin */}
-      <div className="fixed bottom-24 right-5 z-40">
-        <button
-          onClick={handleExport}
-          className="bg-[#4b41e1] hover:bg-[#6c61f2] text-white h-14 px-6 rounded-full shadow-[0px_8px_20px_rgba(75,65,225,0.25)] flex items-center gap-2 active:scale-95 transition-all text-xs font-bold font-display uppercase tracking-wide cursor-pointer"
-        >
-          <Download className="w-4.5 h-4.5" /> Export Data
-        </button>
-      </div>
     </motion.div>
   );
 }

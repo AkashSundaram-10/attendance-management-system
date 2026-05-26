@@ -9,7 +9,9 @@ const { errorHandler, notFound } = require('./middleware/error.middleware');
 const app = express();
 
 // Security Middlewares
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(cors());
 
 // Logging
@@ -25,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/health', (req, res) => {
   res.status(200).json({ success: true, message: 'Server is healthy' });
 });
+
 
 app.use('/api', routes);
 

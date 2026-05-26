@@ -29,7 +29,9 @@ const getAdvances = async (req, res, next) => {
   try {
     const { workerId } = req.query;
 
-    let where = {};
+    let where = {
+      worker: { isDeleted: false }
+    };
     if (workerId) {
       where.workerId = workerId;
     }
@@ -53,7 +55,10 @@ const getAdvancesByWorker = async (req, res, next) => {
     const { workerId } = req.params;
 
     const advances = await prisma.advance.findMany({
-      where: { workerId },
+      where: { 
+        workerId,
+        worker: { isDeleted: false }
+      },
       orderBy: { createdAt: 'desc' },
     });
 

@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Phone, Mail, Calendar, Coins, CheckCircle, ShieldAlert, Award } from 'lucide-react';
 import { AppView, Worker, AttendanceRecord, SalaryRecord } from '../types';
+import { getCurrentPeriod } from '../api';
 
 interface WorkerProfileViewProps {
   worker: Worker;
   attendance: AttendanceRecord[];
   salaries: SalaryRecord[];
   setView: (view: AppView) => void;
-  onNavigateToAdvances: () => void;
   onNavigateToSalaryApproval: () => void;
 }
 
@@ -17,10 +17,9 @@ export default function WorkerProfileView({
   attendance,
   salaries,
   setView,
-  onNavigateToAdvances,
   onNavigateToSalaryApproval,
 }: WorkerProfileViewProps) {
-  const [activeTab, setActiveTab] = useState<'Overview' | 'Attendance' | 'Salary' | 'Advance'>('Overview');
+  const [activeTab, setActiveTab] = useState<'Overview' | 'Attendance' | 'Salary'>('Overview');
 
   // Compute stats for current worker from real live arrays
   const myAttendance = attendance.filter((a) => a.workerId === worker.id);
@@ -33,9 +32,11 @@ export default function WorkerProfileView({
   const attendanceRate = totalMyDaysCount > 0 ? Math.round((presentDaysCount / totalMyDaysCount) * 100) : 96;
   const daysWorked = totalMyDaysCount > 0 ? presentDaysCount : 22;
 
-  // Earnings
-  const mySalary = salaries.find((s) => s.workerId === worker.id);
-  const earningsValue = mySalary ? (mySalary.grossPay + mySalary.overtimePay - mySalary.advanceDeduction) : (daysWorked * worker.dailyWage);
+  // Paid/Unpaid calculations
+  const workerSalaries = salaries.filter(s => s.workerId === worker.id);
+  const totalNetPay = workerSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
+  const totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? (curr.grossPay + curr.overtimePay) : 0)), 0);
+  const totalUnpaid = Math.max(0, totalNetPay - totalPaid);
 
   return (
     <motion.div
@@ -75,25 +76,33 @@ export default function WorkerProfileView({
       </section>
 
       {/* Analytics Summary Row Dashboard Bento-style */}
-      <section className="grid grid-cols-3 gap-3">
+      <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col items-center justify-center text-center">
-          <span className="text-slate-450 text-[10px] font-bold uppercase tracking-wider mb-1">
+          <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">
             Attendance
           </span>
           <span className="text-base font-display font-black text-[#4b41e1]">{attendanceRate}%</span>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col items-center justify-center text-center">
-          <span className="text-slate-450 text-[10px] font-bold uppercase tracking-wider mb-1">
+          <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">
             Days Worked
           </span>
           <span className="text-base font-display font-black text-slate-800">{daysWorked}</span>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col items-center justify-center text-center">
-          <span className="text-slate-450 text-[10px] font-bold uppercase tracking-wider mb-1">
-            Earnings
+          <span className="text-emerald-500 text-[10px] font-bold uppercase tracking-wider mb-1">
+            Paid
           </span>
-          <span className="text-base font-display font-black text-slate-800">
-            ${earningsValue.toLocaleString()}
+          <span className="text-base font-display font-black text-emerald-600">
+            ₹{totalPaid.toLocaleString()}
+          </span>
+        </div>
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col items-center justify-center text-center">
+          <span className="text-red-500 text-[10px] font-bold uppercase tracking-wider mb-1">
+            Unpaid
+          </span>
+          <span className="text-base font-display font-black text-red-500">
+            ₹{totalUnpaid.toLocaleString()}
           </span>
         </div>
       </section>
@@ -101,17 +110,13 @@ export default function WorkerProfileView({
       {/* Tabs list */}
       <section className="border-b border-slate-200">
         <div className="flex overflow-x-auto no-scrollbar pb-1 space-x-6">
-          {(['Overview', 'Attendance', 'Salary', 'Advance'] as const).map((tab) => {
+          {(['Overview', 'Attendance', 'Salary'] as const).map((tab) => {
             const isTabActive = activeTab === tab;
             return (
               <button
                 key={tab}
                 onClick={() => {
-                  if (tab === 'Advance') {
-                    onNavigateToAdvances();
-                  } else {
-                    setActiveTab(tab);
-                  }
+                  setActiveTab(tab);
                 }}
                 className={`text-sm font-semibold pb-2.5 whitespace-nowrap border-b-2 transition-all cursor-pointer ${isTabActive
                     ? 'text-[#4b41e1] border-[#4b41e1]'
@@ -172,7 +177,7 @@ export default function WorkerProfileView({
                 </div>
                 <div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase">Daily Wage</p>
-                  <p className="text-xs font-bold text-slate-850">${worker.dailyWage}.00 / day</p>
+                  <p className="text-xs font-bold text-slate-850">₹{worker.dailyWage}.00 / day</p>
                 </div>
               </div>
             </div>
@@ -223,67 +228,64 @@ export default function WorkerProfileView({
         {activeTab === 'Salary' && (
           <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
             <h3 className="text-xs font-bold text-[#7c839b] uppercase tracking-widest">
-              Financial Compensation (October)
+              Financial Compensation Ledger
             </h3>
 
-            {mySalary ? (
+            {workerSalaries.length > 0 ? (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <p className="text-[10px] text-slate-450 uppercase font-semibold">Base pay</p>
-                    <p className="font-bold text-slate-800">${mySalary.grossPay}.00</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-slate-450 uppercase font-semibold">Bonus/Overtime</p>
-                    <p className="font-bold text-emerald-600">+${mySalary.overtimePay}.00</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-slate-450 uppercase font-semibold">Deduction</p>
-                    <p className="font-bold text-red-650">-${mySalary.advanceDeduction}.00</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-slate-450 uppercase font-semibold">Taxes</p>
-                    <p className="font-bold text-red-650">-${mySalary.tax}.00</p>
-                  </div>
-                </div>
+                {workerSalaries.map((salary) => (
+                  <div key={salary.id} className="border border-slate-100 p-4 rounded-xl bg-slate-50">
+                    <p className="text-xs font-bold text-slate-800 mb-3 border-b border-slate-200 pb-2">{salary.period}</p>
+                    <div className="grid grid-cols-2 gap-4 text-xs mb-3">
+                      <div>
+                        <p className="text-[10px] text-slate-400 uppercase font-semibold">Basic Salary</p>
+                        <p className="font-bold text-slate-800">₹{salary.grossPay}.00</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-slate-400 uppercase font-semibold">Overtime</p>
+                        <p className="font-bold text-emerald-600">+₹{salary.overtimePay}.00</p>
+                      </div>
+                    </div>
 
-                <div className="border-t border-slate-100 pt-3 flex justify-between items-center">
-                  <div>
-                    <p className="text-xs text-slate-400">Total Net Payout</p>
-                    <p className="text-[#0f172a] font-display text-lg font-black">
-                      ${(mySalary.grossPay + mySalary.overtimePay - mySalary.advanceDeduction - mySalary.tax).toLocaleString()}.00
-                    </p>
+                    <div className="border-t border-slate-200 pt-3 flex justify-between items-center">
+                      <div>
+                        <p className="text-xs text-slate-400">Total Net Payout</p>
+                        <p className="text-[#0f172a] font-display text-lg font-black">
+                          ₹{(salary.grossPay + salary.overtimePay).toLocaleString()}.00
+                        </p>
+                      </div>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-bold ${salary.status === 'Paid'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-amber-100 text-amber-800 hover:scale-105 transition-all cursor-pointer'
+                          }`}
+                        onClick={() => {
+                          if (salary.status === 'Pending') {
+                            onNavigateToSalaryApproval();
+                          }
+                        }}
+                      >
+                        {salary.status === 'Paid' ? (
+                          <span className="flex items-center gap-1">
+                            <CheckCircle className="w-3.5 h-3.5" /> Paid {salary.disbursementDate || 'recently'}
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1">
+                            <ShieldAlert className="w-3.5 h-3.5" /> Approve Approval
+                          </span>
+                        )}
+                      </span>
+                    </div>
                   </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${mySalary.status === 'Paid'
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-amber-100 text-amber-800 hover:scale-105 transition-all cursor-pointer'
-                      }`}
-                    onClick={() => {
-                      if (mySalary.status === 'Pending') {
-                        onNavigateToSalaryApproval();
-                      }
-                    }}
-                  >
-                    {mySalary.status === 'Paid' ? (
-                      <span className="flex items-center gap-1">
-                        <CheckCircle className="w-3.5 h-3.5" /> Paid Oct 28
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1">
-                        <ShieldAlert className="w-3.5 h-3.5" /> Approve Approval
-                      </span>
-                    )}
-                  </span>
-                </div>
+                ))}
               </div>
             ) : (
               <div>
-                <p className="text-xs text-slate-500 mb-2">No custom ledger created for this period.</p>
+                <p className="text-xs text-slate-500 mb-2">No custom ledger created for this worker yet.</p>
                 <div className="bg-slate-50 p-3 rounded-xl border border-dashed border-slate-200">
                   <p className="text-[10px] font-bold uppercase text-slate-400">Comp estimate</p>
                   <p className="text-sm font-bold text-slate-800">
-                    ${(daysWorked * worker.dailyWage).toLocaleString()}.00
+                    ₹{(daysWorked * worker.dailyWage).toLocaleString()}.00
                   </p>
                   <p className="text-[11px] text-slate-500 mt-1">
                     Calculated automatically from {daysWorked} days of approved attendance records.

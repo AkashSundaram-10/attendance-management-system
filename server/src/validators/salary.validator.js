@@ -4,7 +4,8 @@ const generateSalarySchema = {
   body: z.object({
     month: z.number().min(1).max(12),
     year: z.number().min(2000),
-    workerId: z.string().uuid().optional(), // If not provided, generate for all
+    targetDate: z.string().optional(),
+    workerId: z.string().optional(), // If not provided, generate for all
   }),
 };
 

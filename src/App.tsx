@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { AppView, Worker, AttendanceRecord, SalaryRecord, AdvancePayment } from './types';
 import {
@@ -7,6 +7,7 @@ import {
   INITIAL_SALARY_RECORDS,
   INITIAL_ADVANCES,
 } from './initialData';
+import { api, getCurrentPeriod } from './api';
 
 // Subcomponents
 import SplashView from './components/SplashView';
@@ -18,12 +19,13 @@ import WorkersView from './components/WorkersView';
 import WorkerProfileView from './components/WorkerProfileView';
 import AttendanceView from './components/AttendanceView';
 import SalaryView from './components/SalaryView';
-import AdvancePaymentsView from './components/AdvancePaymentsView';
 import AnalyticsView from './components/AnalyticsView';
-
+import SettingsView from './components/SettingsView';
+import DeletedWorkersView from './components/DeletedWorkersView';
+import PinPromptModal from './components/PinPromptModal';
 export default function App() {
   // App views state machines
-  const [currentView, setView] = useState<AppView>('splash');
+  const [currentView, setCurrentView] = useState<AppView>('dashboard');
   const [workers, setWorkers] = useState<Worker[]>(INITIAL_WORKERS);
   const [attendance, setAttendance] = useState<AttendanceRecord[]>(INITIAL_ATTENDANCE);
   const [salaries, setSalaries] = useState<SalaryRecord[]>(INITIAL_SALARY_RECORDS);
@@ -32,126 +34,204 @@ export default function App() {
   const [selectedWorkerId, setSelectedWorkerId] = useState<string>('WTP-4921'); // Default Marcus
   const [isAddWorkerOpen, setIsAddWorkerOpen] = useState(false);
   const [notificationsCount, setNotificationsCount] = useState(1);
+  
+  // Security Pin Prompt Modal State
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+  const [secureAction, setSecureAction] = useState<(() => void) | null>(null);
 
-  // Quick helper to fetch selected worker
-  const activeWorker = workers.find((w) => w.id === selectedWorkerId) || workers[0];
-
-  // Callback to add a new worker
-  const handleAddWorker = (newWorker: Omit<Worker, 'id' | 'joinedDate'>) => {
-    const nextIdNum = Math.floor(Math.random() * 8000) + 1000;
-    const isWTP = Math.random() > 0.5;
-    const generatedId = `${isWTP ? 'WTP' : 'WRK'}-${nextIdNum}`;
-
-    const dateToday = new Date();
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const joinedDateStr = `${months[dateToday.getMonth()]} ${String(dateToday.getDate()).padStart(2, '0')}, ${dateToday.getFullYear()}`;
-
-    const recruit: Worker = {
-      id: generatedId,
-      joinedDate: joinedDateStr,
-      ...newWorker,
-    };
-
-    setWorkers((prev) => [recruit, ...prev]);
-
-    // Create automatic blank salary record for October 2023 Period
-    const mockSalary: SalaryRecord = {
-      workerId: recruit.id,
-      period: `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date())} ${new Date().getFullYear()}`,
-      daysWorked: 22,
-      totalDays: 22,
-      grossPay: 22 * recruit.dailyWage,
-      overtimePay: 0,
-      advanceDeduction: 0,
-      tax: Math.round(22 * recruit.dailyWage * 0.08),
-      status: 'Pending',
-    };
-    setSalaries((prev) => [mockSalary, ...prev]);
-
-    // Push notification alert
-    setNotificationsCount((c) => c + 1);
+  const requestSecureAction = (action: () => void) => {
+    setSecureAction(() => action);
+    setIsPinModalOpen(true);
   };
 
-  // Callback to toggle/mark labor attendance
-  const handleUpdateAttendance = (
-    workerId: string,
-    status: 'Present' | 'Absent' | 'Overtime'
-  ) => {
-    setAttendance((prev) => {
-      const todayDate = new Date().toISOString().split('T')[0];
-      const existingIdx = prev.findIndex((a) => a.workerId === workerId && a.date === todayDate);
+  const activeWorker = workers.find((w) => w.id === selectedWorkerId) || workers[0] || {} as Worker;
 
-      const checkInTime = status === 'Present' || status === 'Overtime' ? '08:00 AM' : '--:--';
-      const checkOutTime = status === 'Overtime' ? '07:30 PM' : status === 'Present' ? '05:00 PM' : '--:--';
-
-      if (existingIdx > -1) {
-        const updated = [...prev];
-        updated[existingIdx] = {
-          ...updated[existingIdx],
-          status,
-          checkIn: checkInTime,
-          checkOut: checkOutTime,
-        };
-        return updated;
-      } else {
-        const record: AttendanceRecord = {
-          workerId,
-          date: todayDate,
-          status,
-          checkIn: checkInTime,
-          checkOut: checkOutTime,
-        };
-        return [...prev, record];
+  useEffect(() => {
+    // Initial fetch from backend
+    api.getWorkers().then((fetchedWorkers) => {
+      setWorkers(fetchedWorkers);
+      if (fetchedWorkers.length > 0 && !fetchedWorkers.find(w => w.id === selectedWorkerId)) {
+        setSelectedWorkerId(fetchedWorkers[0].id);
       }
     });
-
-    // Update active salary days count dynamically in response to attendance clicks!
-    setSalaries((prev) => {
-      return prev.map((s) => {
-        const currentPeriod = `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date())} ${new Date().getFullYear()}`;
-        if (s.workerId === workerId && s.period === currentPeriod) {
-          const isMarkedIn = status === 'Present' || status === 'Overtime';
-          const increment = isMarkedIn ? 1 : -1;
-          const wageValue = 1000;
-
-          const updatedDays = Math.max(0, Math.min(22, s.daysWorked + increment));
-          const updatedGross = updatedDays * wageValue;
-
-          return {
-            ...s,
-            daysWorked: updatedDays,
-            grossPay: updatedGross,
-            overtimePay: status === 'Overtime' ? s.overtimePay + 1500 : s.overtimePay,
-          };
-        }
-        return s;
-      });
+    api.getAttendance().then((fetchedAttendance) => {
+      setAttendance(fetchedAttendance);
     });
+    
+    api.generateSalary(new Date().toISOString())
+      .then(() => api.getSalaries())
+      .then((fetchedSalaries) => setSalaries(fetchedSalaries))
+      .catch((e) => alert("Failed to fetch/generate salaries: " + e.message));
+  }, []);
+
+  // Callback to add a new worker
+  const handleAddWorker = async (newWorker: Omit<Worker, 'id' | 'joinedDate'>) => {
+    try {
+      await api.createWorker(newWorker);
+      const updatedWorkers = await api.getWorkers();
+      setWorkers(updatedWorkers);
+      
+      const recruit = updatedWorkers[0] || newWorker; 
+
+      // Create automatic blank salary record for October 2023 Period
+      const mockSalary: SalaryRecord = {
+        workerId: recruit.id,
+        period: `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date())} ${new Date().getFullYear()}`,
+        daysWorked: 0,
+        totalDays: 0,
+        grossPay: 0,
+        overtimePay: 0,
+        advanceDeduction: 0,
+        status: 'Pending',
+      };
+      setSalaries((prev) => [mockSalary, ...prev]);
+
+      // Push notification alert
+      setNotificationsCount((c) => c + 1);
+    } catch (e) {
+      alert("Failed to create worker in DB");
+    }
+  };
+
+  const handleUpdateAttendance = (
+    workerId: string,
+    status: 'Present' | 'Absent' | 'Overtime' | 'UpdateTimes',
+    checkInTimeStr?: string,
+    checkOutTimeStr?: string,
+    targetDateStr?: string
+  ) => {
+    setAttendance((prev) => {
+      const activeDate = targetDateStr || new Date().toISOString().split('T')[0];
+      const existingIdx = prev.findIndex((a) => a.workerId === workerId && a.date === activeDate);
+
+      const nextRecords = [...prev];
+      let newStatus = status;
+      if (status === 'UpdateTimes') {
+         newStatus = existingIdx > -1 ? nextRecords[existingIdx].status : 'Present';
+      }
+
+      let checkInTime = checkInTimeStr ?? (status === 'UpdateTimes' ? (existingIdx > -1 ? nextRecords[existingIdx].checkIn : '09:00') : (status === 'Absent' ? '--:--' : '09:00'));
+      let checkOutTime = checkOutTimeStr ?? (status === 'UpdateTimes' ? (existingIdx > -1 ? nextRecords[existingIdx].checkOut : '18:00') : (status === 'Absent' ? '--:--' : (status === 'Overtime' ? '21:00' : '18:00')));
+
+      if (existingIdx > -1) {
+        nextRecords[existingIdx] = {
+          ...nextRecords[existingIdx],
+          status: newStatus as 'Present'|'Absent'|'Overtime',
+          checkIn: checkInTime,
+          checkOut: checkOutTime,
+          overtimeHours: newStatus === 'Overtime' ? 1 : 0,
+        };
+      } else {
+        nextRecords.push({
+          workerId,
+          date: activeDate,
+          status: newStatus as 'Present'|'Absent'|'Overtime',
+          checkIn: checkInTime,
+          checkOut: checkOutTime,
+          overtimeHours: newStatus === 'Overtime' ? 1 : 0,
+        });
+      }
+
+      // Update active salary days count dynamically and enforce strict wage limits
+      setSalaries((prevSal) => {
+        return prevSal.map((s) => {
+          const currentPeriod = getCurrentPeriod();
+          if (s.workerId === workerId && s.period === currentPeriod) {
+            const currentMonthAttendances = nextRecords.filter(a => a.workerId === workerId && a.date.startsWith(activeDate.substring(0, 7)));
+            let pDays = 0, oDays = 0;
+            currentMonthAttendances.forEach(a => {
+              if (a.status === 'Present') pDays++;
+              if (a.status === 'Overtime') oDays++;
+            });
+            return {
+              ...s,
+              daysWorked: pDays + oDays,
+              grossPay: pDays * 1000,
+              overtimePay: oDays * 1500,
+            };
+          }
+          return s;
+        });
+      });
+
+      const recordToSave = nextRecords.find(a => a.workerId === workerId && a.date === activeDate);
+      if (recordToSave) {
+        api.markAttendance(recordToSave)
+          .then(() => api.generateSalary(activeDate, workerId))
+          .then(() => api.getSalaries())
+          .then((freshSalaries) => setSalaries(freshSalaries))
+          .catch(() => console.error("Failed to sync attendance/salary in DB"));
+      }
+
+      return nextRecords;
+    });
+  };
+
+  const handleEditWorker = async (id: string, updatedWorker: Partial<Worker>) => {
+    try {
+      await api.updateWorker(id, updatedWorker);
+      const updatedWorkers = await api.getWorkers();
+      setWorkers(updatedWorkers);
+    } catch (e) {
+      alert("Failed to update worker in DB");
+    }
+  };
+
+  const handleDeleteWorker = async (id: string) => {
+    if (true) {
+      try {
+        await api.deleteWorker(id);
+        const updatedWorkers = await api.getWorkers();
+        setWorkers(updatedWorkers);
+        if (selectedWorkerId === id) setCurrentView('workers');
+        const updatedAttendance = await api.getAttendance();
+        setAttendance(updatedAttendance);
+        const updatedSalaries = await api.getSalaries();
+        setSalaries(updatedSalaries);
+      } catch (e) {
+        alert("Failed to delete worker in DB");
+      }
+    }
   };
 
   // Callback to edit salary
-  const handleEditSalary = (workerId: string, grossPay: number, overtimePay: number) => {
-    setSalaries((prev) => {
-      return prev.map((s) => {
-        const currentPeriod = `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date())} ${new Date().getFullYear()}`;
-        if (s.workerId === workerId && s.period === currentPeriod) {
-          return {
-            ...s,
-            grossPay,
-            overtimePay,
-          };
-        }
-        return s;
-      });
-    });
+  const handleEditSalary = (workerId: string, grossPay: number, overtimePay: number, period?: string) => {
+    const s = period ? salaries.find(sal => sal.workerId === workerId && sal.period === period) : salaries.find(sal => sal.workerId === workerId);
+    if (s && s.id) {
+      // Overtime logic mapping to backend
+      const overtimeHours = overtimePay / 1500;
+      api.updateSalary(s.id, { grossSalary: grossPay + overtimePay, overtimeHours })
+        .then(() => api.getSalaries())
+        .then(setSalaries)
+        .catch(() => alert('Failed to edit salary in DB'));
+    }
   };
 
+  const handleToggleSalaryStatus = async (id: string, amount?: number, isRevert?: boolean) => {
+    const targetSalary = salaries.find(s => s.id === id);
+    if (!targetSalary) return;
+
+    try {
+      if (isRevert) {
+        await api.updateSalary(targetSalary.id!, { revertPayments: true });
+      } else if (targetSalary.status === 'Pending') {
+        const netPay = targetSalary.grossPay + targetSalary.overtimePay - targetSalary.advanceDeduction;
+        const paymentToMake = amount ?? netPay;
+        await api.updateSalary(targetSalary.id!, { paymentAmount: paymentToMake });
+      }
+      
+      const freshSalaries = await api.getSalaries();
+      setSalaries(freshSalaries);
+    } catch (err) {
+      console.error("Failed to update salary status", err);
+    }
+  };
 
   // Callback to approve individual pending salary rollouts
   const handleApproveSalary = (workerId: string) => {
     setSalaries((prev) => {
       return prev.map((s) => {
-        const currentPeriod = `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date())} ${new Date().getFullYear()}`;
+        const currentPeriod = getCurrentPeriod();
         if (s.workerId === workerId && s.period === currentPeriod) {
           return {
             ...s,
@@ -166,7 +246,7 @@ export default function App() {
     // Automatically recover Outstanding Advances if the worker had approved advances and got salary disbursements!
     setAdvances((prev) => {
       return prev.map((adv) => {
-        if (adv.workerId === workerId && adv.status === 'Approved') {
+        if (adv.workerId === workerId && adv.status === 'Given') {
           return {
             ...adv,
             balance: 0,
@@ -195,7 +275,7 @@ export default function App() {
     // Update active salary state so deduction registers automatically on next rollout!
     setSalaries((prev) => {
       return prev.map((s) => {
-        const currentPeriod = `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date())} ${new Date().getFullYear()}`;
+        const currentPeriod = getCurrentPeriod();
         if (s.workerId === newAdvance.workerId && s.period === currentPeriod) {
           return {
             ...s,
@@ -210,7 +290,7 @@ export default function App() {
   // Change individual Advance status
   const handleUpdateAdvanceStatus = (
     id: string,
-    status: 'Approved' | 'Pending' | 'Recovered'
+    status: 'Given' | 'Recovered'
   ) => {
     setAdvances((prev) => {
       return prev.map((adv) => {
@@ -232,9 +312,19 @@ export default function App() {
 
   return (
     <div className="bg-[#f6f9ff] min-h-screen text-slate-900 flex">
+      {isPinModalOpen && (
+        <PinPromptModal
+          isOpen={isPinModalOpen}
+          onClose={() => setIsPinModalOpen(false)}
+          onSuccess={() => {
+            secureAction?.();
+            setIsPinModalOpen(false);
+          }}
+        />
+      )}
       {/* Sidebar */}
       {!hideShell && (
-        <Sidebar currentView={currentView} setView={setView} />
+        <Sidebar currentView={currentView} setView={setCurrentView} />
       )}
 
       {/* Main Content Area */}
@@ -243,15 +333,15 @@ export default function App() {
         {!hideShell && (
           <TopAppBar
             currentView={currentView}
-            setView={setView}
+            setView={setCurrentView}
             onBack={() => {
               // Context aware back triggers
               if (currentView === 'worker-profile') {
-                setView('workers');
+                setCurrentView('workers');
               } else if (currentView === 'advance-payments') {
-                setView('salary');
+                setCurrentView('salary');
               } else {
-                setView('dashboard');
+                setCurrentView('dashboard');
               }
             }}
             onEditProfile={() => alert(`Profile editor console opened for ${activeWorker.name}`)}
@@ -265,13 +355,13 @@ export default function App() {
           <AnimatePresence mode="wait">
             {currentView === 'splash' && (
               <motion.div key="splash" className="w-full">
-                <SplashView onComplete={() => setView('login')} />
+                <SplashView onComplete={() => setCurrentView('login')} />
               </motion.div>
             )}
 
             {currentView === 'login' && (
               <motion.div key="login" className="w-full">
-                <LoginView onLoginSuccess={() => setView('dashboard')} />
+                <LoginView onLoginSuccess={() => setCurrentView('dashboard')} />
               </motion.div>
             )}
 
@@ -281,10 +371,10 @@ export default function App() {
                   workers={workers}
                   attendance={attendance}
                   salaries={salaries}
-                  setView={setView}
+                  setView={setCurrentView}
                   setSelectedWorkerId={(id) => {
                     setSelectedWorkerId(id);
-                    setView('worker-profile');
+                    setCurrentView('worker-profile');
                   }}
                   onQuickAddWorkerTrigger={() => setIsAddWorkerOpen(true)}
                 />
@@ -295,11 +385,13 @@ export default function App() {
               <motion.div key="workers" className="w-full">
                 <WorkersView
                   workers={workers}
-                  setView={setView}
+                  setView={setCurrentView}
                   setSelectedWorkerId={setSelectedWorkerId}
-                  onAddWorker={handleAddWorker}
+                  onAddWorker={(w) => requestSecureAction(() => handleAddWorker(w))}
                   isAddModalOpen={isAddWorkerOpen}
                   setIsAddModalOpen={setIsAddWorkerOpen}
+                  onEditWorker={(id, w) => requestSecureAction(() => handleEditWorker(id, w))}
+                  onDeleteWorker={(id) => requestSecureAction(() => handleDeleteWorker(id))}
                 />
               </motion.div>
             )}
@@ -310,9 +402,8 @@ export default function App() {
                   worker={activeWorker}
                   attendance={attendance}
                   salaries={salaries}
-                  setView={setView}
-                  onNavigateToAdvances={() => setView('advance-payments')}
-                  onNavigateToSalaryApproval={() => handleApproveSalary(activeWorker.id)}
+                  setView={setCurrentView}
+                  onNavigateToSalaryApproval={() => requestSecureAction(() => handleToggleSalaryStatus(activeWorker.id))}
                 />
               </motion.div>
             )}
@@ -332,28 +423,30 @@ export default function App() {
                 <SalaryView
                   workers={workers}
                   salaries={salaries}
-                  onApproveSalary={handleApproveSalary}
+                  onToggleSalaryStatus={(id, amount, isRevert) => requestSecureAction(() => handleToggleSalaryStatus(id, amount, isRevert))}
                   onEditSalary={handleEditSalary}
-                  setView={setView}
+                  setView={setCurrentView}
                 />
               </motion.div>
             )}
 
-            {currentView === 'advance-payments' && (
-              <motion.div key="advance-payments" className="w-full">
-                <AdvancePaymentsView
-                  workers={workers}
-                  advances={advances}
-                  onAddAdvance={handleAddAdvance}
-                  onUpdateAdvanceStatus={handleUpdateAdvanceStatus}
-                  setView={setView}
-                />
-              </motion.div>
-            )}
+
 
             {currentView === 'analytics' && (
               <motion.div key="analytics" className="w-full">
-                <AnalyticsView workers={workers} setView={setView} />
+                <AnalyticsView workers={workers} salaries={salaries} attendance={attendance} onUpdateAttendance={handleUpdateAttendance} />
+              </motion.div>
+            )}
+
+            {currentView === 'settings' && (
+              <motion.div key="settings" className="w-full">
+                <SettingsView />
+              </motion.div>
+            )}
+
+            {currentView === 'deleted-workers' && (
+              <motion.div key="deleted-workers" className="w-full">
+                <DeletedWorkersView onRestore={() => window.location.reload()} requestSecureAction={requestSecureAction} />
               </motion.div>
             )}
           </AnimatePresence>

@@ -10,6 +10,8 @@ interface WorkersViewProps {
   onAddWorker: (worker: Omit<Worker, 'id' | 'joinedDate'>) => void;
   isAddModalOpen: boolean;
   setIsAddModalOpen: (open: boolean) => void;
+  onEditWorker: (id: string, updatedWorker: Partial<Worker>) => void;
+  onDeleteWorker: (id: string) => void;
 }
 
 export default function WorkersView({
@@ -19,15 +21,19 @@ export default function WorkersView({
   onAddWorker,
   isAddModalOpen,
   setIsAddModalOpen,
+  onEditWorker,
+  onDeleteWorker,
 }: WorkersViewProps) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'On Leave' | 'Disabled'>('All');
 
   // Add Worker Form state
   const [newWorkerName, setNewWorkerName] = useState('');
-  const [newWorkerRole, setNewWorkerRole] = useState('Senior Technician');
-  const [newWorkerWage, setNewWorkerWage] = useState(160);
+  const [newWorkerRole, setNewWorkerRole] = useState('General Labourer');
+  const [newWorkerWage, setNewWorkerWage] = useState(1000);
   const [newWorkerPhone, setNewWorkerPhone] = useState('+1 (555) ');
+
+  const [editingWorker, setEditingWorker] = useState<Worker | null>(null);
   const [newWorkerEmail, setNewWorkerEmail] = useState('');
   const [newWorkerStatus, setNewWorkerStatus] = useState<'Active' | 'On Leave'>('Active');
 
@@ -65,8 +71,8 @@ export default function WorkersView({
 
     // Clear form
     setNewWorkerName('');
-    setNewWorkerRole('Senior Technician');
-    setNewWorkerWage(160);
+    setNewWorkerRole('General Labourer');
+    setNewWorkerWage(1000);
     setNewWorkerPhone('+1 (555) ');
     setNewWorkerEmail('');
     setIsAddModalOpen(false);
@@ -145,15 +151,36 @@ export default function WorkersView({
                     </h2>
                     <span className="text-xs text-[#7c839b]">{w.role}</span>
                     <span className="text-xs font-bold text-[#4b41e1] mt-1">
-                      ${w.dailyWage} / day
+                      ₹{w.dailyWage} / day
                     </span>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-end gap-2">
-                  <button className="text-slate-450 hover:bg-slate-100 p-1 rounded-full transition-colors cursor-pointer">
-                    <MoreVertical className="w-4 h-4 text-slate-400" />
-                  </button>
+                  <div className="flex gap-1.5">
+                    <button 
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        setSelectedWorkerId(w.id);
+                        setView('worker-profile');
+                      }}
+                      className="text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 px-2 py-1 rounded transition-colors cursor-pointer text-xs font-semibold"
+                    >
+                      View
+                    </button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setEditingWorker(w); }}
+                      className="text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition-colors cursor-pointer text-xs font-semibold"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); onDeleteWorker(w.id); }}
+                      className="text-red-400 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded transition-colors cursor-pointer text-xs font-semibold"
+                    >
+                      Delete
+                    </button>
+                  </div>
                   <span
                     className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${isDisabled
                         ? 'bg-red-50 text-red-650'
@@ -221,23 +248,18 @@ export default function WorkersView({
                       onChange={(e) => setNewWorkerRole(e.target.value)}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
                     >
-                      <option value="Senior Technician">Senior Technician</option>
                       <option value="Electrician">Electrician</option>
-                      <option value="Site Supervisor">Site Supervisor</option>
-                      <option value="Plumber">Plumber</option>
-                      <option value="Master Mason">Master Mason</option>
-                      <option value="Logistics Coordinator">Logistics Coordinator</option>
-                      <option value="General Laborer">General Laborer</option>
+                      <option value="Carpenter">Carpenter</option>
+                      <option value="General Labourer">General Labourer</option>
                     </select>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500">Daily Wage ($)</label>
+                    <label className="text-xs font-bold text-slate-500">Daily Wage (₹)</label>
                     <input
                       type="number"
                       required
-                      min={80}
-                      max={400}
+                      min={100}
                       value={newWorkerWage}
                       onChange={(e) => setNewWorkerWage(Number(e.target.value))}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
@@ -294,6 +316,126 @@ export default function WorkersView({
                     className="flex-1 py-3 bg-[#4b41e1] hover:bg-[#6c61f2] text-white font-bold text-sm rounded-xl shadow-lg shadow-[#4b41e1]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     <UserCheck className="w-4 h-4" /> Add Recruit
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Worker Dialog Modal */}
+      <AnimatePresence>
+        {editingWorker && (
+          <div className="fixed inset-0 bg-[#0f172a]/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-200"
+            >
+              <div className="bg-[#4b41e1] text-white px-6 py-4 flex items-center justify-between">
+                <h3 className="font-display font-bold text-base">Edit Worker</h3>
+                <button
+                  onClick={() => setEditingWorker(null)}
+                  className="p-1 rounded-full text-indigo-200 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                onEditWorker(editingWorker.id, editingWorker);
+                setEditingWorker(null);
+              }} className="p-6 space-y-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500">FullName</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingWorker.name}
+                    onChange={(e) => setEditingWorker({ ...editingWorker, name: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-500">Role / Trade</label>
+                    <select
+                      value={editingWorker.role}
+                      onChange={(e) => setEditingWorker({ ...editingWorker, role: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                    >
+                      <option value="Electrician">Electrician</option>
+                      <option value="Carpenter">Carpenter</option>
+                      <option value="General Labourer">General Labourer</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-500">Daily Wage (₹)</label>
+                    <input
+                      type="number"
+                      required
+                      min={100}
+                      value={editingWorker.dailyWage}
+                      onChange={(e) => setEditingWorker({ ...editingWorker, dailyWage: Number(e.target.value) })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500">Phone</label>
+                  <input
+                    type="tel"
+                    required
+                    value={editingWorker.phone}
+                    onChange={(e) => setEditingWorker({ ...editingWorker, phone: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-500">Email (Optional)</label>
+                    <input
+                      type="email"
+                      value={editingWorker.email}
+                      onChange={(e) => setEditingWorker({ ...editingWorker, email: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-500">Status</label>
+                    <select
+                      value={editingWorker.status}
+                      onChange={(e) => setEditingWorker({ ...editingWorker, status: e.target.value as 'Active' | 'On Leave' | 'Disabled' })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="On Leave">On Leave</option>
+                      <option value="Disabled">Disabled</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="pt-4 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditingWorker(null)}
+                    className="flex-1 py-3 border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-sm rounded-xl transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 py-3 bg-[#4b41e1] hover:bg-[#6c61f2] text-white font-bold text-sm rounded-xl shadow-lg shadow-[#4b41e1]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    Save Changes
                   </button>
                 </div>
               </form>

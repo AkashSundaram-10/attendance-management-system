@@ -89,7 +89,9 @@ const getAttendance = async (req, res, next) => {
   try {
     const { date, workerId } = req.query;
     
-    let where = {};
+    let where = {
+      worker: { isDeleted: false }
+    };
     if (date) {
       const targetDate = new Date(date);
       targetDate.setUTCHours(0, 0, 0, 0);
@@ -131,6 +133,7 @@ const getMonthlyAttendance = async (req, res, next) => {
         gte: startDate,
         lte: endDate,
       },
+      worker: { isDeleted: false }
     };
 
     if (workerId) {

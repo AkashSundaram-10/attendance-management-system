@@ -18,10 +18,9 @@ export default function Sidebar({ currentView, setView }: SidebarProps) {
     { id: 'workers' as AppView, label: 'Workers', icon: Users },
     { id: 'attendance' as AppView, label: 'Attendance', icon: CalendarCheck2 },
     { id: 'salary' as AppView, label: 'Salary', icon: BadgeDollarSign },
-    { id: 'advance-payments' as AppView, label: 'Advances', icon: CreditCard },
-    { id: 'salary' as AppView, label: 'Payments', icon: FileText }, // Reusing salary view for payments
-    { id: 'analytics' as AppView, label: 'Reports', icon: PieChart },
-    { id: 'dashboard' as AppView, label: 'Settings', icon: Settings }, // Dummy for now
+    { id: 'analytics' as AppView, label: 'Analytics', icon: PieChart },
+    { id: 'settings' as AppView, label: 'Settings', icon: Settings },
+    { id: 'deleted-workers' as AppView, label: 'Recycle Bin', icon: FileText },
   ];
 
   return (

@@ -4,11 +4,33 @@ const { sendSuccess } = require('../utils/response');
 
 const generateSalary = async (req, res, next) => {
   try {
-    const { month, year, workerId } = req.body;
+    const { month, year, workerId, targetDate } = req.body;
 
-    const startDate = new Date(Date.UTC(year, month - 1, 1));
-    const endDate = new Date(Date.UTC(year, month, 0)); // Last day of month
-    endDate.setUTCHours(23, 59, 59, 999);
+    const getWeek = (date) => {
+      const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+      const dayNum = d.getUTCDay() || 7;
+      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+      return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1)/7);
+    };
+
+    let startDate, endDate, dbMonth = month;
+
+    if (targetDate) {
+      const d = new Date(targetDate);
+      const day = d.getUTCDay() || 7;
+      startDate = new Date(d);
+      startDate.setUTCDate(d.getUTCDate() - day + 1);
+      startDate.setUTCHours(0, 0, 0, 0);
+
+      endDate = new Date(startDate);
+      endDate.setUTCDate(startDate.getUTCDate() + 6);
+      endDate.setUTCHours(23, 59, 59, 999);
+      
+      dbMonth = getWeek(d);
+    } else {
+      endDate.setUTCHours(23, 59, 59, 999);
+    }
 
     // Get workers
     const workers = await prisma.worker.findMany({
@@ -31,33 +53,28 @@ const generateSalary = async (req, res, next) => {
 
       let totalDays = 0;
       let totalOvertimeHours = 0;
+      let grossSalary = 0;
 
       attendances.forEach(att => {
-        if (att.status === 'PRESENT') totalDays += 1;
-        else if (att.status === 'HALF_DAY') totalDays += 0.5;
+        const dailyRate = worker.dailyWage || 1000;
+        const overtimeRate = worker.overtimeRate || (dailyRate * 1.5); // Fallback to 1.5x if not set, or 1500
+
+        if (att.status === 'PRESENT') {
+           grossSalary += dailyRate;
+           totalDays += 1;
+        } else if (att.status === 'OVERTIME') {
+           grossSalary += Math.max(overtimeRate, 1500);
+           totalDays += 1;
+           totalOvertimeHours += 1;
+        } else if (att.status === 'HALF_DAY') {
+           grossSalary += dailyRate / 2;
+           totalDays += 0.5;
+        }
         
-        if (att.overtimeHours) totalOvertimeHours += att.overtimeHours;
+        if (att.overtimeHours && att.status !== 'OVERTIME') totalOvertimeHours += att.overtimeHours;
       });
 
-      // Gross Salary calculation
-      let grossSalary = 0;
-      if (worker.wageType === 'DAILY') {
-        grossSalary = totalDays * worker.dailyWage;
-      } else if (worker.wageType === 'MONTHLY') {
-        // If monthly, assume full salary minus absent days proportionally, or simpler:
-        // for this scope, let's just use monthly wage if they are present mostly, 
-        // or daily proportion of monthly wage. Let's use dailyWage as monthly amount for MONTHLY workers
-        // wait, the schema has `dailyWage`. Let's assume dailyWage stores the base rate.
-        grossSalary = worker.dailyWage; // Needs business logic clarification, using base
-      } else if (worker.wageType === 'HOURLY') {
-        // Assume dailyWage is hourly rate
-        grossSalary = totalDays * 8 * worker.dailyWage; 
-      }
-
-      // Add overtime
-      const overtimeRate = worker.overtimeRate || (worker.dailyWage / 8);
-      const overtimeBonus = totalOvertimeHours * overtimeRate;
-      grossSalary += overtimeBonus;
+      // No dynamic base rate. Hardcoded as per user instruction.
 
       // Handle Advances (simplistic deduction for demo, usually you'd track total unpaid advances)
       // We will deduct up to the grossSalary amount
@@ -87,7 +104,7 @@ const generateSalary = async (req, res, next) => {
       // Save record
       const record = await prisma.salaryRecord.upsert({
         where: {
-          workerId_month_year: { workerId: worker.id, month, year }
+          workerId_month_year: { workerId: worker.id, month: dbMonth, year }
         },
         update: {
           totalDays,
@@ -98,13 +115,14 @@ const generateSalary = async (req, res, next) => {
         },
         create: {
           workerId: worker.id,
-          month,
+          month: dbMonth,
           year,
           totalDays,
           overtimeHours: totalOvertimeHours,
           grossSalary,
           advanceDeduction,
           finalSalary,
+          paymentStatus: 'PENDING'
         }
       });
 
@@ -121,7 +139,9 @@ const getSalaries = async (req, res, next) => {
   try {
     const { month, year, workerId } = req.query;
 
-    let where = {};
+    let where = {
+      worker: { isDeleted: false }
+    };
     if (month) where.month = parseInt(month);
     if (year) where.year = parseInt(year);
     if (workerId) where.workerId = workerId;
@@ -129,7 +149,8 @@ const getSalaries = async (req, res, next) => {
     const salaries = await prisma.salaryRecord.findMany({
       where,
       include: {
-        worker: { select: { fullName: true, workerCode: true } }
+        worker: { select: { fullName: true, workerCode: true } },
+        payments: true
       },
       orderBy: [{ year: 'desc' }, { month: 'desc' }]
     });
@@ -145,7 +166,10 @@ const getWorkerSalary = async (req, res, next) => {
     const { workerId } = req.params;
     
     const salaries = await prisma.salaryRecord.findMany({
-      where: { workerId },
+      where: { 
+        workerId,
+        worker: { isDeleted: false }
+      },
       orderBy: [{ year: 'desc' }, { month: 'desc' }]
     });
 
@@ -155,8 +179,60 @@ const getWorkerSalary = async (req, res, next) => {
   }
 };
 
+const updateSalary = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { grossSalary, overtimeHours, advanceDeduction, paymentAmount, revertPayments } = req.body;
+    
+    let record = await prisma.salaryRecord.findUnique({ where: { id }, include: { payments: true } });
+    if (!record) return res.status(404).json({ success: false, message: 'Salary record not found' });
+
+    if (grossSalary !== undefined || overtimeHours !== undefined || advanceDeduction !== undefined) {
+      record = await prisma.salaryRecord.update({
+        where: { id },
+        data: {
+          ...(grossSalary !== undefined ? { grossSalary } : {}),
+          ...(overtimeHours !== undefined ? { overtimeHours } : {}),
+          ...(advanceDeduction !== undefined ? { advanceDeduction } : {})
+        },
+        include: { payments: true }
+      });
+    }
+
+    if (revertPayments) {
+      await prisma.payment.deleteMany({ where: { salaryRecordId: id } });
+      record = await prisma.salaryRecord.update({
+        where: { id },
+        data: { paymentStatus: 'PENDING' },
+        include: { payments: true }
+      });
+    } else if (paymentAmount !== undefined) {
+      await prisma.payment.create({
+        data: {
+          workerId: record.workerId,
+          salaryRecordId: record.id,
+          amountPaid: paymentAmount,
+        }
+      });
+      record = await prisma.salaryRecord.findUnique({ where: { id }, include: { payments: true } });
+      const totalPaid = record.payments.reduce((acc, curr) => acc + curr.amountPaid, 0);
+      const netPay = record.grossSalary - record.advanceDeduction;
+      if (totalPaid >= netPay) {
+         record = await prisma.salaryRecord.update({ where: { id }, data: { paymentStatus: 'PAID' }, include: { payments: true } });
+      } else {
+         record = await prisma.salaryRecord.update({ where: { id }, data: { paymentStatus: 'PENDING' }, include: { payments: true } });
+      }
+    }
+
+    sendSuccess(res, 200, 'Salary updated successfully', record);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   generateSalary,
   getSalaries,
   getWorkerSalary,
+  updateSalary,
 };

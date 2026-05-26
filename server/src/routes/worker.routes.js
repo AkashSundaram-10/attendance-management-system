@@ -12,6 +12,9 @@ router
   .route('/')
   .get(workerController.getWorkers)
   .post(validate(createWorkerSchema), workerController.createWorker);
+router.get('/deleted', workerController.getDeletedWorkers);
+router.post('/:id/restore', workerController.restoreWorker);
+router.delete('/:id/hard', workerController.hardDeleteWorker);
 
 router
   .route('/:id')

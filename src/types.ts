@@ -20,6 +20,7 @@ export interface AttendanceRecord {
 }
 
 export interface SalaryRecord {
+  id?: string;
   workerId: string;
   period: string; // e.g., "October 2023"
   daysWorked: number; // e.g. 22
@@ -27,9 +28,9 @@ export interface SalaryRecord {
   grossPay: number; // dailyWage * daysWorked
   overtimePay: number; // bonus or OT pay
   advanceDeduction: number;
-  tax: number;
   status: 'Pending' | 'Paid';
   disbursementDate?: string;
+  paidAmount?: number;
 }
 
 export interface AdvancePayment {
@@ -39,7 +40,7 @@ export interface AdvancePayment {
   workerAvatar: string;
   amount: number;
   balance: number;
-  status: 'Approved' | 'Pending' | 'Recovered';
+  status: 'Given' | 'Recovered';
   requestedDate: string;
 }
 
@@ -51,5 +52,6 @@ export type AppView =
   | 'attendance'
   | 'salary'
   | 'worker-profile'
-  | 'advance-payments'
-  | 'analytics';
+  | 'analytics'
+  | 'settings'
+  | 'deleted-workers';

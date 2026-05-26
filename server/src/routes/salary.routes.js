@@ -11,5 +11,6 @@ router.use(protect);
 router.post('/generate', validate(generateSalarySchema), salaryController.generateSalary);
 router.get('/', salaryController.getSalaries);
 router.get('/:workerId', salaryController.getWorkerSalary);
+router.put('/:id', salaryController.updateSalary);
 
 module.exports = router;

@@ -1,37 +1,45 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Download, ClipboardList, CheckCircle2, AlertCircle, ChevronDown, ChevronUp, Check, DollarSign } from 'lucide-react';
+import { Search, Download, ClipboardList, CheckCircle2, AlertCircle, ChevronDown, ChevronUp, Check, Clock, CheckCircle } from 'lucide-react';
 import { Worker, SalaryRecord, AppView } from '../types';
+import { getCurrentPeriod, getWeeksForMonthLabel, getAllMonthsForYear } from '../api';
 
 interface SalaryViewProps {
   workers: Worker[];
   salaries: SalaryRecord[];
-  onApproveSalary: (workerId: string) => void;
-  onEditSalary: (workerId: string, grossPay: number, overtimePay: number) => void;
+  onToggleSalaryStatus: (id: string, amount?: number, isRevert?: boolean) => void;
+  onEditSalary: (workerId: string, grossPay: number, overtimePay: number, period?: string) => void;
   setView: (view: AppView) => void;
 }
 
-export default function SalaryView({ workers, salaries, onApproveSalary, onEditSalary, setView }: SalaryViewProps) {
+export default function SalaryView({ workers, salaries, onToggleSalaryStatus, onEditSalary, setView }: SalaryViewProps) {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'All' | 'Pending' | 'Paid'>('All');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const currentYear = parseInt(getCurrentPeriod().split(' ')[1], 10);
+  const availableMonths = getAllMonthsForYear(currentYear);
+  const [selectedMonth, setSelectedMonth] = useState<string>(getCurrentPeriod().split(' | ')[0]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editGrossPay, setEditGrossPay] = useState(0);
   const [editOvertimePay, setEditOvertimePay] = useState(0);
 
   // Calculate high-fidelity stats aggregates
-  const totalProjected = salaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
-  const totalDisbursed = salaries
-    .filter((s) => s.status === 'Paid')
-    .reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay - curr.advanceDeduction, 0);
-  const totalPending = salaries
-    .filter((s) => s.status === 'Pending')
-    .reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
+  const currentSalaries = salaries.filter(s => s.period.startsWith(selectedMonth) && workers.some(w => w.id === s.workerId));
+  
+  // Get all weeks for the selected month, regardless of whether there are salaries
+  const weeks = getWeeksForMonthLabel(selectedMonth);
 
-  const disbursedPct = totalProjected > 0 ? Math.round((totalDisbursed / totalProjected) * 100) : 65;
+  const totalProjected = currentSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
+  const totalDisbursed = currentSalaries
+    .reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? curr.grossPay + curr.overtimePay : 0)), 0);
+  const totalPending = currentSalaries
+    .filter((s) => s.status === 'Pending')
+    .reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay - (curr.paidAmount || 0), 0);
+
+  const disbursedPct = totalProjected > 0 ? Math.round((totalDisbursed / totalProjected) * 100) : 0;
 
   // Search & Filter
-  const filteredSalaries = salaries.filter((s) => {
+  const filteredSalaries = currentSalaries.filter((s) => {
     const worker = workers.find((w) => w.id === s.workerId);
     if (!worker) return false;
 
@@ -60,11 +68,25 @@ export default function SalaryView({ workers, salaries, onApproveSalary, onEditS
     >
       {/* Header Row */}
       <section className="flex justify-between items-end">
-        <div>
-          <h2 className="text-xl font-display font-black text-slate-900 leading-tight">
+        <div className="w-full">
+          <h2 className="text-2xl font-display font-black text-slate-800 tracking-tight">
             Salary Overview
           </h2>
-          <p className="text-xs text-slate-500 font-medium">{`${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date())} ${new Date().getFullYear()} Period`}</p>
+          <div className="flex items-center gap-2 mt-3 overflow-x-auto pb-2 no-scrollbar w-full">
+            {availableMonths.map(m => (
+              <button
+                key={m}
+                onClick={() => setSelectedMonth(m)}
+                className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                  selectedMonth === m
+                    ? 'bg-[#4b41e1] text-white shadow-md shadow-[#4b41e1]/20'
+                    : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
         </div>
         <button
           onClick={() => alert('Demo Notice: Exporting ledger records as CSV/Sheets...')}
@@ -164,28 +186,53 @@ export default function SalaryView({ workers, salaries, onApproveSalary, onEditS
         </div>
       </section>
 
-      {/* Worker Salary lists cards container */}
-      <section className="space-y-3.5">
-        {filteredSalaries.length === 0 ? (
+      {/* Worker Salary lists cards container grouped by week */}
+      <section className="space-y-8">
+        {weeks.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400 text-xs">
             No salary records match filters.
           </div>
         ) : (
-          filteredSalaries.map((s) => {
-            const worker = workers.find((w) => w.id === s.workerId);
-            if (!worker) return null;
+          weeks.map(week => {
+            const weekSalaries = filteredSalaries.filter(s => s.period === week).sort((a, b) => {
+              const wA = workers.find(w => w.id === a.workerId);
+              const wB = workers.find(w => w.id === b.workerId);
+              return (wA?.name || '').localeCompare(wB?.name || '');
+            });
 
-            const isExpanded = expandedId === worker.id;
-            const netPay = s.grossPay + s.overtimePay - s.advanceDeduction - s.tax;
+            const weekProjected = weekSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
+            const weekDisbursed = weekSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? curr.grossPay + curr.overtimePay : 0)), 0);
+            const weekPending = weekSalaries.filter((s) => s.status === 'Pending').reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay - (curr.paidAmount || 0), 0);
+
+            return (
+              <div key={week} className="space-y-3.5">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <h3 className="text-lg font-black font-display text-slate-800">{week.includes(' | ') ? week.split(' | ')[1] : week}</h3>
+                  <div className="flex items-center gap-4 text-xs font-bold">
+                    <span className="text-emerald-600">Paid: ₹{weekDisbursed.toLocaleString()}</span>
+                    <span className="text-red-500">Unpaid: ₹{weekPending.toLocaleString()}</span>
+                    <span className="text-slate-500">Total: ₹{weekProjected.toLocaleString()}</span>
+                  </div>
+                </div>
+                {weekSalaries.length === 0 ? (
+                  <div className="text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-slate-400 text-xs italic">
+                    No records for this week
+                  </div>
+                ) : weekSalaries.map((s) => {
+                  const worker = workers.find((w) => w.id === s.workerId);
+                  if (!worker) return null;
+
+            const isExpanded = expandedId === s.id;
+            const netPay = s.grossPay + s.overtimePay;
 
             return (
               <div
-                key={worker.id}
+                key={s.id}
                 className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden"
               >
                 {/* Main Card row trigger summaries clicks */}
                 <div
-                  onClick={() => toggleExpand(worker.id)}
+                  onClick={() => toggleExpand(s.id as string)}
                   className="p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
                 >
                   <div className="flex items-center gap-4 w-full md:w-auto">
@@ -215,12 +262,7 @@ export default function SalaryView({ workers, salaries, onApproveSalary, onEditS
                       </div>
                     </div>
 
-                    <div className="hidden md:block text-right">
-                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                        Gross
-                      </div>
-                      <div className="text-xs font-bold text-slate-800">₹{s.grossPay}</div>
-                    </div>
+
 
                     <div className="text-right">
                       <div className="text-base font-display font-black text-slate-900">
@@ -228,11 +270,11 @@ export default function SalaryView({ workers, salaries, onApproveSalary, onEditS
                       </div>
                       {s.status === 'Paid' ? (
                         <div className="text-[10px] font-bold text-emerald-600 flex items-center justify-end gap-0.5">
-                          <Check className="w-3.5 h-3.5" /> Paid {s.disbursementDate || 'Oct 28'}
+                          <Check className="w-3.5 h-3.5" /> {s.paidAmount && s.paidAmount < netPay ? `Paid ₹${s.paidAmount}` : 'Paid'} {s.disbursementDate || 'recently'}
                         </div>
                       ) : (
                         <div className="text-[10px] font-bold text-amber-500 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full inline-flex items-center justify-end gap-1 mt-1 font-sans">
-                          Pending
+                          {s.paidAmount && s.paidAmount > 0 ? `Partial (Paid ₹${s.paidAmount})` : 'Pending'}
                         </div>
                       )}
                     </div>
@@ -253,16 +295,17 @@ export default function SalaryView({ workers, salaries, onApproveSalary, onEditS
                       transition={{ duration: 0.2 }}
                       className="border-t border-slate-150 bg-slate-50 p-4 font-sans select-none"
                     >
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs">
                         <div>
                           <div className="text-slate-400 font-semibold mb-1">
-                            Base Pay ({s.daysWorked} days)
+                            Basic Salary ({Math.max(0, s.daysWorked - Math.round(s.overtimePay / 1500))} days)
                           </div>
-                          {editingId === worker.id ? (
+                          {editingId === s.id ? (
                             <input 
                               type="number" 
+                              step="1"
                               value={editGrossPay} 
-                              onChange={(e) => setEditGrossPay(Number(e.target.value))}
+                              onChange={(e) => setEditGrossPay(parseInt(e.target.value, 10) || 0)}
                               className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs"
                             />
                           ) : (
@@ -270,32 +313,23 @@ export default function SalaryView({ workers, salaries, onApproveSalary, onEditS
                           )}
                         </div>
                         <div>
-                          <div className="text-slate-400 font-semibold mb-1">Overtime/Bonuses</div>
-                          {editingId === worker.id ? (
+                          <div className="text-slate-400 font-semibold mb-1">Overtime ({Math.round(s.overtimePay / 1500)} days)</div>
+                          {editingId === s.id ? (
                             <input 
                               type="number" 
+                              step="1"
                               value={editOvertimePay} 
-                              onChange={(e) => setEditOvertimePay(Number(e.target.value))}
+                              onChange={(e) => setEditOvertimePay(parseInt(e.target.value, 10) || 0)}
                               className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs"
                             />
                           ) : (
                             <div className="font-bold text-emerald-600">+₹{s.overtimePay}</div>
                           )}
                         </div>
-                        <div>
-                          <div className="text-slate-400 font-semibold mb-1">Advance Deductions</div>
-                          <div className="font-bold text-red-600">-₹{s.advanceDeduction}</div>
-                        </div>
-                        <div>
-                          <div className="text-slate-400 font-semibold mb-1">Est Taxes / Levies</div>
-                          <div className="font-bold text-red-650">-₹{s.tax}</div>
-                        </div>
                       </div>
 
                       <div className="mt-5 border-t border-slate-200/60 pt-3 flex justify-between items-center">
-                        <span className="text-slate-450 hover:underline text-[10px] uppercase font-bold tracking-wider cursor-pointer" onClick={() => setView('advance-payments')}>
-                          View Advance Recovery
-                        </span>
+                        <div className="flex-1"></div>
 
                         <div className="flex gap-2">
                           <button
@@ -305,20 +339,20 @@ export default function SalaryView({ workers, salaries, onApproveSalary, onEditS
                             View Payslip
                           </button>
 
-                          {editingId === worker.id ? (
+                          {editingId === s.id ? (
                             <button
                               onClick={() => {
-                                onEditSalary(worker.id, editGrossPay, editOvertimePay);
+                                onEditSalary(worker.id, editGrossPay, editOvertimePay, s.period);
                                 setEditingId(null);
                               }}
                               className="px-3.5 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-bold text-xs rounded-lg transition-colors cursor-pointer select-none"
                             >
                               Save Edit
                             </button>
-                          ) : s.status === 'Pending' ? (
+                          ) : (
                             <button
                               onClick={() => {
-                                setEditingId(worker.id);
+                                setEditingId(s.id as string);
                                 setEditGrossPay(s.grossPay);
                                 setEditOvertimePay(s.overtimePay);
                               }}
@@ -326,24 +360,64 @@ export default function SalaryView({ workers, salaries, onApproveSalary, onEditS
                             >
                               Edit Salary
                             </button>
-                          ) : null}
+                          )}
 
-                          {s.status === 'Pending' && (
-                            <button
+                          {s.status === 'Paid' ? (
+                            <span
+                              className="px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1 bg-slate-100 text-slate-800 hover:bg-slate-200"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                onApproveSalary(worker.id);
+                                onToggleSalaryStatus(s.id as string, undefined, true);
                               }}
-                              className="px-4 py-1.5 bg-[#4b41e1] hover:bg-[#6c61f2] text-white font-bold text-xs rounded-lg shadow-md shadow-[#4b41e1]/20 transition-colors cursor-pointer select-none"
                             >
-                              Approve Payment
-                            </button>
+                              <Clock className="w-3.5 h-3.5" /> Revert to Pending
+                            </span>
+                          ) : (
+                            <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                              {(s.paidAmount && s.paidAmount > 0) ? (
+                                <span
+                                  className="px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1 bg-slate-100 text-slate-800 hover:bg-slate-200"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onToggleSalaryStatus(s.id as string, undefined, true);
+                                  }}
+                                >
+                                  <Clock className="w-3.5 h-3.5" /> Revert ₹{s.paidAmount}
+                                </span>
+                              ) : null}
+                              <input
+                                type="number"
+                                className="w-24 bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs focus:border-[#4b41e1] outline-none"
+                                placeholder={`Max: ${netPay - (s.paidAmount || 0)}`}
+                                id={`pay-${s.id}`}
+                                defaultValue={netPay - (s.paidAmount || 0)}
+                                step="1"
+                              />
+                              <span
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1 bg-[#4b41e1] text-white hover:bg-[#6c61f2] shadow-md shadow-[#4b41e1]/20"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const el = document.getElementById(`pay-${s.id}`) as HTMLInputElement;
+                                  let amount = netPay - (s.paidAmount || 0);
+                                  if (el && el.value.trim() !== '') {
+                                    const parsed = parseInt(el.value, 10);
+                                    if (!isNaN(parsed)) amount = parsed;
+                                  }
+                                  onToggleSalaryStatus(s.id as string, amount, false);
+                                }}
+                              >
+                                <CheckCircle className="w-3.5 h-3.5" /> Approve
+                              </span>
+                            </div>
                           )}
                         </div>
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
+              </div>
+            );
+          })}
               </div>
             );
           })
