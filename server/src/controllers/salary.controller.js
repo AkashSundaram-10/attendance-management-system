@@ -99,7 +99,17 @@ const generateSalary = async (req, res, next) => {
       });
 
       const advanceDeduction = monthAdvances._sum.amount || 0;
-      const finalSalary = Math.max(0, grossSalary - advanceDeduction);
+      let finalSalary = Math.max(0, grossSalary - advanceDeduction);
+
+      const existingRecord = await prisma.salaryRecord.findUnique({
+        where: { workerId_month_year: { workerId: worker.id, month: dbMonth, year } }
+      });
+
+      if (existingRecord && existingRecord.isManuallyEdited) {
+        grossSalary = existingRecord.grossSalary;
+        totalOvertimeHours = existingRecord.overtimeHours;
+        finalSalary = existingRecord.finalSalary;
+      }
 
       // Save record
       const record = await prisma.salaryRecord.upsert({
@@ -193,7 +203,8 @@ const updateSalary = async (req, res, next) => {
         data: {
           ...(grossSalary !== undefined ? { grossSalary } : {}),
           ...(overtimeHours !== undefined ? { overtimeHours } : {}),
-          ...(advanceDeduction !== undefined ? { advanceDeduction } : {})
+          ...(advanceDeduction !== undefined ? { advanceDeduction } : {}),
+          isManuallyEdited: true
         },
         include: { payments: true }
       });

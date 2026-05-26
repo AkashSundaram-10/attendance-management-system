@@ -91,6 +91,7 @@ model SalaryRecord {
   advanceDeduction Float    @default(0)
   finalSalary      Float
   paymentStatus    PaymentStatus @default(PENDING)
+  isManuallyEdited Boolean  @default(false)
   generatedAt      DateTime @default(now())
 
   worker           Worker   @relation(fields: [workerId], references: [id])
