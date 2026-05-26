@@ -323,13 +323,10 @@ export default function App() {
           }}
         />
       )}
-      {/* Sidebar */}
-      {!hideShell && (
-        <Sidebar currentView={currentView} setView={(v) => { setCurrentView(v); setIsSidebarOpen(false); }} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      )}
+
 
       {/* Main Content Area */}
-      <div className={`flex-1 flex flex-col ${!hideShell ? 'md:ml-64 w-full md:w-auto overflow-hidden' : 'w-full'}`}>
+      <div className="flex-1 flex flex-col w-full overflow-hidden">
         {/* Dynamic Header container */}
         {!hideShell && (
           <TopAppBar
@@ -351,8 +348,10 @@ export default function App() {
           />
         )}
 
+        {!hideShell && <Sidebar currentView={currentView} setView={setCurrentView} />}
+
         {/* Main viewport transitions */}
-        <main className={!hideShell ? 'px-8 py-8 w-full max-w-7xl mx-auto flex-1' : 'flex-1'}>
+        <main className={!hideShell ? 'px-8 py-8 w-full max-w-7xl mx-auto flex-1 overflow-y-auto' : 'flex-1 overflow-y-auto'}>
           <AnimatePresence mode="wait">
             {currentView === 'splash' && (
               <motion.div key="splash" className="w-full">

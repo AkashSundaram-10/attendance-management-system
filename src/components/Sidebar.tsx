@@ -8,7 +8,7 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
-export default function Sidebar({ currentView, setView, isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ currentView, setView }: SidebarProps) {
   const getIsActive = (tab: AppView) => {
     if (tab === 'workers' && currentView === 'worker-profile') return true;
     if (tab === 'salary' && currentView === 'advance-payments') return true;
@@ -26,35 +26,8 @@ export default function Sidebar({ currentView, setView, isOpen, onClose }: Sideb
   ];
 
   return (
-    <>
-      {/* Mobile Overlay */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden" 
-          onClick={onClose} 
-        />
-      )}
-      
-      <aside className={`w-64 bg-[#111827] text-white flex flex-col h-screen fixed left-0 top-0 overflow-y-auto z-50 transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
-        <div className="p-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#4b41e1] rounded-lg flex items-center justify-center">
-              <div className="w-4 h-4 border-2 border-white rounded-sm rotate-45"></div>
-            </div>
-            <div>
-              <h1 className="text-sm font-bold leading-tight">WorkTrack Pro</h1>
-              <p className="text-[10px] text-slate-400">Attendance & Wage</p>
-            </div>
-          </div>
-          {/* Mobile close button */}
-          <button className="md:hidden p-1 text-slate-400 hover:text-white" onClick={onClose}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-          </button>
-        </div>
-
-
-
-      <nav className="flex-1 px-4 space-y-1">
+    <nav className="w-full bg-[#111827] text-white flex items-center justify-center overflow-x-auto no-scrollbar shadow-md z-40 sticky top-20 shrink-0">
+      <div className="flex px-2 py-2 space-x-1 min-w-max">
         {navItems.map((item, index) => {
           const isActive = getIsActive(item.id);
           const Icon = item.icon;
@@ -63,49 +36,18 @@ export default function Sidebar({ currentView, setView, isOpen, onClose }: Sideb
             <button
               key={`${item.id}-${index}`}
               onClick={() => setView(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl transition-colors shrink-0 ${
                 isActive 
-                  ? 'bg-[#4b41e1] text-white' 
+                  ? 'bg-[var(--primary-color)] text-white' 
                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
-              <Icon className="w-5 h-5" />
-              {item.label}
+              <Icon className="w-4 h-4" />
+              <span className="whitespace-nowrap">{item.label}</span>
             </button>
           );
         })}
-      </nav>
-
-      {/* Mini Calendar Widget */}
-      <div className="p-4 mt-auto">
-        <div className="bg-[#1f2937] rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-4 text-sm font-medium">
-            <CalendarCheck2 className="w-4 h-4 text-slate-400" />
-            {new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date())}
-          </div>
-          <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-slate-400 mb-2 font-medium">
-            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-          </div>
-          <div className="grid grid-cols-7 gap-1 text-center text-xs text-white">
-            {Array.from({ length: 42 }, (_, i) => {
-               const d = new Date();
-               const today = d.getDate();
-               d.setDate(1);
-               const startDay = d.getDay();
-               const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-               const cellNum = i - startDay + 1;
-               if (cellNum < 1 || cellNum > daysInMonth) return <div key={i}></div>;
-               const isToday = cellNum === today;
-               return (
-                 <div key={i} className={isToday ? "bg-[#4b41e1] text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto" : "flex items-center justify-center h-6"}>
-                   {cellNum}
-                 </div>
-               );
-            })}
-          </div>
-        </div>
       </div>
-      </aside>
-    </>
+    </nav>
   );
 }

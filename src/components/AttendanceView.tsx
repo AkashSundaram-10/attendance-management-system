@@ -51,7 +51,7 @@ export default function AttendanceView({
       const hasAbsent = attendanceForDay.some(a => a.status === 'Absent');
       let dayColorClass = '';
       if (hasOvertime) {
-        dayColorClass = isSelected ? 'bg-[#4b41e1] text-white shadow-md shadow-[#4b41e1]/25 border border-transparent' : 'bg-indigo-50 text-[#4b41e1] border border-indigo-200 hover:bg-indigo-100';
+        dayColorClass = isSelected ? 'bg-[var(--primary-color)] text-white shadow-md shadow-[var(--primary-color)]/25 border border-transparent' : 'bg-indigo-50 text-[var(--primary-color)] border border-indigo-200 hover:bg-indigo-100';
       } else if (hasPresent) {
         dayColorClass = isSelected ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/25 border border-transparent' : 'bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100';
       } else {
@@ -85,7 +85,7 @@ export default function AttendanceView({
           </button>
           
           <div className="font-bold font-display text-slate-800 text-lg flex items-center gap-2">
-            <CalendarIcon className="w-4 h-4 text-[#4b41e1]" />
+            <CalendarIcon className="w-4 h-4 text-[var(--primary-color)]" />
             {new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(activeObj)}
           </div>
           
@@ -167,7 +167,7 @@ export default function AttendanceView({
 
             <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between min-h-[110px] col-span-2 lg:col-span-2 xl:col-span-1">
               <div className="flex items-center gap-1.5 text-slate-500 pb-2">
-                <Activity className="w-4 h-4 text-[#4b41e1]" />
+                <Activity className="w-4 h-4 text-[var(--primary-color)]" />
                 <span className="text-xs font-semibold">Overtime</span>
               </div>
               <div className="text-2xl font-black font-display text-slate-800">{overtimeCount || 0}</div>
@@ -183,7 +183,7 @@ export default function AttendanceView({
         <div className="relative flex-grow">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
-            className="w-full bg-white border border-slate-200 rounded-xl py-2.5 pl-9 pr-4 text-xs font-medium text-slate-850 focus:outline-none focus:border-[#4b41e1] shadow-sm"
+            className="w-full bg-white border border-slate-200 rounded-xl py-2.5 pl-9 pr-4 text-xs font-medium text-slate-850 focus:outline-none focus:border-[var(--primary-color)] shadow-sm"
             placeholder="Search workers by name or role..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -231,7 +231,7 @@ export default function AttendanceView({
                   referrerPolicy="no-referrer"
                 />
                 <div>
-                  <h3 className="text-sm font-display font-bold text-slate-800 group-hover:text-[#4b41e1]">
+                  <h3 className="text-sm font-display font-bold text-slate-800 group-hover:text-[var(--primary-color)]">
                     {w.name}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">{w.role}</p>
@@ -248,7 +248,7 @@ export default function AttendanceView({
                     type="time"
                     value={record ? record.checkIn : ''}
                     disabled={!record}
-                    className="text-xs font-bold text-slate-800 bg-transparent border border-slate-200 rounded px-1 min-w-[70px] outline-none focus:border-[#4b41e1]"
+                    className="text-xs font-bold text-slate-800 bg-transparent border border-slate-200 rounded px-1 min-w-[70px] outline-none focus:border-[var(--primary-color)]"
                     onChange={(e) => onUpdateAttendance(w.id, 'UpdateTimes', e.target.value, undefined, selectedDate)}
                   />
                 </div>
@@ -261,7 +261,7 @@ export default function AttendanceView({
                     type="time" 
                     value={record ? record.checkOut : ''}
                     disabled={!record}
-                    className="text-xs font-bold text-slate-850 bg-transparent border border-slate-200 rounded px-1 min-w-[70px] outline-none focus:border-[#4b41e1]"
+                    className="text-xs font-bold text-slate-850 bg-transparent border border-slate-200 rounded px-1 min-w-[70px] outline-none focus:border-[var(--primary-color)]"
                     onChange={(e) => onUpdateAttendance(w.id, 'UpdateTimes', undefined, e.target.value, selectedDate)}
                   />
                 </div>

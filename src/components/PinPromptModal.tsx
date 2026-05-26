@@ -74,7 +74,7 @@ export default function PinPromptModal({ isOpen, onClose, onSuccess }: PinPrompt
                 
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-slate-900 hover:bg-[#4b41e1] text-white rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 cursor-pointer mt-2"
+                  className="w-full py-3.5 bg-slate-900 hover:bg-[var(--primary-color)] text-white rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 cursor-pointer mt-2"
                 >
                   Verify Now
                 </button>

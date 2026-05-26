@@ -90,7 +90,7 @@ export default function WorkersView({
         <div className="relative w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" />
           <input
-            className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:border-[#4b41e1] text-sm placeholder-slate-400 shadow-sm"
+            className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:border-[var(--primary-color)] text-sm placeholder-slate-400 shadow-sm"
             placeholder="Search workers..."
             type="text"
             value={search}
@@ -135,7 +135,7 @@ export default function WorkersView({
                   setSelectedWorkerId(w.id);
                   setView('worker-profile');
                 }}
-                className="bg-white rounded-2xl p-4 flex items-center justify-between shadow-[0px_4px_12px_rgba(15,23,42,0.05)] border border-slate-200 cursor-pointer hover:border-[#4b41e1] transition-all group"
+                className="bg-white rounded-2xl p-4 flex items-center justify-between shadow-[0px_4px_12px_rgba(15,23,42,0.05)] border border-slate-200 cursor-pointer hover:border-[var(--primary-color)] transition-all group"
               >
                 <div className="flex items-center gap-4">
                   <img
@@ -146,11 +146,11 @@ export default function WorkersView({
                     referrerPolicy="no-referrer"
                   />
                   <div className="flex flex-col">
-                    <h2 className="text-sm font-display font-bold text-slate-800 group-hover:text-[#4b41e1] transition-colors leading-snug">
+                    <h2 className="text-sm font-display font-bold text-slate-800 group-hover:text-[var(--primary-color)] transition-colors leading-snug">
                       {w.name}
                     </h2>
                     <span className="text-xs text-[#7c839b]">{w.role}</span>
-                    <span className="text-xs font-bold text-[#4b41e1] mt-1">
+                    <span className="text-xs font-bold text-[var(--primary-color)] mt-1">
                       ₹{w.dailyWage} / day
                     </span>
                   </div>
@@ -201,7 +201,7 @@ export default function WorkersView({
       {/* Floating Add Button */}
       <button
         onClick={() => setIsAddModalOpen(true)}
-        className="fixed bottom-24 right-5 bg-[#4b41e1] hover:bg-[#645efb] text-white w-14 h-14 rounded-full shadow-[0px_8px_20px_rgba(75,65,225,0.25)] flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95 z-40"
+        className="fixed bottom-24 right-5 bg-[var(--primary-color)] hover:bg-[#645efb] text-white w-14 h-14 rounded-full shadow-[0px_8px_20px_rgba(75,65,225,0.25)] flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95 z-40"
         title="Add New Worker"
       >
         <Plus className="w-6 h-6 stroke-[2.5px]" />
@@ -236,7 +236,7 @@ export default function WorkersView({
                     placeholder="e.g. John Miller"
                     value={newWorkerName}
                     onChange={(e) => setNewWorkerName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                   />
                 </div>
 
@@ -246,7 +246,7 @@ export default function WorkersView({
                     <select
                       value={newWorkerRole}
                       onChange={(e) => setNewWorkerRole(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     >
                       <option value="Electrician">Electrician</option>
                       <option value="Carpenter">Carpenter</option>
@@ -262,7 +262,7 @@ export default function WorkersView({
                       min={100}
                       value={newWorkerWage}
                       onChange={(e) => setNewWorkerWage(Number(e.target.value))}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     />
                   </div>
                 </div>
@@ -274,7 +274,7 @@ export default function WorkersView({
                     required
                     value={newWorkerPhone}
                     onChange={(e) => setNewWorkerPhone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                   />
                 </div>
 
@@ -286,7 +286,7 @@ export default function WorkersView({
                       placeholder="e.g. jmiller@site.com"
                       value={newWorkerEmail}
                       onChange={(e) => setNewWorkerEmail(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     />
                   </div>
 
@@ -295,7 +295,7 @@ export default function WorkersView({
                     <select
                       value={newWorkerStatus}
                       onChange={(e) => setNewWorkerStatus(e.target.value as 'Active' | 'On Leave')}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     >
                       <option value="Active">Active</option>
                       <option value="On Leave">On Leave</option>
@@ -313,7 +313,7 @@ export default function WorkersView({
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 bg-[#4b41e1] hover:bg-[#6c61f2] text-white font-bold text-sm rounded-xl shadow-lg shadow-[#4b41e1]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-[var(--primary-color)] hover:bg-[#6c61f2] text-white font-bold text-sm rounded-xl shadow-lg shadow-[var(--primary-color)]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     <UserCheck className="w-4 h-4" /> Add Recruit
                   </button>
@@ -334,7 +334,7 @@ export default function WorkersView({
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-200"
             >
-              <div className="bg-[#4b41e1] text-white px-6 py-4 flex items-center justify-between">
+              <div className="bg-[var(--primary-color)] text-white px-6 py-4 flex items-center justify-between">
                 <h3 className="font-display font-bold text-base">Edit Worker</h3>
                 <button
                   onClick={() => setEditingWorker(null)}
@@ -356,7 +356,7 @@ export default function WorkersView({
                     required
                     value={editingWorker.name}
                     onChange={(e) => setEditingWorker({ ...editingWorker, name: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                   />
                 </div>
 
@@ -366,7 +366,7 @@ export default function WorkersView({
                     <select
                       value={editingWorker.role}
                       onChange={(e) => setEditingWorker({ ...editingWorker, role: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     >
                       <option value="Electrician">Electrician</option>
                       <option value="Carpenter">Carpenter</option>
@@ -382,7 +382,7 @@ export default function WorkersView({
                       min={100}
                       value={editingWorker.dailyWage}
                       onChange={(e) => setEditingWorker({ ...editingWorker, dailyWage: Number(e.target.value) })}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     />
                   </div>
                 </div>
@@ -394,7 +394,7 @@ export default function WorkersView({
                     required
                     value={editingWorker.phone}
                     onChange={(e) => setEditingWorker({ ...editingWorker, phone: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                   />
                 </div>
 
@@ -405,7 +405,7 @@ export default function WorkersView({
                       type="email"
                       value={editingWorker.email}
                       onChange={(e) => setEditingWorker({ ...editingWorker, email: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     />
                   </div>
 
@@ -414,7 +414,7 @@ export default function WorkersView({
                     <select
                       value={editingWorker.status}
                       onChange={(e) => setEditingWorker({ ...editingWorker, status: e.target.value as 'Active' | 'On Leave' | 'Disabled' })}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     >
                       <option value="Active">Active</option>
                       <option value="On Leave">On Leave</option>
@@ -433,7 +433,7 @@ export default function WorkersView({
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 bg-[#4b41e1] hover:bg-[#6c61f2] text-white font-bold text-sm rounded-xl shadow-lg shadow-[#4b41e1]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-[var(--primary-color)] hover:bg-[#6c61f2] text-white font-bold text-sm rounded-xl shadow-lg shadow-[var(--primary-color)]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     Save Changes
                   </button>

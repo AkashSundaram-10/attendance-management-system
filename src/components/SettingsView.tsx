@@ -3,15 +3,18 @@ import { Palette, UserCircle, Save, Sliders, Bell, Shield, Smartphone } from 'lu
 import { useState } from 'react';
 
 export default function SettingsView() {
-  const [themeColor, setThemeColor] = useState('#4b41e1');
+  const [themeColor, setThemeColor] = useState('var(--primary-color)');
   const [defaultAvatarStyle, setDefaultAvatarStyle] = useState('avataaars');
 
   const avatarStyles = ['avataaars', 'bottts', 'identicon', 'initials', 'micah'];
-  const presetColors = ['#4b41e1', '#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#6366f1'];
+  const presetColors = ['var(--primary-color)', '#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#6366f1'];
 
   const handleSave = () => {
     // Just a mock save for now. In a real app this would save to local storage or backend.
     document.documentElement.style.setProperty('--primary-color', themeColor);
+    // Rough calculation for hover state (darker)
+    document.documentElement.style.setProperty('--primary-hover', themeColor);
+    localStorage.setItem('wtp-theme', themeColor);
     alert('Settings saved successfully! (Theme customization previewed)');
   };
 
@@ -36,7 +39,7 @@ export default function SettingsView() {
           
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Palette className="w-5 h-5 text-[#4b41e1]" />
+              <Palette className="w-5 h-5 text-[var(--primary-color)]" />
               <h3 className="text-sm font-bold text-slate-800">Theme Color</h3>
             </div>
             <p className="text-xs text-slate-500 mb-4">Select a primary color for your dashboard.</p>
@@ -71,7 +74,7 @@ export default function SettingsView() {
 
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <UserCircle className="w-5 h-5 text-[#4b41e1]" />
+              <UserCircle className="w-5 h-5 text-[var(--primary-color)]" />
               <h3 className="text-sm font-bold text-slate-800">Worker Avatar Style</h3>
             </div>
             <p className="text-xs text-slate-500 mb-4">Choose the default generated avatar style for new workers.</p>
@@ -81,7 +84,7 @@ export default function SettingsView() {
                 <div 
                   key={style}
                   onClick={() => setDefaultAvatarStyle(style)}
-                  className={`border rounded-xl p-3 flex flex-col items-center gap-2 cursor-pointer transition-all ${defaultAvatarStyle === style ? 'border-[#4b41e1] bg-indigo-50 shadow-sm' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'}`}
+                  className={`border rounded-xl p-3 flex flex-col items-center gap-2 cursor-pointer transition-all ${defaultAvatarStyle === style ? 'border-[var(--primary-color)] bg-indigo-50 shadow-sm' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'}`}
                 >
                   <img 
                     src={`https://api.dicebear.com/7.x/${style}/svg?seed=preview`} 
@@ -134,7 +137,7 @@ export default function SettingsView() {
       <div className="flex justify-end pt-4">
         <button 
           onClick={handleSave}
-          className="flex items-center gap-2 bg-[#4b41e1] hover:bg-[#3f36c4] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors cursor-pointer"
+          className="flex items-center gap-2 bg-[var(--primary-color)] hover:bg-[var(--primary-hover)] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors cursor-pointer"
         >
           <Save className="w-4 h-4" /> Save Preferences
         </button>

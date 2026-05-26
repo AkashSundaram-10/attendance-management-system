@@ -1,3 +1,7 @@
+:root {
+  --primary-color: #4b41e1;
+  --primary-hover: #3f36c4;
+}
 @import "tailwindcss";
 
 @theme {

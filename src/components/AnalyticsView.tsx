@@ -290,7 +290,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
           </div>
         </div>
         <div className="bg-[#eff6ff] border border-[#dbeafe] rounded-xl p-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[#4b41e1] flex items-center justify-center text-white font-black text-sm">
+          <div className="w-12 h-12 rounded-full bg-[var(--primary-color)] flex items-center justify-center text-white font-black text-sm">
             OT
           </div>
           <div>
@@ -385,7 +385,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
           </div>
         </div>
         <div className="bg-[#eff6ff] border border-[#dbeafe] rounded-xl p-5 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-[#4b41e1] flex items-center justify-center text-white font-black shrink-0">
+          <div className="w-10 h-10 rounded-full bg-[var(--primary-color)] flex items-center justify-center text-white font-black shrink-0">
             OT
           </div>
           <div>

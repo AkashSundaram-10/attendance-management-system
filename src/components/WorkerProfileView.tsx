@@ -54,7 +54,7 @@ export default function WorkerProfileView({
             src={worker.avatar}
             referrerPolicy="no-referrer"
           />
-          <div className="absolute bottom-0 right-0 w-6 h-6 bg-[#4b41e1] text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+          <div className="absolute bottom-0 right-0 w-6 h-6 bg-[var(--primary-color)] text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm">
             <Award className="w-3.5 h-3.5" />
           </div>
         </div>
@@ -70,7 +70,7 @@ export default function WorkerProfileView({
 
         {/* Status Badge */}
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#e2dfff] text-[#0f0069] border border-[#c3c0ff]">
-          <span className="w-2 h-2 rounded-full bg-[#4b41e1]" />
+          <span className="w-2 h-2 rounded-full bg-[var(--primary-color)]" />
           <span className="text-[10px] font-bold uppercase tracking-wider">{worker.status}</span>
         </div>
       </section>
@@ -81,7 +81,7 @@ export default function WorkerProfileView({
           <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">
             Attendance
           </span>
-          <span className="text-base font-display font-black text-[#4b41e1]">{attendanceRate}%</span>
+          <span className="text-base font-display font-black text-[var(--primary-color)]">{attendanceRate}%</span>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col items-center justify-center text-center">
           <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">
@@ -119,7 +119,7 @@ export default function WorkerProfileView({
                   setActiveTab(tab);
                 }}
                 className={`text-sm font-semibold pb-2.5 whitespace-nowrap border-b-2 transition-all cursor-pointer ${isTabActive
-                    ? 'text-[#4b41e1] border-[#4b41e1]'
+                    ? 'text-[var(--primary-color)] border-[var(--primary-color)]'
                     : 'text-slate-500 border-transparent hover:text-slate-800'
                   }`}
               >
@@ -172,7 +172,7 @@ export default function WorkerProfileView({
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#e2dfff] text-[#4b41e1] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-[#e2dfff] text-[var(--primary-color)] flex items-center justify-center">
                   <Coins className="w-4 h-4" />
                 </div>
                 <div>
@@ -190,7 +190,7 @@ export default function WorkerProfileView({
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
                 Attendance Register
               </h3>
-              <span className="text-xs text-[#4b41e1] font-bold">{presentDaysCount} days present</span>
+              <span className="text-xs text-[var(--primary-color)] font-bold">{presentDaysCount} days present</span>
             </div>
 
             <div className="space-y-2.5">

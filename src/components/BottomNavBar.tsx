@@ -70,7 +70,7 @@ export default function BottomNavBar({ currentView, setView }: BottomNavBarProps
             onClick={() => setView(item.targetView)}
             className={`flex flex-col items-center justify-center transition-all duration-200 py-1.5 cursor-pointer select-none ${
               isActive
-                ? 'text-[#4b41e1] font-bold bg-[#dae2fd] rounded-full px-5 scale-95'
+                ? 'text-[var(--primary-color)] font-bold bg-[#dae2fd] rounded-full px-5 scale-95'
                 : 'text-slate-500 text-[#45464d] px-3'
             }`}
           >

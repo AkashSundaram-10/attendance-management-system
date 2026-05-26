@@ -79,7 +79,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                 onClick={() => setSelectedMonth(m)}
                 className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
                   selectedMonth === m
-                    ? 'bg-[#4b41e1] text-white shadow-md shadow-[#4b41e1]/20'
+                    ? 'bg-[var(--primary-color)] text-white shadow-md shadow-[var(--primary-color)]/20'
                     : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'
                 }`}
               >
@@ -103,7 +103,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
           <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-bl-full -mr-4 -mt-4 opacity-50" />
           <div>
             <div className="flex items-center gap-1.5 text-slate-505 text-slate-500">
-              <ClipboardList className="w-5 h-5 text-[#4b41e1]" />
+              <ClipboardList className="w-5 h-5 text-[var(--primary-color)]" />
               <span className="text-xs font-semibold">Total Projected</span>
             </div>
             <div className="text-2xl font-black font-display text-slate-900 mt-2">
@@ -159,7 +159,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
-            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:border-[#4b41e1] focus:ring-1 focus:ring-[#4b41e1] outline-none transition-all shadow-sm"
+            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] outline-none transition-all shadow-sm"
             placeholder="Search worker name or ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -175,7 +175,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                 key={t}
                 onClick={() => setFilter(t)}
                 className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap border cursor-pointer ${isSel
-                    ? 'bg-[#4b41e1] text-white border-[#4b41e1] shadow-sm shadow-[#4b41e1]/20'
+                    ? 'bg-[var(--primary-color)] text-white border-[var(--primary-color)] shadow-sm shadow-[var(--primary-color)]/20'
                     : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
                   }`}
               >
@@ -387,14 +387,14 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                               ) : null}
                               <input
                                 type="number"
-                                className="w-24 bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs focus:border-[#4b41e1] outline-none"
+                                className="w-24 bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs focus:border-[var(--primary-color)] outline-none"
                                 placeholder={`Max: ${netPay - (s.paidAmount || 0)}`}
                                 id={`pay-${s.id}`}
                                 defaultValue={netPay - (s.paidAmount || 0)}
                                 step="1"
                               />
                               <span
-                                className="px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1 bg-[#4b41e1] text-white hover:bg-[#6c61f2] shadow-md shadow-[#4b41e1]/20"
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1 bg-[var(--primary-color)] text-white hover:bg-[#6c61f2] shadow-md shadow-[var(--primary-color)]/20"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   const el = document.getElementById(`pay-${s.id}`) as HTMLInputElement;

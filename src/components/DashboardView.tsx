@@ -139,7 +139,7 @@ export default function DashboardView({
         {/* Card 1 */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
           <div className="flex gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-[#4b41e1] flex items-center justify-center flex-shrink-0 text-white">
+            <div className="w-14 h-14 rounded-2xl bg-[var(--primary-color)] flex items-center justify-center flex-shrink-0 text-white">
               <Users className="w-7 h-7" />
             </div>
             <div className="flex flex-col justify-center">
@@ -147,7 +147,7 @@ export default function DashboardView({
               <div className="text-sm text-slate-500 font-medium leading-none">Total Workers</div>
             </div>
           </div>
-          <button onClick={() => setView('workers')} className="text-xs font-semibold text-[#4b41e1] hover:underline text-left mt-2">
+          <button onClick={() => setView('workers')} className="text-xs font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View all workers
           </button>
         </div>
@@ -163,7 +163,7 @@ export default function DashboardView({
               <div className="text-sm text-slate-500 font-medium leading-none">Today Present</div>
             </div>
           </div>
-          <button onClick={() => setView('attendance')} className="text-xs font-semibold text-[#4b41e1] hover:underline text-left mt-2">
+          <button onClick={() => setView('attendance')} className="text-xs font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View attendance
           </button>
         </div>
@@ -179,7 +179,7 @@ export default function DashboardView({
               <div className="text-sm text-slate-500 font-medium leading-none">{`Total Salary (${new Intl.DateTimeFormat('en-US', { month: 'short' }).format(new Date())})`}</div>
             </div>
           </div>
-          <button onClick={() => setView('salary')} className="text-xs font-semibold text-[#4b41e1] hover:underline text-left mt-2">
+          <button onClick={() => setView('salary')} className="text-xs font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View salary
           </button>
         </div>
@@ -195,7 +195,7 @@ export default function DashboardView({
               <div className="text-sm text-slate-500 font-medium leading-none">Pending Payments</div>
             </div>
           </div>
-          <button onClick={() => setView('salary')} className="text-xs font-semibold text-[#4b41e1] hover:underline text-left mt-2">
+          <button onClick={() => setView('salary')} className="text-xs font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View payments
           </button>
         </div>
@@ -209,7 +209,7 @@ export default function DashboardView({
             <h2 className="text-[15px] font-bold text-slate-900">Today's Attendance</h2>
             <button
               onClick={() => setView('attendance')}
-              className="text-xs font-semibold text-[#4b41e1] hover:underline flex items-center gap-1"
+              className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
             >
               Mark Attendance <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -277,7 +277,7 @@ export default function DashboardView({
           <div className="p-4 mt-auto text-right">
             <button
               onClick={() => setView('attendance')}
-              className="text-xs font-semibold text-[#4b41e1] hover:underline flex items-center gap-1 ml-auto"
+              className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 ml-auto"
             >
               View all attendance <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -346,7 +346,7 @@ export default function DashboardView({
           <h2 className="text-[15px] font-bold text-slate-900">Recent Payments</h2>
           <button
             onClick={() => setView('salary')}
-            className="text-xs font-semibold text-[#4b41e1] hover:underline flex items-center gap-1"
+            className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
           >
             View all payments <ArrowRight className="w-3.5 h-3.5" />
           </button>

@@ -39,7 +39,7 @@ export default function TopAppBar({
         <h1 className="text-lg font-display font-bold text-slate-900">Worker Profile</h1>
         <button
           onClick={onEditProfile}
-          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-[#4b41e1] cursor-pointer"
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-[var(--primary-color)] cursor-pointer"
         >
           <Edit className="w-4 h-4" />
         </button>
@@ -66,14 +66,12 @@ export default function TopAppBar({
   const avatarUrl = '/admin%20image.png';
 
   return (
-    <header className="sticky top-0 z-50 flex justify-between items-center px-4 md:px-8 h-20 bg-white border-b border-slate-200 transition-colors">
+    <header className="sticky top-0 z-50 flex justify-between items-center px-4 md:px-8 h-20 bg-white border-b border-slate-200 transition-colors shrink-0">
       <div className="flex items-center gap-3">
-        <button 
-          onClick={onMenuToggle}
-          className="md:hidden w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-500 cursor-pointer"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-        </button>
+        <img src="/logo.png?v=3" alt="WorkTrack Pro Logo" className="w-10 h-10 object-contain rounded-lg shadow-sm" />
+        <div className="hidden sm:block">
+            <h1 className="text-sm font-bold leading-tight">WorkTrack Pro</h1>
+        </div>
       </div>
 
       <div className="relative">
@@ -87,7 +85,7 @@ export default function TopAppBar({
           </div>
           <img
             alt="User Profile"
-            className="w-10 h-10 rounded-full bg-slate-200 object-cover hover:ring-2 hover:ring-[#4b41e1] transition-all"
+            className="w-10 h-10 rounded-full bg-slate-200 object-cover hover:ring-2 hover:ring-[var(--primary-color)] transition-all"
             style={{ objectPosition: 'center 20%' }}
             src={avatarUrl}
             referrerPolicy="no-referrer"
@@ -103,7 +101,7 @@ export default function TopAppBar({
               </div>
               <div className="text-center">
                 <h3 className="font-black text-xl text-slate-900 tracking-tight">Mani</h3>
-                <p className="text-xs text-[#4b41e1] font-bold uppercase tracking-widest mt-0.5">Supervisor</p>
+                <p className="text-xs text-[var(--primary-color)] font-bold uppercase tracking-widest mt-0.5">Supervisor</p>
               </div>
             </div>
             
@@ -124,7 +122,7 @@ export default function TopAppBar({
                   </div>
                   <span>Age</span>
                 </div>
-                <span className="font-bold text-[#4b41e1] bg-indigo-50/80 px-2.5 py-1 rounded-md">{new Date().getFullYear() - 1982} Years</span>
+                <span className="font-bold text-[var(--primary-color)] bg-indigo-50/80 px-2.5 py-1 rounded-md">{new Date().getFullYear() - 1982} Years</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-3 text-slate-500 font-medium">

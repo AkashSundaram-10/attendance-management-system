@@ -26,7 +26,7 @@ export default function SplashView({ onComplete }: SplashViewProps) {
             onClick={onComplete}
             className="w-24 h-24 bg-white rounded-2xl shadow-xl flex items-center justify-center mb-6 transform rotate-3 hover:rotate-0 transition-transform duration-500 ease-out cursor-pointer"
           >
-            <Landmark className="text-[#4b41e1] w-12 h-12" />
+            <Landmark className="text-[var(--primary-color)] w-12 h-12" />
           </div>
           <h1 className="font-display text-4xl font-extrabold tracking-tight text-white mb-2">
             WorkTrack Pro

@@ -75,7 +75,7 @@ export default function AdvancePaymentsView({
       {/* Summary Bento Row */}
       <section className="grid grid-cols-2 gap-4">
         {/* Total Advances */}
-        <div className="col-span-2 bg-[#4b41e1] text-white rounded-2xl p-5 shadow-lg shadow-indigo-600/20 relative overflow-hidden flex flex-col justify-between min-h-[140px]">
+        <div className="col-span-2 bg-[var(--primary-color)] text-white rounded-2xl p-5 shadow-lg shadow-indigo-600/20 relative overflow-hidden flex flex-col justify-between min-h-[140px]">
           <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
           <div>
             <span className="text-[10px] font-bold text-indigo-150 uppercase tracking-widest opacity-80">
@@ -119,7 +119,7 @@ export default function AdvancePaymentsView({
           </span>
           <div className="w-full bg-slate-100 rounded-full h-1.5 mt-auto">
             <div
-              className="bg-[#4b41e1] h-1.5 rounded-full transition-all"
+              className="bg-[var(--primary-color)] h-1.5 rounded-full transition-all"
               style={{ width: `${recoveredPct}%` }}
             />
           </div>
@@ -131,7 +131,7 @@ export default function AdvancePaymentsView({
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
-            className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-xs font-semibold focus:outline-none focus:border-[#4b41e1] transition-all placeholder:text-slate-400 shadow-sm"
+            className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-xs font-semibold focus:outline-none focus:border-[var(--primary-color)] transition-all placeholder:text-slate-400 shadow-sm"
             placeholder="Search by name or ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -231,7 +231,7 @@ export default function AdvancePaymentsView({
       {/* FAB button */}
       <button
         onClick={() => setIsAddOpen(true)}
-        className="fixed bottom-24 right-5 bg-[#4b41e1] hover:bg-[#6c61f2] text-white px-5 py-3.5 rounded-xl shadow-[0px_8px_20px_rgba(75,65,225,0.25)] flex items-center gap-2 active:scale-95 transition-all z-40 text-xs font-bold font-display tracking-wide cursor-pointer"
+        className="fixed bottom-24 right-5 bg-[var(--primary-color)] hover:bg-[#6c61f2] text-white px-5 py-3.5 rounded-xl shadow-[0px_8px_20px_rgba(75,65,225,0.25)] flex items-center gap-2 active:scale-95 transition-all z-40 text-xs font-bold font-display tracking-wide cursor-pointer"
       >
         <Plus className="w-5 h-5 stroke-[2.5px]" /> Give Advance
       </button>
@@ -248,7 +248,7 @@ export default function AdvancePaymentsView({
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-display font-extrabold text-slate-900 text-sm uppercase tracking-wide flex items-center gap-1.5 p-1">
-                  <AlertOctagon className="w-5 h-5 text-[#4b41e1]" /> Give Advance
+                  <AlertOctagon className="w-5 h-5 text-[var(--primary-color)]" /> Give Advance
                 </h3>
                 <button
                   onClick={() => setIsAddOpen(false)}
@@ -267,7 +267,7 @@ export default function AdvancePaymentsView({
                     value={selectedWorkerId}
                     onChange={(e) => setSelectedWorkerId(e.target.value)}
                     required
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#4b41e1]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                   >
                     <option value="">Select a worker...</option>
                     {workers.map((w) => (
@@ -306,7 +306,7 @@ export default function AdvancePaymentsView({
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 bg-[#4b41e1] hover:bg-[#6c61f2] text-white font-bold text-xs rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-1"
+                    className="flex-1 py-3 bg-[var(--primary-color)] hover:bg-[#6c61f2] text-white font-bold text-xs rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-1"
                   >
                     <UserCheck className="w-4 h-4" /> Give Advance
                   </button>
