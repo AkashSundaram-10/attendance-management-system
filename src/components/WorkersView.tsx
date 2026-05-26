@@ -201,10 +201,11 @@ export default function WorkersView({
       {/* Floating Add Button */}
       <button
         onClick={() => setIsAddModalOpen(true)}
-        className="fixed bottom-24 right-5 bg-[var(--primary-color)] hover:bg-[#645efb] text-white w-14 h-14 rounded-full shadow-[0px_8px_20px_rgba(75,65,225,0.25)] flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95 z-40"
+        className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[var(--primary-color)] hover:bg-[#645efb] text-white px-8 py-4 rounded-full shadow-[0px_8px_20px_rgba(75,65,225,0.3)] flex items-center justify-center gap-2 cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95 z-40 whitespace-nowrap"
         title="Add New Worker"
       >
-        <Plus className="w-6 h-6 stroke-[2.5px]" />
+        <span className="text-lg font-bold">Add Worker</span>
+        <Plus className="w-6 h-6 stroke-[3px]" />
       </button>
 
       {/* Add Worker Dialog Modal */}
