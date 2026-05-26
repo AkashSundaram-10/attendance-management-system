@@ -36,6 +36,16 @@ const markAttendance = async (req, res, next) => {
       });
     }
 
+    // Unfreeze manual salary overrides when attendance is updated so it dynamically recalculates
+    await prisma.salaryRecord.updateMany({
+      where: {
+        workerId,
+        month: attendanceDate.getMonth() + 1,
+        year: attendanceDate.getFullYear()
+      },
+      data: { isManuallyEdited: false }
+    });
+
     sendSuccess(res, 200, 'Attendance marked successfully', attendance);
   } catch (error) {
     next(error);
@@ -76,6 +86,17 @@ const bulkMarkAttendance = async (req, res, next) => {
     });
 
     const results = await prisma.$transaction(operations);
+    
+    // Unfreeze manual overrides for these workers for this month
+    const workerIds = records.map(r => r.workerId);
+    await prisma.salaryRecord.updateMany({
+      where: {
+        workerId: { in: workerIds },
+        month: attendanceDate.getMonth() + 1,
+        year: attendanceDate.getFullYear()
+      },
+      data: { isManuallyEdited: false }
+    });
 
     sendSuccess(res, 200, 'Bulk attendance marked successfully', {
       processed: results.length,
