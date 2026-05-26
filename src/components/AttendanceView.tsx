@@ -66,7 +66,7 @@ export default function AttendanceView({
         <button
           key={dateStr}
           onClick={() => setSelectedDate(dateStr)}
-          className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex flex-col items-center justify-center text-sm font-medium transition-all cursor-pointer ${dayColorClass}`}
+          className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex flex-col items-center justify-center text-base font-medium transition-all cursor-pointer ${dayColorClass}`}
         >
           <span className="font-bold">{d.getDate()}</span>
         </button>
@@ -99,7 +99,7 @@ export default function AttendanceView({
         </div>
         <div className="grid grid-cols-7 gap-1 text-center mb-3">
           {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
-            <div key={d} className="text-sm font-bold text-slate-400 uppercase tracking-wider">{d}</div>
+            <div key={d} className="text-base font-bold text-slate-400 uppercase tracking-wider">{d}</div>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-1 place-items-center">
@@ -137,7 +137,7 @@ export default function AttendanceView({
             <h2 className="text-xl font-display font-black text-slate-900 leading-tight">
               Daily Attendance
             </h2>
-            <p className="text-sm text-slate-500 font-medium">
+            <p className="text-base text-slate-500 font-medium">
               {new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(selectedDate))}
             </p>
           </div>
@@ -152,7 +152,7 @@ export default function AttendanceView({
             <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between min-h-[110px]">
               <div className="flex items-center gap-1.5 text-slate-500 pb-2">
                 <Check className="w-4 h-4 text-emerald-600" />
-                <span className="text-sm font-semibold">Present</span>
+                <span className="text-base font-semibold">Present</span>
               </div>
               <div className="text-2xl font-black font-display text-slate-800">{presentCount || 0}</div>
             </div>
@@ -160,7 +160,7 @@ export default function AttendanceView({
             <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between min-h-[110px]">
               <div className="flex items-center gap-1.5 text-slate-500 pb-2">
                 <X className="w-4 h-4 text-red-600" />
-                <span className="text-sm font-semibold">Absent</span>
+                <span className="text-base font-semibold">Absent</span>
               </div>
               <div className="text-2xl font-black font-display text-slate-800">{absentCount || 0}</div>
             </div>
@@ -168,7 +168,7 @@ export default function AttendanceView({
             <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between min-h-[110px] col-span-2 lg:col-span-2 xl:col-span-1">
               <div className="flex items-center gap-1.5 text-slate-500 pb-2">
                 <Activity className="w-4 h-4 text-[var(--primary-color)]" />
-                <span className="text-sm font-semibold">Overtime</span>
+                <span className="text-base font-semibold">Overtime</span>
               </div>
               <div className="text-2xl font-black font-display text-slate-800">{overtimeCount || 0}</div>
             </div>
@@ -183,14 +183,14 @@ export default function AttendanceView({
         <div className="relative flex-grow">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
-            className="w-full bg-white border border-slate-200 rounded-xl py-2.5 pl-9 pr-4 text-sm font-medium text-slate-850 focus:outline-none focus:border-[var(--primary-color)] shadow-sm"
+            className="w-full bg-white border border-slate-200 rounded-xl py-2.5 pl-9 pr-4 text-base font-medium text-slate-850 focus:outline-none focus:border-[var(--primary-color)] shadow-sm"
             placeholder="Search workers by name or role..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             type="text"
           />
         </div>
-        <button className="bg-white border border-slate-200 px-3.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer">
+        <button className="bg-white border border-slate-200 px-3.5 rounded-xl text-base font-bold text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer">
           <SlidersHorizontal className="w-4 h-4 text-slate-500" /> Filter
         </button>
       </section>
@@ -231,10 +231,10 @@ export default function AttendanceView({
                   referrerPolicy="no-referrer"
                 />
                 <div>
-                  <h3 className="text-sm font-display font-bold text-slate-800 group-hover:text-[var(--primary-color)]">
+                  <h3 className="text-base font-display font-bold text-slate-800 group-hover:text-[var(--primary-color)]">
                     {w.name}
                   </h3>
-                  <p className="text-sm text-slate-500 font-medium">{w.role}</p>
+                  <p className="text-base text-slate-500 font-medium">{w.role}</p>
                 </div>
               </div>
 
@@ -248,7 +248,7 @@ export default function AttendanceView({
                     type="time"
                     value={record ? record.checkIn : ''}
                     disabled={!record}
-                    className="text-sm font-bold text-slate-800 bg-transparent border border-slate-200 rounded px-1 min-w-[70px] outline-none focus:border-[var(--primary-color)]"
+                    className="text-base font-bold text-slate-800 bg-transparent border border-slate-200 rounded px-1 min-w-[70px] outline-none focus:border-[var(--primary-color)]"
                     onChange={(e) => onUpdateAttendance(w.id, 'UpdateTimes', e.target.value, undefined, selectedDate)}
                   />
                 </div>
@@ -261,7 +261,7 @@ export default function AttendanceView({
                     type="time" 
                     value={record ? record.checkOut : ''}
                     disabled={!record}
-                    className="text-sm font-bold text-slate-850 bg-transparent border border-slate-200 rounded px-1 min-w-[70px] outline-none focus:border-[var(--primary-color)]"
+                    className="text-base font-bold text-slate-850 bg-transparent border border-slate-200 rounded px-1 min-w-[70px] outline-none focus:border-[var(--primary-color)]"
                     onChange={(e) => onUpdateAttendance(w.id, 'UpdateTimes', undefined, e.target.value, selectedDate)}
                   />
                 </div>
@@ -271,7 +271,7 @@ export default function AttendanceView({
               {record ? (
                 <div className="flex gap-2">
                   <span
-                    className={`px-3 py-1 rounded-full border text-sm font-bold flex items-center gap-1 cursor-pointer hover:bg-slate-50 ${badge.color}`}
+                    className={`px-3 py-1 rounded-full border text-base font-bold flex items-center gap-1 cursor-pointer hover:bg-slate-50 ${badge.color}`}
                     onClick={() => {
                       // Cycle attendance statuses on badge clicks for high convenience!
                       const nextStat =
@@ -293,13 +293,13 @@ export default function AttendanceView({
                 <div className="flex gap-2 w-full md:w-auto">
                   <button
                     onClick={() => onUpdateAttendance(w.id, 'Present', undefined, undefined, selectedDate)}
-                    className="flex-1 md:flex-none px-3 py-1.5 rounded-lg border border-slate-350 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-350 text-slate-500 text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
+                    className="flex-1 md:flex-none px-3 py-1.5 rounded-lg border border-slate-350 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-350 text-slate-500 text-base font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
                   >
                     <Check className="w-3 h-3" /> Present
                   </button>
                   <button
                     onClick={() => onUpdateAttendance(w.id, 'Absent', undefined, undefined, selectedDate)}
-                    className="flex-1 md:flex-none px-3 py-1.5 rounded-lg border border-slate-350 hover:bg-red-50 hover:text-red-700 hover:border-red-350 text-slate-500 text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
+                    className="flex-1 md:flex-none px-3 py-1.5 rounded-lg border border-slate-350 hover:bg-red-50 hover:text-red-700 hover:border-red-350 text-slate-500 text-base font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
                   >
                     <X className="w-3 h-3" /> Absent
                   </button>

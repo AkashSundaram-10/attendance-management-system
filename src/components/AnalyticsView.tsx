@@ -148,7 +148,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
 
   const getStatusIcon = (status: string | null, dateStr: string) => {
     if (status === 'Present') return <Check className="w-5 h-5 text-emerald-500 stroke-[4]" />;
-    if (status === 'Overtime') return <span className="text-sm font-black text-indigo-600">OT</span>;
+    if (status === 'Overtime') return <span className="text-base font-black text-indigo-600">OT</span>;
     
     const todayStr = new Date().toISOString().split('T')[0];
     if (dateStr > todayStr) {
@@ -219,7 +219,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
           <h2 className="text-[22px] font-display font-black text-[#1e293b] leading-tight">
             Weekly Attendance
           </h2>
-          <p className="text-sm text-slate-500 font-medium">View weekly wise attendance of all workers in a month</p>
+          <p className="text-base text-slate-500 font-medium">View weekly wise attendance of all workers in a month</p>
         </div>
         
         <div className="flex items-center gap-3">
@@ -228,7 +228,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
             <select 
               value={selectedMonth} 
               onChange={handleMonthChange}
-              className="text-sm font-bold text-slate-700 bg-transparent outline-none cursor-pointer"
+              className="text-base font-bold text-slate-700 bg-transparent outline-none cursor-pointer"
             >
               {Array.from({ length: 12 }).map((_, i) => (
                 <option key={i} value={i}>
@@ -239,7 +239,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
             <select 
               value={selectedYear} 
               onChange={handleYearChange}
-              className="text-sm font-bold text-slate-700 bg-transparent outline-none cursor-pointer"
+              className="text-base font-bold text-slate-700 bg-transparent outline-none cursor-pointer"
             >
               {[currentDate.getFullYear() - 1, currentDate.getFullYear(), currentDate.getFullYear() + 1].map(y => (
                 <option key={y} value={y}>{y}</option>
@@ -249,7 +249,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
           
           <button 
             onClick={exportToExcel}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-sm cursor-pointer"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-sm cursor-pointer"
           >
             <Download className="w-4 h-4" /> Export Excel
           </button>
@@ -263,7 +263,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
             <Users className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Workers</div>
+            <div className="text-base font-bold text-slate-500 uppercase tracking-wide">Total Workers</div>
             <div className="text-xl font-black text-slate-800">{tableData.topKPI.totalWorkers}</div>
           </div>
         </div>
@@ -272,9 +272,9 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
             <CheckCircle2 className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Present</div>
+            <div className="text-base font-bold text-slate-500 uppercase tracking-wide">Present</div>
             <div className="text-xl font-black text-slate-800">
-              {tableData.topKPI.present} <span className="text-sm text-emerald-600 font-bold">({tableData.topKPI.presentPct}%)</span>
+              {tableData.topKPI.present} <span className="text-base text-emerald-600 font-bold">({tableData.topKPI.presentPct}%)</span>
             </div>
           </div>
         </div>
@@ -283,20 +283,20 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
             <XCircle className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Absent</div>
+            <div className="text-base font-bold text-slate-500 uppercase tracking-wide">Absent</div>
             <div className="text-xl font-black text-slate-800">
-              {tableData.topKPI.absent} <span className="text-sm text-red-600 font-bold">({tableData.topKPI.absentPct}%)</span>
+              {tableData.topKPI.absent} <span className="text-base text-red-600 font-bold">({tableData.topKPI.absentPct}%)</span>
             </div>
           </div>
         </div>
         <div className="bg-[#eff6ff] border border-[#dbeafe] rounded-xl p-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[var(--primary-color)] flex items-center justify-center text-white font-black text-sm">
+          <div className="w-12 h-12 rounded-full bg-[var(--primary-color)] flex items-center justify-center text-white font-black text-base">
             OT
           </div>
           <div>
-            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Overtime</div>
+            <div className="text-base font-bold text-slate-500 uppercase tracking-wide">Overtime</div>
             <div className="text-xl font-black text-slate-800">
-              {tableData.topKPI.overtime} <span className="text-sm text-slate-500 font-medium">Days</span>
+              {tableData.topKPI.overtime} <span className="text-base text-slate-500 font-medium">Days</span>
             </div>
           </div>
         </div>
@@ -308,21 +308,21 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
           <thead>
             {/* Week Groupings Header */}
             <tr className="border-b border-slate-200 bg-slate-50">
-              <th className="px-4 py-4 font-semibold text-sm text-slate-800 border-r border-slate-200 w-12 text-center sticky left-0 bg-slate-50 z-20" rowSpan={2}>No.</th>
-              <th className="px-5 py-4 font-semibold text-sm text-slate-800 border-r border-slate-200 min-w-[220px] sticky left-[48px] bg-slate-50 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" rowSpan={2}>Worker Name</th>
+              <th className="px-4 py-4 font-semibold text-base text-slate-800 border-r border-slate-200 w-12 text-center sticky left-0 bg-slate-50 z-20" rowSpan={2}>No.</th>
+              <th className="px-5 py-4 font-semibold text-base text-slate-800 border-r border-slate-200 min-w-[220px] sticky left-[48px] bg-slate-50 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" rowSpan={2}>Worker Name</th>
               
               {weeks.map((weekDays, idx) => {
                 const firstDay = weekDays[0];
                 const lastDay = weekDays[weekDays.length - 1];
                 return (
-                  <th key={idx} className="py-3 font-bold text-base md:text-lg text-slate-800 border-r border-slate-200 text-center" colSpan={7}>
-                    Week {idx + 1} <div className="text-sm text-slate-500 font-bold mt-0.5">({firstDay.day} {new Date(0, firstDay.month).toLocaleString('en', { month: 'short' })} - {lastDay.day} {new Date(0, lastDay.month).toLocaleString('en', { month: 'short' })})</div>
+                  <th key={idx} className="py-3 font-bold text-lg md:text-lg text-slate-800 border-r border-slate-200 text-center" colSpan={7}>
+                    Week {idx + 1} <div className="text-base text-slate-500 font-bold mt-0.5">({firstDay.day} {new Date(0, firstDay.month).toLocaleString('en', { month: 'short' })} - {lastDay.day} {new Date(0, lastDay.month).toLocaleString('en', { month: 'short' })})</div>
                   </th>
                 )
               })}
               
-              <th className="px-4 py-4 font-semibold text-sm text-slate-800 border-r border-slate-200 text-center leading-tight" rowSpan={2}>Days<br/>Worked</th>
-              <th className="px-4 py-4 font-semibold text-sm text-slate-800 text-center leading-tight" rowSpan={2}>Total<br/>Amount</th>
+              <th className="px-4 py-4 font-semibold text-base text-slate-800 border-r border-slate-200 text-center leading-tight" rowSpan={2}>Days<br/>Worked</th>
+              <th className="px-4 py-4 font-semibold text-base text-slate-800 text-center leading-tight" rowSpan={2}>Total<br/>Amount</th>
             </tr>
             {/* Days Header */}
             <tr className="border-b border-slate-200 bg-white">
@@ -331,8 +331,8 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
                 const dayName = dObj.dateObj.toLocaleString('en-US', { weekday: 'short' });
                 return (
                   <th key={dObj.dateStr} className={`py-3 min-w-[42px] font-semibold text-center border-r ${isWeekend ? 'bg-red-50/50 text-red-500' : 'text-slate-600'} ${idx === 6 || idx === 13 || idx === 20 || idx === 27 ? 'border-r-slate-200' : 'border-slate-100'}`}>
-                    <div className="text-base font-bold">{dObj.day}</div>
-                    <div className="text-xs font-bold opacity-70 uppercase tracking-tighter">{dayName}</div>
+                    <div className="text-lg font-bold">{dObj.day}</div>
+                    <div className="text-sm font-bold opacity-70 uppercase tracking-tighter">{dayName}</div>
                   </th>
                 )
               })}
@@ -341,8 +341,8 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
           <tbody>
             {tableData.rows.map((row, index) => (
               <tr key={row.worker.id} className="group border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                <td className="py-4 px-2 text-sm font-medium text-slate-500 text-center border-r border-slate-100 sticky left-0 bg-white group-hover:bg-slate-50 z-10 transition-colors">{index + 1}</td>
-                <td className="py-4 px-5 text-sm font-bold text-slate-800 border-r border-slate-100 whitespace-nowrap sticky left-[48px] bg-white group-hover:bg-slate-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] transition-colors">{row.worker.name}</td>
+                <td className="py-4 px-2 text-base font-medium text-slate-500 text-center border-r border-slate-100 sticky left-0 bg-white group-hover:bg-slate-50 z-10 transition-colors">{index + 1}</td>
+                <td className="py-4 px-5 text-base font-bold text-slate-800 border-r border-slate-100 whitespace-nowrap sticky left-[48px] bg-white group-hover:bg-slate-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] transition-colors">{row.worker.name}</td>
                 
                 {daysArray.map((dObj, idx) => (
                   <td 
@@ -355,8 +355,8 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
                   </td>
                 ))}
                 
-                <td className="py-4 px-4 text-sm font-bold text-slate-700 text-center border-r border-slate-100">{row.daysWorked}</td>
-                <td className="py-4 px-4 text-sm font-black text-slate-900 text-center">₹{row.totalAmount.toLocaleString()}</td>
+                <td className="py-4 px-4 text-base font-bold text-slate-700 text-center border-r border-slate-100">{row.daysWorked}</td>
+                <td className="py-4 px-4 text-base font-black text-slate-900 text-center">₹{row.totalAmount.toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
@@ -364,7 +364,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
       </div>
       
       {/* Legend */}
-      <div className="flex items-center gap-6 px-2 text-sm font-bold text-slate-600">
+      <div className="flex items-center gap-6 px-2 text-base font-bold text-slate-600">
         <span>Legend:</span>
         <div className="flex items-center gap-2 text-emerald-600"><Check className="w-4 h-4 stroke-[3]" /> Present</div>
         <div className="flex items-center gap-2 text-red-600"><X className="w-4 h-4 stroke-[3]" /> Absent</div>
@@ -378,9 +378,9 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
             <CalendarIcon className="w-8 h-8" />
           </div>
           <div>
-            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Days Worked</div>
+            <div className="text-base font-bold text-slate-500 uppercase tracking-wide">Total Days Worked</div>
             <div className="text-xl font-black text-slate-800">
-              {tableData.bottomKPI.overallDaysWorked} <span className="text-sm text-slate-500 font-medium">Days</span>
+              {tableData.bottomKPI.overallDaysWorked} <span className="text-base text-slate-500 font-medium">Days</span>
             </div>
           </div>
         </div>
@@ -389,9 +389,9 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
             OT
           </div>
           <div>
-            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Overtime Days</div>
+            <div className="text-base font-bold text-slate-500 uppercase tracking-wide">Total Overtime Days</div>
             <div className="text-xl font-black text-slate-800">
-              {tableData.bottomKPI.overallOvertime} <span className="text-sm text-slate-500 font-medium">Days</span>
+              {tableData.bottomKPI.overallOvertime} <span className="text-base text-slate-500 font-medium">Days</span>
             </div>
           </div>
         </div>
@@ -400,7 +400,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
             <BarChart2 className="w-8 h-8" />
           </div>
           <div>
-            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Average Attendance</div>
+            <div className="text-base font-bold text-slate-500 uppercase tracking-wide">Average Attendance</div>
             <div className="text-xl font-black text-slate-800">
               {tableData.bottomKPI.averageAttendance}%
             </div>
@@ -411,7 +411,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
             <IndianRupee className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Salary</div>
+            <div className="text-base font-bold text-slate-500 uppercase tracking-wide">Total Salary</div>
             <div className="text-xl font-black text-indigo-700">
               ₹{tableData.bottomKPI.overallTotalSalary.toLocaleString()}
             </div>

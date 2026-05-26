@@ -131,7 +131,7 @@ export default function DashboardView({
     >
       <div>
         <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">{greeting}, Mani!</h1>
-        <p className="text-sm text-slate-500 mt-1 italic">"{quoteOfDay}"</p>
+        <p className="text-base text-slate-500 mt-1 italic">"{quoteOfDay}"</p>
       </div>
 
       {/* Statistic Cards Grid */}
@@ -144,10 +144,10 @@ export default function DashboardView({
             </div>
             <div className="flex flex-col justify-center">
               <div className="text-[26px] font-bold text-slate-900 leading-tight">{totalWorkers}</div>
-              <div className="text-sm text-slate-500 font-medium leading-none">Total Workers</div>
+              <div className="text-base text-slate-500 font-medium leading-none">Total Workers</div>
             </div>
           </div>
-          <button onClick={() => setView('workers')} className="text-sm font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
+          <button onClick={() => setView('workers')} className="text-base font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View all workers
           </button>
         </div>
@@ -160,10 +160,10 @@ export default function DashboardView({
             </div>
             <div className="flex flex-col justify-center">
               <div className="text-[26px] font-bold text-slate-900 leading-tight">{presentCount}</div>
-              <div className="text-sm text-slate-500 font-medium leading-none">Today Present</div>
+              <div className="text-base text-slate-500 font-medium leading-none">Today Present</div>
             </div>
           </div>
-          <button onClick={() => setView('attendance')} className="text-sm font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
+          <button onClick={() => setView('attendance')} className="text-base font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View attendance
           </button>
         </div>
@@ -176,10 +176,10 @@ export default function DashboardView({
             </div>
             <div className="flex flex-col justify-center">
               <div className="text-[26px] font-bold text-slate-900 leading-tight">{formatINR(totalSalaryProjected)}</div>
-              <div className="text-sm text-slate-500 font-medium leading-none">{`Total Salary (${new Intl.DateTimeFormat('en-US', { month: 'short' }).format(new Date())})`}</div>
+              <div className="text-base text-slate-500 font-medium leading-none">{`Total Salary (${new Intl.DateTimeFormat('en-US', { month: 'short' }).format(new Date())})`}</div>
             </div>
           </div>
-          <button onClick={() => setView('salary')} className="text-sm font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
+          <button onClick={() => setView('salary')} className="text-base font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View salary
           </button>
         </div>
@@ -192,10 +192,10 @@ export default function DashboardView({
             </div>
             <div className="flex flex-col justify-center">
               <div className="text-[26px] font-bold text-slate-900 leading-tight">{formatINR(pendingSalaries)}</div>
-              <div className="text-sm text-slate-500 font-medium leading-none">Pending Payments</div>
+              <div className="text-base text-slate-500 font-medium leading-none">Pending Payments</div>
             </div>
           </div>
-          <button onClick={() => setView('salary')} className="text-sm font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
+          <button onClick={() => setView('salary')} className="text-base font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View payments
           </button>
         </div>
@@ -209,7 +209,7 @@ export default function DashboardView({
             <h2 className="text-[15px] font-bold text-slate-900">Today's Attendance</h2>
             <button
               onClick={() => setView('attendance')}
-              className="text-sm font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
+              className="text-base font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
             >
               Mark Attendance <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -218,7 +218,7 @@ export default function DashboardView({
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-y border-slate-100 text-[11px] uppercase tracking-wider font-semibold text-slate-500">
+                <tr className="border-y border-slate-100 text-base uppercase tracking-wider font-semibold text-slate-500">
                   <th className="px-5 py-3">Worker Name</th>
                   <th className="px-5 py-3">Status</th>
                   <th className="px-5 py-3">Check In</th>
@@ -226,7 +226,7 @@ export default function DashboardView({
                   <th className="px-5 py-3"></th>
                 </tr>
               </thead>
-              <tbody className="text-sm">
+              <tbody className="text-base">
                 {attendanceTodayList.map(({ worker, status, checkIn, checkOut }) => {
                   const getBadgeStyle = (stat: string) => {
                     switch (stat) {
@@ -251,18 +251,18 @@ export default function DashboardView({
                             referrerPolicy="no-referrer"
                           />
                           <div>
-                            <p className="font-semibold text-slate-900 text-[13px]">{worker.name}</p>
-                            <p className="text-[11px] text-slate-500">{worker.role}</p>
+                            <p className="font-semibold text-slate-900 text-lg">{worker.name}</p>
+                            <p className="text-base text-slate-500">{worker.role}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-5 py-3">
-                        <span className={`px-2 py-0.5 rounded text-sm font-semibold ${getBadgeStyle(status)}`}>
+                        <span className={`px-2 py-0.5 rounded text-base font-semibold ${getBadgeStyle(status)}`}>
                           {status}
                         </span>
                       </td>
-                      <td className="px-5 py-3 text-[13px] text-slate-600 font-medium">{checkIn}</td>
-                      <td className="px-5 py-3 text-[13px] text-slate-600 font-medium">{checkOut}</td>
+                      <td className="px-5 py-3 text-lg text-slate-600 font-medium">{checkIn}</td>
+                      <td className="px-5 py-3 text-lg text-slate-600 font-medium">{checkOut}</td>
                       <td className="px-5 py-3 text-right">
                         <button className="text-slate-400 hover:text-slate-600">
                           <MoreVertical className="w-4 h-4" />
@@ -277,7 +277,7 @@ export default function DashboardView({
           <div className="p-4 mt-auto text-right">
             <button
               onClick={() => setView('attendance')}
-              className="text-sm font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 ml-auto"
+              className="text-base font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 ml-auto"
             >
               View all attendance <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -300,39 +300,39 @@ export default function DashboardView({
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-xl font-bold text-slate-900">{totalPaymentWorkers}</span>
-                <span className="text-sm text-slate-500 font-medium">Total</span>
+                <span className="text-base text-slate-500 font-medium">Total</span>
               </div>
             </div>
 
-            <div className="flex flex-col gap-4 text-sm font-medium text-slate-700">
+            <div className="flex flex-col gap-4 text-base font-medium text-slate-700">
               <div className="flex items-center justify-between gap-6">
-                <div className="flex items-center gap-2 text-[13px]">
+                <div className="flex items-center gap-2 text-lg">
                   <span className="w-2 h-2 rounded-full bg-[#10b981]" />
                   Paid
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-bold text-slate-900 text-sm">{paidCount}</span>
-                  <span className="text-slate-400 text-[11px]">({paidPct}%)</span>
+                  <span className="font-bold text-slate-900 text-base">{paidCount}</span>
+                  <span className="text-slate-400 text-base">({paidPct}%)</span>
                 </div>
               </div>
               <div className="flex items-center justify-between gap-6">
-                <div className="flex items-center gap-2 text-[13px]">
+                <div className="flex items-center gap-2 text-lg">
                   <span className="w-2 h-2 rounded-full bg-[#f59e0b]" />
                   Partial
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-bold text-slate-900 text-sm">{partialCount}</span>
-                  <span className="text-slate-400 text-[11px]">({partialPct}%)</span>
+                  <span className="font-bold text-slate-900 text-base">{partialCount}</span>
+                  <span className="text-slate-400 text-base">({partialPct}%)</span>
                 </div>
               </div>
               <div className="flex items-center justify-between gap-6">
-                <div className="flex items-center gap-2 text-[13px]">
+                <div className="flex items-center gap-2 text-lg">
                   <span className="w-2 h-2 rounded-full bg-[#ef4444]" />
                   Pending
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-bold text-slate-900 text-sm">{pendingCount}</span>
-                  <span className="text-slate-400 text-[11px]">({pendingPct}%)</span>
+                  <span className="font-bold text-slate-900 text-base">{pendingCount}</span>
+                  <span className="text-slate-400 text-base">({pendingPct}%)</span>
                 </div>
               </div>
             </div>
@@ -346,7 +346,7 @@ export default function DashboardView({
           <h2 className="text-[15px] font-bold text-slate-900">Recent Payments</h2>
           <button
             onClick={() => setView('salary')}
-            className="text-sm font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
+            className="text-base font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
           >
             View all payments <ArrowRight className="w-3.5 h-3.5" />
           </button>
@@ -354,7 +354,7 @@ export default function DashboardView({
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-y border-slate-100 text-[11px] uppercase tracking-wider font-semibold text-slate-500">
+              <tr className="border-y border-slate-100 text-base uppercase tracking-wider font-semibold text-slate-500">
                 <th className="px-5 py-3">Worker Name</th>
                 <th className="px-5 py-3">Total Salary</th>
 
@@ -364,7 +364,7 @@ export default function DashboardView({
                 <th className="px-5 py-3">Payment Date</th>
               </tr>
             </thead>
-            <tbody className="text-[13px]">
+            <tbody className="text-lg">
               {recentPaymentsList.map((payment) => {
                 const getStatusStyle = (stat: string) => {
                   if (stat === 'Paid') return 'text-emerald-600 border border-emerald-200 bg-emerald-50';
@@ -390,7 +390,7 @@ export default function DashboardView({
                     <td className="px-5 py-3 text-slate-600">{formatINR(payment.paid)}</td>
                     <td className="px-5 py-3 text-slate-600">{formatINR(payment.balance)}</td>
                     <td className="px-5 py-3">
-                      <span className={`px-2 py-0.5 rounded text-sm font-semibold ${getStatusStyle(payment.status)}`}>
+                      <span className={`px-2 py-0.5 rounded text-base font-semibold ${getStatusStyle(payment.status)}`}>
                         {payment.status}
                       </span>
                     </td>

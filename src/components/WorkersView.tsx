@@ -90,7 +90,7 @@ export default function WorkersView({
         <div className="relative w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" />
           <input
-            className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:border-[var(--primary-color)] text-sm placeholder-slate-400 shadow-sm"
+            className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:border-[var(--primary-color)] text-base placeholder-slate-400 shadow-sm"
             placeholder="Search workers..."
             type="text"
             value={search}
@@ -105,7 +105,7 @@ export default function WorkersView({
               <button
                 key={filter}
                 onClick={() => setStatusFilter(filter)}
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all border cursor-pointer ${isSelected
+                className={`px-4 py-1.5 rounded-full text-base font-semibold whitespace-nowrap transition-all border cursor-pointer ${isSelected
                     ? 'bg-[#131b2e] text-white border-[#131b2e] shadow-sm'
                     : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
                   }`}
@@ -120,7 +120,7 @@ export default function WorkersView({
       {/* Workers Cards List */}
       <section className="flex flex-col gap-4">
         {filteredWorkers.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400 text-sm">
+          <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400 text-base">
             No workers matches the selection filters.
           </div>
         ) : (
@@ -146,11 +146,11 @@ export default function WorkersView({
                     referrerPolicy="no-referrer"
                   />
                   <div className="flex flex-col">
-                    <h2 className="text-sm font-display font-bold text-slate-800 group-hover:text-[var(--primary-color)] transition-colors leading-snug">
+                    <h2 className="text-base font-display font-bold text-slate-800 group-hover:text-[var(--primary-color)] transition-colors leading-snug">
                       {w.name}
                     </h2>
-                    <span className="text-sm text-[#7c839b]">{w.role}</span>
-                    <span className="text-sm font-bold text-[var(--primary-color)] mt-1">
+                    <span className="text-base text-[#7c839b]">{w.role}</span>
+                    <span className="text-base font-bold text-[var(--primary-color)] mt-1">
                       ₹{w.dailyWage} / day
                     </span>
                   </div>
@@ -164,25 +164,25 @@ export default function WorkersView({
                         setSelectedWorkerId(w.id);
                         setView('worker-profile');
                       }}
-                      className="text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 px-2 py-1 rounded transition-colors cursor-pointer text-sm font-semibold"
+                      className="text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 px-2 py-1 rounded transition-colors cursor-pointer text-base font-semibold"
                     >
                       View
                     </button>
                     <button 
                       onClick={(e) => { e.stopPropagation(); setEditingWorker(w); }}
-                      className="text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition-colors cursor-pointer text-sm font-semibold"
+                      className="text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition-colors cursor-pointer text-base font-semibold"
                     >
                       Edit
                     </button>
                     <button 
                       onClick={(e) => { e.stopPropagation(); onDeleteWorker(w.id); }}
-                      className="text-red-400 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded transition-colors cursor-pointer text-sm font-semibold"
+                      className="text-red-400 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded transition-colors cursor-pointer text-base font-semibold"
                     >
                       Delete
                     </button>
                   </div>
                   <span
-                    className={`px-2 py-0.5 rounded-full text-sm font-bold ${isDisabled
+                    className={`px-2 py-0.5 rounded-full text-base font-bold ${isDisabled
                         ? 'bg-red-50 text-red-650'
                         : isOnLeave
                           ? 'bg-amber-50 text-amber-700'
@@ -218,7 +218,7 @@ export default function WorkersView({
               className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-200"
             >
               <div className="bg-[#131b2e] text-white px-6 py-4 flex items-center justify-between">
-                <h3 className="font-display font-bold text-base">Register New Worker</h3>
+                <h3 className="font-display font-bold text-lg">Register New Worker</h3>
                 <button
                   onClick={() => setIsAddModalOpen(false)}
                   className="p-1 rounded-full text-[#7c839b] hover:text-white transition-colors cursor-pointer"
@@ -229,24 +229,24 @@ export default function WorkersView({
 
               <form onSubmit={handleFormSubmit} className="p-6 space-y-4">
                 <div className="space-y-1">
-                  <label className="text-sm font-bold text-slate-500">FullName</label>
+                  <label className="text-base font-bold text-slate-500">FullName</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. John Miller"
                     value={newWorkerName}
                     onChange={(e) => setNewWorkerName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-sm font-bold text-slate-500">Role / Trade</label>
+                    <label className="text-base font-bold text-slate-500">Role / Trade</label>
                     <select
                       value={newWorkerRole}
                       onChange={(e) => setNewWorkerRole(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     >
                       <option value="Electrician">Electrician</option>
                       <option value="Carpenter">Carpenter</option>
@@ -255,47 +255,47 @@ export default function WorkersView({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-sm font-bold text-slate-500">Daily Wage (₹)</label>
+                    <label className="text-base font-bold text-slate-500">Daily Wage (₹)</label>
                     <input
                       type="number"
                       required
                       min={100}
                       value={newWorkerWage}
                       onChange={(e) => setNewWorkerWage(Number(e.target.value))}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-sm font-bold text-slate-500">Phone</label>
+                  <label className="text-base font-bold text-slate-500">Phone</label>
                   <input
                     type="tel"
                     required
                     value={newWorkerPhone}
                     onChange={(e) => setNewWorkerPhone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-sm font-bold text-slate-500">Email (Optional)</label>
+                    <label className="text-base font-bold text-slate-500">Email (Optional)</label>
                     <input
                       type="email"
                       placeholder="e.g. jmiller@site.com"
                       value={newWorkerEmail}
                       onChange={(e) => setNewWorkerEmail(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-sm font-bold text-slate-500">Status</label>
+                    <label className="text-base font-bold text-slate-500">Status</label>
                     <select
                       value={newWorkerStatus}
                       onChange={(e) => setNewWorkerStatus(e.target.value as 'Active' | 'On Leave')}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     >
                       <option value="Active">Active</option>
                       <option value="On Leave">On Leave</option>
@@ -307,13 +307,13 @@ export default function WorkersView({
                   <button
                     type="button"
                     onClick={() => setIsAddModalOpen(false)}
-                    className="flex-1 py-3 border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-sm rounded-xl transition-colors cursor-pointer"
+                    className="flex-1 py-3 border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-base rounded-xl transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 bg-[var(--primary-color)] hover:bg-[#6c61f2] text-white font-bold text-sm rounded-xl shadow-lg shadow-[var(--primary-color)]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-[var(--primary-color)] hover:bg-[#6c61f2] text-white font-bold text-base rounded-xl shadow-lg shadow-[var(--primary-color)]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     <UserCheck className="w-4 h-4" /> Add Recruit
                   </button>
@@ -335,7 +335,7 @@ export default function WorkersView({
               className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-200"
             >
               <div className="bg-[var(--primary-color)] text-white px-6 py-4 flex items-center justify-between">
-                <h3 className="font-display font-bold text-base">Edit Worker</h3>
+                <h3 className="font-display font-bold text-lg">Edit Worker</h3>
                 <button
                   onClick={() => setEditingWorker(null)}
                   className="p-1 rounded-full text-indigo-200 hover:text-white transition-colors cursor-pointer"
@@ -350,23 +350,23 @@ export default function WorkersView({
                 setEditingWorker(null);
               }} className="p-6 space-y-4">
                 <div className="space-y-1">
-                  <label className="text-sm font-bold text-slate-500">FullName</label>
+                  <label className="text-base font-bold text-slate-500">FullName</label>
                   <input
                     type="text"
                     required
                     value={editingWorker.name}
                     onChange={(e) => setEditingWorker({ ...editingWorker, name: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-sm font-bold text-slate-500">Role / Trade</label>
+                    <label className="text-base font-bold text-slate-500">Role / Trade</label>
                     <select
                       value={editingWorker.role}
                       onChange={(e) => setEditingWorker({ ...editingWorker, role: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     >
                       <option value="Electrician">Electrician</option>
                       <option value="Carpenter">Carpenter</option>
@@ -375,46 +375,46 @@ export default function WorkersView({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-sm font-bold text-slate-500">Daily Wage (₹)</label>
+                    <label className="text-base font-bold text-slate-500">Daily Wage (₹)</label>
                     <input
                       type="number"
                       required
                       min={100}
                       value={editingWorker.dailyWage}
                       onChange={(e) => setEditingWorker({ ...editingWorker, dailyWage: Number(e.target.value) })}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-sm font-bold text-slate-500">Phone</label>
+                  <label className="text-base font-bold text-slate-500">Phone</label>
                   <input
                     type="tel"
                     required
                     value={editingWorker.phone}
                     onChange={(e) => setEditingWorker({ ...editingWorker, phone: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-sm font-bold text-slate-500">Email (Optional)</label>
+                    <label className="text-base font-bold text-slate-500">Email (Optional)</label>
                     <input
                       type="email"
                       value={editingWorker.email}
                       onChange={(e) => setEditingWorker({ ...editingWorker, email: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-sm font-bold text-slate-500">Status</label>
+                    <label className="text-base font-bold text-slate-500">Status</label>
                     <select
                       value={editingWorker.status}
                       onChange={(e) => setEditingWorker({ ...editingWorker, status: e.target.value as 'Active' | 'On Leave' | 'Disabled' })}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-800 focus:outline-none focus:border-[var(--primary-color)]"
                     >
                       <option value="Active">Active</option>
                       <option value="On Leave">On Leave</option>
@@ -427,13 +427,13 @@ export default function WorkersView({
                   <button
                     type="button"
                     onClick={() => setEditingWorker(null)}
-                    className="flex-1 py-3 border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-sm rounded-xl transition-colors cursor-pointer"
+                    className="flex-1 py-3 border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-base rounded-xl transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 bg-[var(--primary-color)] hover:bg-[#6c61f2] text-white font-bold text-sm rounded-xl shadow-lg shadow-[var(--primary-color)]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-[var(--primary-color)] hover:bg-[#6c61f2] text-white font-bold text-base rounded-xl shadow-lg shadow-[var(--primary-color)]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     Save Changes
                   </button>
