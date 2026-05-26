@@ -315,8 +315,8 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
                 const firstDay = weekDays[0];
                 const lastDay = weekDays[weekDays.length - 1];
                 return (
-                  <th key={idx} className="py-3 font-bold text-sm text-slate-800 border-r border-slate-200 text-center" colSpan={7}>
-                    Week {idx + 1} <div className="text-[11px] text-slate-500 font-medium mt-0.5">({firstDay.day} {new Date(0, firstDay.month).toLocaleString('en', { month: 'short' })} - {lastDay.day} {new Date(0, lastDay.month).toLocaleString('en', { month: 'short' })})</div>
+                  <th key={idx} className="py-3 font-bold text-base md:text-lg text-slate-800 border-r border-slate-200 text-center" colSpan={7}>
+                    Week {idx + 1} <div className="text-sm text-slate-500 font-bold mt-0.5">({firstDay.day} {new Date(0, firstDay.month).toLocaleString('en', { month: 'short' })} - {lastDay.day} {new Date(0, lastDay.month).toLocaleString('en', { month: 'short' })})</div>
                   </th>
                 )
               })}
@@ -330,9 +330,9 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
                 const isWeekend = dObj.dateObj.getDay() === 0;
                 const dayName = dObj.dateObj.toLocaleString('en-US', { weekday: 'short' });
                 return (
-                  <th key={dObj.dateStr} className={`py-2 min-w-[38px] font-semibold text-center border-r ${isWeekend ? 'bg-red-50/50 text-red-500' : 'text-slate-600'} ${idx === 6 || idx === 13 || idx === 20 || idx === 27 ? 'border-r-slate-200' : 'border-slate-100'}`}>
-                    <div className="text-sm">{dObj.day}</div>
-                    <div className="text-[9px] font-bold opacity-60 uppercase tracking-tighter -mt-0.5">{dayName}</div>
+                  <th key={dObj.dateStr} className={`py-3 min-w-[42px] font-semibold text-center border-r ${isWeekend ? 'bg-red-50/50 text-red-500' : 'text-slate-600'} ${idx === 6 || idx === 13 || idx === 20 || idx === 27 ? 'border-r-slate-200' : 'border-slate-100'}`}>
+                    <div className="text-base font-bold">{dObj.day}</div>
+                    <div className="text-xs font-bold opacity-70 uppercase tracking-tighter">{dayName}</div>
                   </th>
                 )
               })}
