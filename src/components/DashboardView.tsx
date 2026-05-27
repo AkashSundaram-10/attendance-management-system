@@ -57,7 +57,7 @@ export default function DashboardView({
     const totalAdvance = workerSalaries.reduce((acc, curr) => acc + curr.advanceDeduction, 0);
     const totalNetPay = totalGross + totalOvertime - totalAdvance;
     const totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? (curr.grossPay + curr.overtimePay - curr.advanceDeduction) : 0)), 0);
-    
+
     // Status Logic
     let status = 'Pending';
     if (totalNetPay > 0 && totalPaid >= totalNetPay) status = 'Paid';
@@ -140,7 +140,7 @@ export default function DashboardView({
       <section className="grid grid-cols-1 md:grid-cols-4 gap-5">
         {/* Card 1 */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-          <div className="flex gap-4 mb-4">
+          <div className="flex flex-col xl:flex-row gap-4 mb-4 items-start xl:items-center">
             <div className="w-14 h-14 rounded-2xl bg-[var(--primary-color)] flex items-center justify-center flex-shrink-0 text-white">
               <Users className="w-7 h-7" />
             </div>
@@ -156,7 +156,7 @@ export default function DashboardView({
 
         {/* Card 2 */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-          <div className="flex gap-4 mb-4">
+          <div className="flex flex-col xl:flex-row gap-4 mb-4 items-start xl:items-center">
             <div className="w-14 h-14 rounded-2xl bg-[#10b981] flex items-center justify-center flex-shrink-0 text-white">
               <UserCheck className="w-7 h-7" />
             </div>
@@ -172,7 +172,7 @@ export default function DashboardView({
 
         {/* Card 3 */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-          <div className="flex gap-4 mb-4">
+          <div className="flex flex-col xl:flex-row gap-4 mb-4 items-start xl:items-center">
             <div className="w-14 h-14 rounded-2xl bg-[#f59e0b] flex items-center justify-center flex-shrink-0 text-white">
               <IndianRupee className="w-7 h-7" />
             </div>
@@ -188,7 +188,7 @@ export default function DashboardView({
 
         {/* Card 4 */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-          <div className="flex gap-4 mb-4">
+          <div className="flex flex-col xl:flex-row gap-4 mb-4 items-start xl:items-center">
             <div className="w-14 h-14 rounded-2xl bg-[#ef4444] flex items-center justify-center flex-shrink-0 text-white">
               <Wallet className="w-7 h-7" />
             </div>

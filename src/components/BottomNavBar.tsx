@@ -68,14 +68,14 @@ export default function BottomNavBar({ currentView, setView }: BottomNavBarProps
           <button
             key={item.id}
             onClick={() => setView(item.targetView)}
-            className={`flex flex-col items-center justify-center transition-all duration-200 py-1.5 cursor-pointer select-none ${
+            className={`flex flex-col items-center justify-center transition-all duration-200 py-2 cursor-pointer select-none ${
               isActive
                 ? 'text-[var(--primary-color)] font-bold bg-[#dae2fd] rounded-full px-5 scale-95'
                 : 'text-slate-500 text-[#45464d] px-3'
             }`}
           >
-            <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[1.8px]'}`} />
-            <span className="text-xs uppercase tracking-wider font-semibold mt-1">
+            <Icon className={`w-6 h-6 md:w-7 md:h-7 ${isActive ? 'stroke-[2.5px]' : 'stroke-[1.8px]'}`} />
+            <span className="text-sm md:text-base uppercase tracking-wider font-bold mt-1.5">
               {item.label}
             </span>
           </button>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Bell, ArrowLeft, Edit, Calendar, User, Phone, Mail } from 'lucide-react';
 import { AppView } from '../types';
 
@@ -22,6 +22,20 @@ export default function TopAppBar({
   onMenuToggle,
 }: TopAppBarProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    }
+    
+    if (isProfileOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isProfileOpen]);
 
   // If we are in detailed sub-pages, show back arrow headers
   const isProfile = currentView === 'worker-profile';
@@ -66,26 +80,26 @@ export default function TopAppBar({
   const avatarUrl = '/admin%20image.png';
 
   return (
-    <header className="sticky top-0 z-50 flex justify-between items-center px-4 md:px-8 h-20 bg-white border-b border-slate-200 transition-colors shrink-0">
-      <div className="flex items-center gap-3">
-        <img src="/logo.png?v=3" alt="WorkTrack Pro Logo" className="w-12 h-12 object-contain rounded-xl shadow-sm" />
+    <header className="sticky top-0 z-50 flex justify-between items-center px-4 md:px-8 h-24 md:h-28 bg-white border-b border-slate-200 transition-colors shrink-0">
+      <div className="flex items-center gap-4">
+        <img src="/logo.png?v=3" alt="WorkTrack Pro Logo" className="w-16 h-16 md:w-20 md:h-20 object-contain rounded-xl shadow-sm" />
         <div className="block">
-          <h1 className="text-lg md:text-xl font-black text-slate-900 leading-tight tracking-tight">WorkTrack Pro</h1>
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight tracking-tight">WorkTrack Pro</h1>
         </div>
       </div>
 
-      <div className="relative">
+      <div className="relative" ref={profileRef}>
         <div 
           className="flex items-center gap-4 cursor-pointer hover:bg-slate-50 p-2 rounded-xl transition-colors"
           onClick={() => setIsProfileOpen(!isProfileOpen)}
         >
           <div className="text-right hidden md:block">
-            <h1 className="text-base font-bold text-[#0f172a]">Mani</h1>
-            <p className="text-sm font-bold text-[var(--primary-color)]">Supervisor</p>
+            <h1 className="text-xl md:text-2xl font-bold text-[#0f172a]">Mani</h1>
+            <p className="text-lg font-bold text-[var(--primary-color)]">Supervisor</p>
           </div>
           <img
             alt="User Profile"
-            className="w-14 h-14 rounded-full bg-slate-200 object-cover hover:ring-4 hover:ring-[var(--primary-color)] transition-all shadow-md"
+            className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-slate-200 object-cover hover:ring-4 hover:ring-[var(--primary-color)] transition-all shadow-md"
             style={{ objectPosition: 'center 20%' }}
             src={avatarUrl}
             referrerPolicy="no-referrer"
