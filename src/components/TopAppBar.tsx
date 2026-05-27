@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, ArrowLeft, Edit, Calendar, User, Phone, Mail } from 'lucide-react';
+import { Bell, ArrowLeft, Edit, Calendar, User, Phone, Mail, Settings } from 'lucide-react';
 import { AppView } from '../types';
 
 interface TopAppBarProps {
@@ -80,11 +80,11 @@ export default function TopAppBar({
   const avatarUrl = '/admin%20image.png';
 
   return (
-    <header className="sticky top-0 z-50 flex justify-between items-center px-4 md:px-8 h-24 md:h-28 bg-white border-b border-slate-200 transition-colors shrink-0">
-      <div className="flex items-center gap-4">
-        <img src="/logo.png?v=3" alt="WorkTrack Pro Logo" className="w-16 h-16 md:w-20 md:h-20 object-contain rounded-xl shadow-sm" />
+    <header className="sticky top-0 z-50 flex justify-between items-center px-3 md:px-8 h-20 md:h-28 bg-white border-b border-slate-200 transition-colors shrink-0">
+      <div className="flex items-center gap-2 md:gap-4">
+        <img src="/logo.png?v=3" alt="WorkTrack Pro Logo" className="w-12 h-12 md:w-20 md:h-20 object-contain rounded-xl shadow-sm" />
         <div className="block">
-          <h1 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight tracking-tight">WorkTrack Pro</h1>
+          <h1 className="text-lg md:text-3xl font-black text-slate-900 leading-tight tracking-tight whitespace-nowrap">WorkTrack Pro</h1>
         </div>
       </div>
 
@@ -95,11 +95,11 @@ export default function TopAppBar({
         >
           <div className="text-right hidden md:block">
             <h1 className="text-xl md:text-2xl font-bold text-[#0f172a]">Mani</h1>
-            <p className="text-lg font-bold text-[var(--primary-color)]">Supervisor</p>
+            <p className="text-base md:text-lg font-bold text-[var(--primary-color)]">Supervisor</p>
           </div>
           <img
             alt="User Profile"
-            className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-slate-200 object-cover hover:ring-4 hover:ring-[var(--primary-color)] transition-all shadow-md"
+            className="w-12 h-12 md:w-20 md:h-20 rounded-full bg-slate-200 object-cover hover:ring-4 hover:ring-[var(--primary-color)] transition-all shadow-md"
             style={{ objectPosition: 'center 20%' }}
             src={avatarUrl}
             referrerPolicy="no-referrer"
@@ -147,6 +147,19 @@ export default function TopAppBar({
                 </div>
                 <span className="font-bold text-slate-900">+91 98844 09329</span>
               </div>
+            </div>
+
+            <div className="mt-5 pt-4 border-t border-slate-100">
+              <button 
+                onClick={() => {
+                  setView('settings');
+                  setIsProfileOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-base font-semibold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
+              >
+                <Settings className="w-5 h-5 text-slate-400" />
+                <span>Settings</span>
+              </button>
             </div>
           </div>
         )}

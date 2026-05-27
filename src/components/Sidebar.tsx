@@ -21,7 +21,6 @@ export default function Sidebar({ currentView, setView }: SidebarProps) {
     { id: 'attendance' as AppView, label: 'Attendance', icon: CalendarCheck2 },
     { id: 'salary' as AppView, label: 'Salary', icon: BadgeDollarSign },
     { id: 'analytics' as AppView, label: 'Analytics', icon: PieChart },
-    { id: 'settings' as AppView, label: 'Settings', icon: Settings },
     { id: 'deleted-workers' as AppView, label: 'Recycle Bin', icon: FileText },
   ];
 
