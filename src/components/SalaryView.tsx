@@ -77,7 +77,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
               <button
                 key={m}
                 onClick={() => setSelectedMonth(m)}
-                className={`px-4 py-1.5 rounded-full text-base font-bold whitespace-nowrap transition-all ${
+                className={`px-5 py-2 rounded-full text-lg md:text-xl font-bold whitespace-nowrap transition-all ${
                   selectedMonth === m
                     ? 'bg-[var(--primary-color)] text-white shadow-md shadow-[var(--primary-color)]/20'
                     : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'
@@ -206,9 +206,9 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
 
             return (
               <div key={week} className="space-y-3.5">
-                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                  <h3 className="text-lg font-black font-display text-slate-800">{week.includes(' | ') ? week.split(' | ')[1] : week}</h3>
-                  <div className="flex items-center gap-4 text-base font-bold">
+                <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-200 pb-3 gap-2">
+                  <h3 className="text-2xl font-black font-display text-slate-800">{week.includes(' | ') ? week.split(' | ')[1] : week}</h3>
+                  <div className="flex flex-wrap items-center gap-4 text-lg md:text-xl font-bold">
                     <span className="text-emerald-600">Paid: ₹{weekDisbursed.toLocaleString()}</span>
                     <span className="text-red-500">Unpaid: ₹{weekPending.toLocaleString()}</span>
                     <span className="text-slate-500">Total: ₹{weekProjected.toLocaleString()}</span>
@@ -243,10 +243,10 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                       referrerPolicy="no-referrer"
                     />
                     <div>
-                      <h3 className="text-base font-display font-bold text-slate-800">
+                      <h3 className="text-xl font-display font-bold text-slate-800">
                         {worker.name}
                       </h3>
-                      <p className="text-base text-slate-500 font-medium">
+                      <p className="text-lg text-slate-500 font-medium">
                         {worker.role} • ID: {worker.id}
                       </p>
                     </div>
@@ -254,10 +254,10 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
 
                   <div className="flex items-center justify-between w-full md:w-auto gap-6">
                     <div className="hidden md:block text-right">
-                      <div className="text-base text-slate-400 font-bold uppercase tracking-wider">
+                      <div className="text-lg text-slate-400 font-bold uppercase tracking-wider">
                         Days
                       </div>
-                      <div className="text-base font-bold text-slate-800">
+                      <div className="text-xl font-bold text-slate-800">
                         {s.daysWorked}/{s.totalDays}
                       </div>
                     </div>
@@ -265,7 +265,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
 
 
                     <div className="text-right">
-                      <div className="text-lg font-display font-black text-slate-900">
+                      <div className="text-2xl font-display font-black text-slate-900">
                         ₹{netPay.toLocaleString()}
                       </div>
                       {s.status === 'Paid' ? (

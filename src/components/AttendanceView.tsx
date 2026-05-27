@@ -66,7 +66,7 @@ export default function AttendanceView({
         <button
           key={dateStr}
           onClick={() => setSelectedDate(dateStr)}
-          className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex flex-col items-center justify-center text-base font-medium transition-all cursor-pointer ${dayColorClass}`}
+          className={`w-14 h-14 md:w-16 md:h-16 rounded-xl flex flex-col items-center justify-center text-xl md:text-2xl font-medium transition-all cursor-pointer ${dayColorClass}`}
         >
           <span className="font-bold">{d.getDate()}</span>
         </button>
@@ -74,7 +74,7 @@ export default function AttendanceView({
     }
     
     return (
-      <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm w-full lg:max-w-md">
+      <div className="bg-white p-5 md:p-8 rounded-2xl border border-slate-200 shadow-sm w-full lg:max-w-xl">
         <div className="flex justify-between items-center mb-6">
           <button 
             onClick={() => shiftWeek(-1)} 
@@ -84,8 +84,8 @@ export default function AttendanceView({
             <ChevronLeft className="w-5 h-5" />
           </button>
           
-          <div className="font-bold font-display text-slate-800 text-lg flex items-center gap-2">
-            <CalendarIcon className="w-4 h-4 text-[var(--primary-color)]" />
+          <div className="font-bold font-display text-slate-800 text-xl md:text-2xl flex items-center gap-2">
+            <CalendarIcon className="w-6 h-6 text-[var(--primary-color)]" />
             {new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(activeObj)}
           </div>
           
@@ -97,12 +97,12 @@ export default function AttendanceView({
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
-        <div className="grid grid-cols-7 gap-1 text-center mb-3">
+        <div className="grid grid-cols-7 gap-2 md:gap-4 text-center mb-4">
           {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
-            <div key={d} className="text-base font-bold text-slate-400 uppercase tracking-wider">{d}</div>
+            <div key={d} className="text-lg font-bold text-slate-400 uppercase tracking-wider">{d}</div>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-1 place-items-center">
+        <div className="grid grid-cols-7 gap-2 md:gap-4 place-items-center">
           {days}
         </div>
       </div>

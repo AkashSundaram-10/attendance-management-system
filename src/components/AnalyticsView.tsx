@@ -314,21 +314,21 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
           <thead>
             {/* Week Groupings Header */}
             <tr className="border-b border-slate-200 bg-slate-50">
-              <th className="px-4 py-4 font-semibold text-base text-slate-800 border-r border-slate-200 w-12 text-center sticky left-0 bg-slate-50 z-20" rowSpan={2}>No.</th>
-              <th className="px-5 py-4 font-semibold text-base text-slate-800 border-r border-slate-200 min-w-[220px] sticky left-[48px] bg-slate-50 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" rowSpan={2}>Worker Name</th>
+              <th className="px-4 py-4 font-semibold text-lg md:text-xl text-slate-800 border-r border-slate-200 w-12 text-center sticky left-0 bg-slate-50 z-20" rowSpan={2}>No.</th>
+              <th className="px-5 py-4 font-semibold text-lg md:text-xl text-slate-800 border-r border-slate-200 min-w-[220px] sticky left-[48px] bg-slate-50 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" rowSpan={2}>Worker Name</th>
               
               {weeks.map((weekDays, idx) => {
                 const firstDay = weekDays[0];
                 const lastDay = weekDays[weekDays.length - 1];
                 return (
-                  <th key={idx} className="py-3 font-bold text-lg md:text-lg text-slate-800 border-r border-slate-200 text-center" colSpan={7}>
-                    Week {idx + 1} <div className="text-base text-slate-500 font-bold mt-0.5">({firstDay.day} {new Date(0, firstDay.month).toLocaleString('en', { month: 'short' })} - {lastDay.day} {new Date(0, lastDay.month).toLocaleString('en', { month: 'short' })})</div>
+                  <th key={idx} className="py-3 font-bold text-xl md:text-2xl text-slate-800 border-r border-slate-200 text-center" colSpan={7}>
+                    Week {idx + 1} <div className="text-lg text-slate-500 font-bold mt-0.5">({firstDay.day} {new Date(0, firstDay.month).toLocaleString('en', { month: 'short' })} - {lastDay.day} {new Date(0, lastDay.month).toLocaleString('en', { month: 'short' })})</div>
                   </th>
                 )
               })}
               
-              <th className="px-4 py-4 font-semibold text-base text-slate-800 border-r border-slate-200 text-center leading-tight" rowSpan={2}>Days<br/>Worked</th>
-              <th className="px-4 py-4 font-semibold text-base text-slate-800 text-center leading-tight" rowSpan={2}>Total<br/>Amount</th>
+              <th className="px-4 py-4 font-semibold text-lg md:text-xl text-slate-800 border-r border-slate-200 text-center leading-tight" rowSpan={2}>Days<br/>Worked</th>
+              <th className="px-4 py-4 font-semibold text-lg md:text-xl text-slate-800 text-center leading-tight" rowSpan={2}>Total<br/>Amount</th>
             </tr>
             {/* Days Header */}
             <tr className="border-b border-slate-200 bg-white">
@@ -336,9 +336,9 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
                 const isWeekend = dObj.dateObj.getDay() === 0;
                 const dayName = dObj.dateObj.toLocaleString('en-US', { weekday: 'short' });
                 return (
-                  <th key={dObj.dateStr} className={`py-3 min-w-[42px] font-semibold text-center border-r ${isWeekend ? 'bg-red-50/50 text-red-500' : 'text-slate-600'} ${idx === 6 || idx === 13 || idx === 20 || idx === 27 ? 'border-r-slate-200' : 'border-slate-100'}`}>
-                    <div className="text-lg font-bold">{dObj.day}</div>
-                    <div className="text-sm font-bold opacity-70 uppercase tracking-tighter">{dayName}</div>
+                  <th key={dObj.dateStr} className={`py-3 min-w-[50px] font-semibold text-center border-r ${isWeekend ? 'bg-red-50/50 text-red-500' : 'text-slate-600'} ${idx === 6 || idx === 13 || idx === 20 || idx === 27 ? 'border-r-slate-200' : 'border-slate-100'}`}>
+                    <div className="text-xl font-bold">{dObj.day}</div>
+                    <div className="text-base font-bold opacity-70 uppercase tracking-tighter">{dayName}</div>
                   </th>
                 )
               })}
@@ -347,22 +347,22 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
           <tbody>
             {tableData.rows.map((row, index) => (
               <tr key={row.worker.id} className="group border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                <td className="py-4 px-2 text-base font-medium text-slate-500 text-center border-r border-slate-100 sticky left-0 bg-white group-hover:bg-slate-50 z-10 transition-colors">{index + 1}</td>
-                <td className="py-4 px-5 text-base font-bold text-slate-800 border-r border-slate-100 whitespace-nowrap sticky left-[48px] bg-white group-hover:bg-slate-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] transition-colors">{row.worker.name}</td>
+                <td className="py-4 px-2 text-lg font-medium text-slate-500 text-center border-r border-slate-100 sticky left-0 bg-white group-hover:bg-slate-50 z-10 transition-colors">{index + 1}</td>
+                <td className="py-4 px-5 text-lg font-bold text-slate-800 border-r border-slate-100 whitespace-nowrap sticky left-[48px] bg-white group-hover:bg-slate-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] transition-colors">{row.worker.name}</td>
                 
                 {daysArray.map((dObj, idx) => (
                   <td 
                     key={dObj.dateStr} 
                     className={`p-1.5 border-r text-center transition-colors ${idx === 6 || idx === 13 || idx === 20 || idx === 27 ? 'border-r-slate-200' : 'border-slate-100'}`}
                   >
-                    <div className="w-8 h-8 mx-auto flex items-center justify-center rounded">
+                    <div className="w-10 h-10 mx-auto flex items-center justify-center rounded">
                       {getStatusIcon(row.dayMarks[dObj.dateStr], dObj.dateStr)}
                     </div>
                   </td>
                 ))}
                 
-                <td className="py-4 px-4 text-base font-bold text-slate-700 text-center border-r border-slate-100">{row.daysWorked}</td>
-                <td className="py-4 px-4 text-base font-black text-slate-900 text-center">₹{row.totalAmount.toLocaleString()}</td>
+                <td className="py-4 px-4 text-lg font-bold text-slate-700 text-center border-r border-slate-100">{row.daysWorked}</td>
+                <td className="py-4 px-4 text-lg font-black text-slate-900 text-center">₹{row.totalAmount.toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
@@ -432,21 +432,21 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="px-4 py-4 font-semibold text-base text-slate-800 border-r border-slate-200 w-12 text-center">No.</th>
-                <th className="px-5 py-4 font-semibold text-base text-slate-800 border-r border-slate-200">Worker Name</th>
-                <th className="px-5 py-4 font-semibold text-base text-slate-800 border-r border-slate-200 text-center">Total Salary</th>
-                <th className="px-5 py-4 font-semibold text-base text-slate-800 border-r border-slate-200 text-center">Paid Amount</th>
-                <th className="px-5 py-4 font-semibold text-base text-slate-800 text-center">Unpaid (Balance)</th>
+                <th className="px-4 py-4 font-semibold text-lg text-slate-800 border-r border-slate-200 w-12 text-center">No.</th>
+                <th className="px-5 py-4 font-semibold text-lg text-slate-800 border-r border-slate-200">Worker Name</th>
+                <th className="px-5 py-4 font-semibold text-lg text-slate-800 border-r border-slate-200 text-center">Total Salary</th>
+                <th className="px-5 py-4 font-semibold text-lg text-slate-800 border-r border-slate-200 text-center">Paid Amount</th>
+                <th className="px-5 py-4 font-semibold text-lg text-slate-800 text-center">Unpaid (Balance)</th>
               </tr>
             </thead>
             <tbody>
               {tableData.rows.map((row, index) => (
                 <tr key={row.worker.id} className="group border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                  <td className="py-4 px-4 text-base font-medium text-slate-500 text-center border-r border-slate-100">{index + 1}</td>
-                  <td className="py-4 px-5 text-base font-bold text-slate-800 border-r border-slate-100">{row.worker.name}</td>
-                  <td className="py-4 px-5 text-base font-black text-slate-900 text-center border-r border-slate-100">₹{row.totalAmount.toLocaleString()}</td>
-                  <td className="py-4 px-5 text-base font-black text-emerald-600 text-center border-r border-slate-100">₹{row.totalPaid.toLocaleString()}</td>
-                  <td className="py-4 px-5 text-base font-black text-red-600 text-center">₹{row.unpaidAmount.toLocaleString()}</td>
+                  <td className="py-4 px-4 text-lg font-medium text-slate-500 text-center border-r border-slate-100">{index + 1}</td>
+                  <td className="py-4 px-5 text-lg font-bold text-slate-800 border-r border-slate-100">{row.worker.name}</td>
+                  <td className="py-4 px-5 text-lg font-black text-slate-900 text-center border-r border-slate-100">₹{row.totalAmount.toLocaleString()}</td>
+                  <td className="py-4 px-5 text-lg font-black text-emerald-600 text-center border-r border-slate-100">₹{row.totalPaid.toLocaleString()}</td>
+                  <td className="py-4 px-5 text-lg font-black text-red-600 text-center">₹{row.unpaidAmount.toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>

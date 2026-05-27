@@ -132,8 +132,8 @@ export default function DashboardView({
       className="space-y-6 pb-12 font-sans"
     >
       <div>
-        <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">{greeting}, Mani!</h1>
-        <p className="text-base text-slate-500 mt-1 italic">"{quoteOfDay}"</p>
+        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{greeting}, Mani!</h1>
+        <p className="text-xl text-slate-500 mt-2 italic">"{quoteOfDay}"</p>
       </div>
 
       {/* Statistic Cards Grid */}
@@ -145,11 +145,11 @@ export default function DashboardView({
               <Users className="w-7 h-7" />
             </div>
             <div className="flex flex-col justify-center">
-              <div className="text-[26px] font-bold text-slate-900 leading-tight">{totalWorkers}</div>
-              <div className="text-base text-slate-500 font-medium leading-none">Total Workers</div>
+              <div className="text-4xl font-bold text-slate-900 leading-tight">{totalWorkers}</div>
+              <div className="text-lg text-slate-500 font-medium leading-none mt-1">Total Workers</div>
             </div>
           </div>
-          <button onClick={() => setView('workers')} className="text-base font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
+          <button onClick={() => setView('workers')} className="text-lg font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View all workers
           </button>
         </div>
@@ -161,11 +161,11 @@ export default function DashboardView({
               <UserCheck className="w-7 h-7" />
             </div>
             <div className="flex flex-col justify-center">
-              <div className="text-[26px] font-bold text-slate-900 leading-tight">{presentCount}</div>
-              <div className="text-base text-slate-500 font-medium leading-none">Today Present</div>
+              <div className="text-4xl font-bold text-slate-900 leading-tight">{presentCount}</div>
+              <div className="text-lg text-slate-500 font-medium leading-none mt-1">Today Present</div>
             </div>
           </div>
-          <button onClick={() => setView('attendance')} className="text-base font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
+          <button onClick={() => setView('attendance')} className="text-lg font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View attendance
           </button>
         </div>
@@ -177,11 +177,11 @@ export default function DashboardView({
               <IndianRupee className="w-7 h-7" />
             </div>
             <div className="flex flex-col justify-center">
-              <div className="text-[26px] font-bold text-slate-900 leading-tight">{formatINR(totalSalaryProjected)}</div>
-              <div className="text-base text-slate-500 font-medium leading-none">{`Total Salary (${new Intl.DateTimeFormat('en-US', { month: 'short' }).format(new Date())})`}</div>
+              <div className="text-4xl font-bold text-slate-900 leading-tight">{formatINR(totalSalaryProjected)}</div>
+              <div className="text-lg text-slate-500 font-medium leading-none mt-1">{`Total Salary (${new Intl.DateTimeFormat('en-US', { month: 'short' }).format(new Date())})`}</div>
             </div>
           </div>
-          <button onClick={() => setView('salary')} className="text-base font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
+          <button onClick={() => setView('salary')} className="text-lg font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View salary
           </button>
         </div>
@@ -193,11 +193,11 @@ export default function DashboardView({
               <Wallet className="w-7 h-7" />
             </div>
             <div className="flex flex-col justify-center">
-              <div className="text-[26px] font-bold text-slate-900 leading-tight">{formatINR(pendingSalaries)}</div>
-              <div className="text-base text-slate-500 font-medium leading-none">Pending Payments</div>
+              <div className="text-4xl font-bold text-slate-900 leading-tight">{formatINR(pendingSalaries)}</div>
+              <div className="text-lg text-slate-500 font-medium leading-none mt-1">Pending Payments</div>
             </div>
           </div>
-          <button onClick={() => setView('salary')} className="text-base font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
+          <button onClick={() => setView('salary')} className="text-lg font-semibold text-[var(--primary-color)] hover:underline text-left mt-2">
             View payments
           </button>
         </div>
@@ -208,19 +208,19 @@ export default function DashboardView({
         {/* Today's Attendance List */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col">
           <div className="p-5 flex justify-between items-center">
-            <h2 className="text-[15px] font-bold text-slate-900">Today's Attendance</h2>
+            <h2 className="text-xl font-bold text-slate-900">Today's Attendance</h2>
             <button
               onClick={() => setView('attendance')}
-              className="text-base font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
+              className="text-lg font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
             >
-              Mark Attendance <ArrowRight className="w-3.5 h-3.5" />
+              Mark Attendance <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-y border-slate-100 text-base uppercase tracking-wider font-semibold text-slate-500">
+                <tr className="border-y border-slate-100 text-lg uppercase tracking-wider font-semibold text-slate-500">
                   <th className="px-5 py-3">Worker Name</th>
                   <th className="px-5 py-3">Status</th>
                   <th className="px-5 py-3">Check In</th>
@@ -279,30 +279,30 @@ export default function DashboardView({
           <div className="p-4 mt-auto text-right">
             <button
               onClick={() => setView('attendance')}
-              className="text-base font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 ml-auto"
+              className="text-lg font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 ml-auto"
             >
-              View all attendance <ArrowRight className="w-3.5 h-3.5" />
+              View all attendance <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Payment Overview Chart */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col p-5">
-          <h2 className="text-[15px] font-bold text-slate-900 mb-6">
+          <h2 className="text-xl font-bold text-slate-900 mb-6">
             Payment Overview
           </h2>
 
           <div className="flex items-center gap-6 justify-center flex-1">
             {/* Donut Chart visual */}
-            <div className="relative w-36 h-36 flex-shrink-0">
+            <div className="relative w-48 h-48 flex-shrink-0">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                <circle cx="18" cy="18" r="14" fill="none" stroke="#ef4444" strokeWidth="8" className="opacity-100" pathLength="100" />
-                <circle cx="18" cy="18" r="14" fill="none" stroke="#f59e0b" strokeWidth="8" strokeDasharray={`${paidPct + partialPct} ${100 - (paidPct + partialPct)}`} strokeDashoffset="0" pathLength="100" />
-                <circle cx="18" cy="18" r="14" fill="none" stroke="#10b981" strokeWidth="8" strokeDasharray={`${paidPct} ${100 - paidPct}`} strokeDashoffset="0" pathLength="100" />
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#ef4444" strokeWidth="6" className="opacity-100" pathLength="100" />
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#f59e0b" strokeWidth="6" strokeDasharray={`${paidPct + partialPct} ${100 - (paidPct + partialPct)}`} strokeDashoffset="0" pathLength="100" />
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#10b981" strokeWidth="6" strokeDasharray={`${paidPct} ${100 - paidPct}`} strokeDashoffset="0" pathLength="100" />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-xl font-bold text-slate-900">{totalPaymentWorkers}</span>
-                <span className="text-base text-slate-500 font-medium">Total</span>
+                <span className="text-3xl font-bold text-slate-900">{totalPaymentWorkers}</span>
+                <span className="text-lg text-slate-500 font-medium">Total</span>
               </div>
             </div>
 
@@ -345,18 +345,18 @@ export default function DashboardView({
       {/* Recent Payments List */}
       <section className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col">
         <div className="p-5 flex justify-between items-center">
-          <h2 className="text-[15px] font-bold text-slate-900">Recent Payments</h2>
+          <h2 className="text-xl font-bold text-slate-900">Recent Payments</h2>
           <button
             onClick={() => setView('salary')}
-            className="text-base font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
+            className="text-lg font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1"
           >
-            View all payments <ArrowRight className="w-3.5 h-3.5" />
+            View all payments <ArrowRight className="w-4 h-4" />
           </button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-y border-slate-100 text-base uppercase tracking-wider font-semibold text-slate-500">
+              <tr className="border-y border-slate-100 text-lg uppercase tracking-wider font-semibold text-slate-500">
                 <th className="px-5 py-3">Worker Name</th>
                 <th className="px-5 py-3">Total Salary</th>
 
