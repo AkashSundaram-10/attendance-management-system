@@ -4,7 +4,7 @@ const { sendSuccess } = require('../utils/response');
 
 const generateSalary = async (req, res, next) => {
   try {
-    const { month, year, workerId, targetDate } = req.body;
+    const { month, year, workerId, targetDate, forceRecalculate } = req.body;
 
     const getWeek = (date) => {
       const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
@@ -59,19 +59,20 @@ const generateSalary = async (req, res, next) => {
         const dailyRate = worker.dailyWage || 1000;
         const overtimeRate = worker.overtimeRate || (dailyRate * 1.5); // Fallback to 1.5x if not set, or 1500
 
-        if (att.status === 'PRESENT') {
+        const statusUpper = att.status ? att.status.toUpperCase() : '';
+        if (statusUpper === 'PRESENT') {
            grossSalary += dailyRate;
            totalDays += 1;
-        } else if (att.status === 'OVERTIME') {
+        } else if (statusUpper === 'OVERTIME') {
            grossSalary += Math.max(overtimeRate, 1500);
            totalDays += 1;
            totalOvertimeHours += 1;
-        } else if (att.status === 'HALF_DAY') {
+        } else if (statusUpper === 'HALF_DAY' || statusUpper === 'HALF DAY') {
            grossSalary += dailyRate / 2;
            totalDays += 0.5;
         }
         
-        if (att.overtimeHours && att.status !== 'OVERTIME') totalOvertimeHours += att.overtimeHours;
+        if (att.overtimeHours && statusUpper !== 'OVERTIME') totalOvertimeHours += att.overtimeHours;
       });
 
       // No dynamic base rate. Hardcoded as per user instruction.
@@ -105,9 +106,48 @@ const generateSalary = async (req, res, next) => {
         where: { workerId_month_year: { workerId: worker.id, month: dbMonth, year } }
       });
 
+      let finalIsManuallyEdited = existingRecord ? existingRecord.isManuallyEdited : false;
+      let finalBasicSalary = null;
+      let finalOvertimeSalary = null;
+
       if (existingRecord && existingRecord.isManuallyEdited) {
-        grossSalary = existingRecord.grossSalary;
-        finalSalary = existingRecord.finalSalary;
+        if (forceRecalculate) {
+          if (totalDays === 0) {
+            // Revert completely to 0 if all days are absent
+            finalIsManuallyEdited = false;
+            grossSalary = 0;
+            finalSalary = 0;
+          } else {
+            // Retain manual edit, but adjust it mathematically by the difference in attendance
+            finalIsManuallyEdited = true;
+
+            const oldTotalDays = Number(existingRecord.totalDays) || 0;
+            const oldOvertimeHours = Number(existingRecord.overtimeHours) || 0;
+
+            const diffDays = totalDays - oldTotalDays;
+            const diffOvertime = totalOvertimeHours - oldOvertimeHours;
+            const diffPresent = diffDays - diffOvertime;
+
+            const dailyRate = worker.dailyWage || 1000;
+            const overtimeRate = Math.max(worker.overtimeRate || (dailyRate * 1.5), 1500);
+
+            const currentBasic = existingRecord.basicSalary !== null ? existingRecord.basicSalary : Math.round((existingRecord.grossSalary || 0) - (oldOvertimeHours * overtimeRate));
+            const currentOvertime = existingRecord.overtimeSalary !== null ? existingRecord.overtimeSalary : Math.round(oldOvertimeHours * overtimeRate);
+
+            finalBasicSalary = Math.max(0, currentBasic + (diffPresent * dailyRate));
+            finalOvertimeSalary = Math.max(0, currentOvertime + (diffOvertime * overtimeRate));
+            
+            grossSalary = finalBasicSalary + finalOvertimeSalary;
+            finalSalary = Math.max(0, grossSalary - advanceDeduction);
+          }
+        } else {
+          grossSalary = existingRecord.grossSalary;
+          finalSalary = existingRecord.finalSalary;
+          finalBasicSalary = existingRecord.basicSalary;
+          finalOvertimeSalary = existingRecord.overtimeSalary;
+          totalDays = existingRecord.totalDays !== null ? existingRecord.totalDays : totalDays;
+          totalOvertimeHours = existingRecord.overtimeHours !== null ? existingRecord.overtimeHours : totalOvertimeHours;
+        }
       }
 
       // Save record
@@ -121,6 +161,14 @@ const generateSalary = async (req, res, next) => {
           grossSalary,
           advanceDeduction,
           finalSalary,
+          isManuallyEdited: finalIsManuallyEdited,
+          ...(finalIsManuallyEdited ? { 
+            basicSalary: finalBasicSalary,
+            overtimeSalary: finalOvertimeSalary
+          } : {
+            basicSalary: null,
+            overtimeSalary: null
+          })
         },
         create: {
           workerId: worker.id,

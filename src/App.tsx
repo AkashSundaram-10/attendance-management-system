@@ -134,33 +134,11 @@ export default function App() {
         });
       }
 
-      // Update active salary days count dynamically and enforce strict wage limits
-      setSalaries((prevSal) => {
-        return prevSal.map((s) => {
-          const currentPeriod = getCurrentPeriod();
-          if (s.workerId === workerId && s.period === currentPeriod) {
-            const currentMonthAttendances = nextRecords.filter(a => a.workerId === workerId && a.date.startsWith(activeDate.substring(0, 7)));
-            let pDays = 0, oDays = 0;
-            currentMonthAttendances.forEach(a => {
-              if (a.status === 'Present') pDays++;
-              if (a.status === 'Overtime') oDays++;
-            });
-            return {
-              ...s,
-              daysWorked: pDays + oDays,
-              grossPay: pDays * 1000,
-              overtimePay: oDays * 1500,
-              overtimeDays: oDays,
-            };
-          }
-          return s;
-        });
-      });
 
       const recordToSave = nextRecords.find(a => a.workerId === workerId && a.date === activeDate);
       if (recordToSave) {
         api.markAttendance(recordToSave)
-          .then(() => api.generateSalary(activeDate, workerId))
+          .then(() => api.generateSalary(activeDate, workerId, true))
           .then(() => api.getSalaries())
           .then((freshSalaries) => setSalaries(freshSalaries))
           .catch(() => console.error("Failed to sync attendance/salary in DB"));

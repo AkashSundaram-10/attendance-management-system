@@ -6,6 +6,7 @@ const generateSalarySchema = {
     year: z.number().min(2000),
     targetDate: z.string().optional(),
     workerId: z.string().optional(), // If not provided, generate for all
+    forceRecalculate: z.boolean().optional(),
   }),
 };
 

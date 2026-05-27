@@ -274,12 +274,13 @@ export const api = {
     }
   },
 
-  generateSalary: async (dateStr: string, workerId?: string) => {
+  generateSalary: async (dateStr: string, workerId?: string, forceRecalculate?: boolean) => {
     const d = new Date(dateStr);
     const month = d.getMonth() + 1;
     const year = d.getFullYear();
     const payload: any = { month, year, targetDate: dateStr };
     if (workerId) payload.workerId = workerId;
+    if (forceRecalculate) payload.forceRecalculate = true;
     
     const res = await fetch(`${API_BASE}/salary/generate`, {
       method: 'POST',
