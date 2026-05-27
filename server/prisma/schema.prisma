@@ -23,6 +23,7 @@ enum AttendanceStatus {
   ABSENT
   HALF_DAY
   OVERTIME
+  NIGHT_SHIFT
 }
 
 enum PaymentStatus {
@@ -86,10 +87,15 @@ model SalaryRecord {
   month            Int
   year             Int
   totalDays        Float
+  presentDays      Float    @default(0)
+  halfDayDays      Float    @default(0)
+  nightShiftDays   Float    @default(0)
   overtimeHours    Float    @default(0)
   grossSalary      Float
   basicSalary      Float?
   overtimeSalary   Float?
+  halfDaySalary    Float?
+  nightShiftSalary Float?
   advanceDeduction Float    @default(0)
   finalSalary      Float
   paymentStatus    PaymentStatus @default(PENDING)

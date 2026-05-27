@@ -7,7 +7,7 @@ const markAttendanceSchema = {
     checkIn: z.string().transform((str) => new Date(str)).optional(),
     checkOut: z.string().transform((str) => new Date(str)).optional(),
     overtimeHours: z.number().min(0).optional(),
-    status: z.enum(['PRESENT', 'ABSENT', 'HALF_DAY', 'OVERTIME']),
+    status: z.enum(['PRESENT', 'ABSENT', 'HALF_DAY', 'OVERTIME', 'NIGHT_SHIFT']),
     notes: z.string().optional(),
   }),
 };
@@ -17,7 +17,7 @@ const bulkAttendanceSchema = {
     date: z.string().transform((str) => new Date(str)),
     records: z.array(z.object({
       workerId: z.string().uuid(),
-      status: z.enum(['PRESENT', 'ABSENT', 'HALF_DAY', 'OVERTIME']),
+      status: z.enum(['PRESENT', 'ABSENT', 'HALF_DAY', 'OVERTIME', 'NIGHT_SHIFT']),
       checkIn: z.string().transform((str) => new Date(str)).optional(),
       checkOut: z.string().transform((str) => new Date(str)).optional(),
       overtimeHours: z.number().min(0).optional(),

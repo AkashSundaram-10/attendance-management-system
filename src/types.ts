@@ -13,7 +13,7 @@ export interface Worker {
 export interface AttendanceRecord {
   workerId: string;
   date: string; // YYYY-MM-DD
-  status: 'Present' | 'Absent' | 'Overtime';
+  status: 'Present' | 'Absent' | 'Overtime' | 'Half Day' | 'Night Shift';
   checkIn: string; // e.g. "08:00 AM" or "--:--"
   checkOut: string; // e.g. "05:00 PM", "--:--" or "07:30 PM"
   overtimeHours?: number;
@@ -25,8 +25,13 @@ export interface SalaryRecord {
   period: string; // e.g., "October 2023"
   daysWorked: number; // e.g. 22
   totalDays: number; // e.g. 22 or 24
+  presentDays?: number;
+  halfDayDays?: number;
+  nightShiftDays?: number;
   grossPay: number; // dailyWage * daysWorked
   overtimePay: number; // bonus or OT pay
+  halfDayPay?: number;
+  nightShiftPay?: number;
   overtimeDays: number; // count of overtime days from attendance
   advanceDeduction: number;
   status: 'Pending' | 'Paid';

@@ -8,7 +8,7 @@ interface AnalyticsViewProps {
   workers: Worker[];
   salaries: SalaryRecord[];
   attendance: AttendanceRecord[];
-  onUpdateAttendance: (workerId: string, status: 'Present' | 'Absent' | 'Overtime', checkInTimeStr?: string, checkOutTimeStr?: string, targetDateStr?: string) => void;
+  onUpdateAttendance: (workerId: string, status: 'Present' | 'Absent' | 'Overtime' | 'Half Day' | 'Night Shift', checkInTimeStr?: string, checkOutTimeStr?: string, targetDateStr?: string) => void;
 }
 
 export default function AnalyticsView({ workers, salaries, attendance, onUpdateAttendance }: AnalyticsViewProps) {
@@ -71,7 +71,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
     const currentMonthSalaries = salaries.filter(s => s.period.startsWith(selectedMonthStr));
 
     const rows = workers.map(worker => {
-      const dayMarks: Record<string, 'Present' | 'Absent' | 'Overtime' | null> = {};
+      const dayMarks: Record<string, 'Present' | 'Absent' | 'Overtime' | 'Half Day' | 'Night Shift' | null> = {};
       let daysWorked = 0;
       
       for (const dObj of daysArray) {
@@ -154,16 +154,18 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
   }, [workers, attendance, daysArray]);
 
   const getStatusIcon = (status: string | null, dateStr: string) => {
-    if (status === 'Present') return <Check className="w-5 h-5 text-emerald-500 stroke-[4]" />;
-    if (status === 'Overtime') return <span className="text-base font-black text-indigo-600">OT</span>;
+    if (status === 'Present') return <span className="text-base font-black text-emerald-600">1</span>;
+    if (status === 'Overtime') return <span className="text-base font-black text-indigo-600">1.5</span>;
+    if (status === 'Half Day') return <span className="text-base font-black text-amber-600">0.5</span>;
+    if (status === 'Night Shift') return <span className="text-base font-black text-purple-600">1</span>;
     
     const todayStr = new Date().toISOString().split('T')[0];
     if (dateStr > todayStr) {
       return <span className="text-slate-300 text-lg">-</span>;
     }
     
-    // Default to Absent (X) instead of dash for past/today
-    return <X className="w-5 h-5 text-red-500 stroke-[4]" />;
+    // Default to Absent (0) instead of dash for past/today
+    return <span className="text-base font-black text-red-500">0</span>;
   };
 
   const exportToExcel = () => {
@@ -185,6 +187,8 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
         let val = '';
         if (status === 'Present') val = 'P';
         else if (status === 'Overtime') val = 'OT';
+        else if (status === 'Half Day') val = 'HD';
+        else if (status === 'Night Shift') val = 'NS';
         else if (d.dateStr > todayStr) val = '-';
         else val = 'A';
         rowData.push(val);

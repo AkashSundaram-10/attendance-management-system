@@ -97,7 +97,7 @@ export default function App() {
 
   const handleUpdateAttendance = (
     workerId: string,
-    status: 'Present' | 'Absent' | 'Overtime' | 'UpdateTimes',
+    status: 'Present' | 'Absent' | 'Overtime' | 'Half Day' | 'Night Shift' | 'UpdateTimes',
     checkInTimeStr?: string,
     checkOutTimeStr?: string,
     targetDateStr?: string
@@ -112,13 +112,13 @@ export default function App() {
          newStatus = existingIdx > -1 ? nextRecords[existingIdx].status : 'Present';
       }
 
-      let checkInTime = checkInTimeStr ?? (status === 'UpdateTimes' ? (existingIdx > -1 ? nextRecords[existingIdx].checkIn : '09:00') : (status === 'Absent' ? '--:--' : '09:00'));
-      let checkOutTime = checkOutTimeStr ?? (status === 'UpdateTimes' ? (existingIdx > -1 ? nextRecords[existingIdx].checkOut : '18:00') : (status === 'Absent' ? '--:--' : (status === 'Overtime' ? '21:00' : '18:00')));
+      let checkInTime = checkInTimeStr ?? (status === 'UpdateTimes' ? (existingIdx > -1 ? nextRecords[existingIdx].checkIn : '09:00') : (status === 'Absent' ? '--:--' : (status === 'Night Shift' ? '21:00' : '09:00')));
+      let checkOutTime = checkOutTimeStr ?? (status === 'UpdateTimes' ? (existingIdx > -1 ? nextRecords[existingIdx].checkOut : '18:00') : (status === 'Absent' ? '--:--' : (status === 'Overtime' ? '21:00' : (status === 'Half Day' ? '13:00' : (status === 'Night Shift' ? '06:00' : '18:00')))));
 
       if (existingIdx > -1) {
         nextRecords[existingIdx] = {
           ...nextRecords[existingIdx],
-          status: newStatus as 'Present'|'Absent'|'Overtime',
+          status: newStatus as 'Present'|'Absent'|'Overtime'|'Half Day'|'Night Shift',
           checkIn: checkInTime,
           checkOut: checkOutTime,
           overtimeHours: newStatus === 'Overtime' ? 1 : 0,
@@ -127,7 +127,7 @@ export default function App() {
         nextRecords.push({
           workerId,
           date: activeDate,
-          status: newStatus as 'Present'|'Absent'|'Overtime',
+          status: newStatus as 'Present'|'Absent'|'Overtime'|'Half Day'|'Night Shift',
           checkIn: checkInTime,
           checkOut: checkOutTime,
           overtimeHours: newStatus === 'Overtime' ? 1 : 0,
@@ -176,14 +176,16 @@ export default function App() {
   };
 
   // Callback to edit salary
-  const handleEditSalary = (workerId: string, grossPay: number, overtimePay: number, period?: string) => {
+  const handleEditSalary = (workerId: string, grossPay: number, overtimePay: number, halfDayPay: number, nightShiftPay: number, period?: string) => {
     const s = period ? salaries.find(sal => sal.workerId === workerId && sal.period === period) : salaries.find(sal => sal.workerId === workerId);
     if (s && s.id) {
       // Save manual edit as basicSalary and overtimeSalary
       api.updateSalary(s.id, { 
-        grossSalary: grossPay + overtimePay, 
+        grossSalary: grossPay + overtimePay + halfDayPay + nightShiftPay, 
         basicSalary: grossPay,
-        overtimeSalary: overtimePay 
+        overtimeSalary: overtimePay,
+        halfDaySalary: halfDayPay,
+        nightShiftSalary: nightShiftPay
       })
         .then(() => api.getSalaries())
         .then(setSalaries)
@@ -199,7 +201,7 @@ export default function App() {
       if (isRevert) {
         await api.updateSalary(targetSalary.id!, { revertPayments: true });
       } else if (targetSalary.status === 'Pending') {
-        const netPay = targetSalary.grossPay + targetSalary.overtimePay - targetSalary.advanceDeduction;
+        const netPay = targetSalary.grossPay + targetSalary.overtimePay + (targetSalary.halfDayPay || 0) + (targetSalary.nightShiftPay || 0) - targetSalary.advanceDeduction;
         const paymentToMake = amount ?? netPay;
         await api.updateSalary(targetSalary.id!, { paymentAmount: paymentToMake });
       }

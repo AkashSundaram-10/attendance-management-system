@@ -174,7 +174,7 @@ export const api = {
       return data.data.map((a: any) => ({
         workerId: a.workerId,
         date: new Date(a.date).toISOString().split('T')[0],
-        status: a.status === 'PRESENT' ? 'Present' : a.status === 'ABSENT' ? 'Absent' : 'Overtime',
+        status: a.status === 'PRESENT' ? 'Present' : a.status === 'ABSENT' ? 'Absent' : a.status === 'HALF_DAY' ? 'Half Day' : a.status === 'NIGHT_SHIFT' ? 'Night Shift' : 'Overtime',
         checkIn: a.checkIn ? `${new Date(a.checkIn).getHours().toString().padStart(2, '0')}:${new Date(a.checkIn).getMinutes().toString().padStart(2, '0')}` : '--:--',
         checkOut: a.checkOut ? `${new Date(a.checkOut).getHours().toString().padStart(2, '0')}:${new Date(a.checkOut).getMinutes().toString().padStart(2, '0')}` : '--:--',
         overtimeHours: a.overtimeHours
@@ -235,7 +235,7 @@ export const api = {
     const payload: any = {
       workerId: record.workerId,
       date: activeDate.toISOString(),
-      status: record.status.toUpperCase(), // 'PRESENT', 'ABSENT', 'OVERTIME'
+      status: record.status.toUpperCase().replace(' ', '_'), // 'PRESENT', 'ABSENT', 'OVERTIME', 'HALF_DAY', 'NIGHT_SHIFT'
       overtimeHours: record.overtimeHours || 0,
     };
     
@@ -260,20 +260,27 @@ export const api = {
       
       return data.data.map((s: any) => {
         const paidAmount = s.payments ? s.payments.reduce((acc: number, curr: any) => acc + curr.amountPaid, 0) : 0;
-        const grossPay = s.basicSalary ?? Math.round((s.grossSalary || 0) - ((s.overtimeHours || 0) * 1500));
         const overtimePay = s.overtimeSalary ?? Math.round((s.overtimeHours || 0) * 1500);
+        const halfDayPay = s.halfDaySalary ?? (s.halfDayDays ? s.halfDayDays * 2 * 500 : 0);
+        const nightShiftPay = s.nightShiftSalary ?? (s.nightShiftDays ? s.nightShiftDays * 1000 : 0);
+        const grossPay = s.basicSalary ?? Math.round((s.grossSalary || 0) - overtimePay - halfDayPay - nightShiftPay);
         const advanceDeduction = Math.round(s.advanceDeduction || 0);
-        const netPay = grossPay + overtimePay - advanceDeduction;
+        const netPay = grossPay + overtimePay + halfDayPay + nightShiftPay - advanceDeduction;
         
         return {
           id: s.id,
           workerId: s.workerId,
           period: getMonthWeekLabel(s.month, s.year),
           daysWorked: s.totalDays,
+          presentDays: s.presentDays || 0,
+          halfDayDays: s.halfDayDays || 0,
+          nightShiftDays: s.nightShiftDays || 0,
           overtimeDays: s.overtimeHours || 0,
           totalDays: 7,
           grossPay,
           overtimePay,
+          halfDayPay,
+          nightShiftPay,
           advanceDeduction,
           status: (s.paymentStatus === 'PAID' && paidAmount >= netPay) ? 'Paid' : (paidAmount >= netPay && netPay > 0 ? 'Paid' : 'Pending'),
           paidAmount,

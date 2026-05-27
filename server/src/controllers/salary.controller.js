@@ -53,23 +53,42 @@ const generateSalary = async (req, res, next) => {
 
       let totalDays = 0;
       let totalOvertimeHours = 0;
+      let presentDays = 0;
+      let halfDayDays = 0;
+      let nightShiftDays = 0;
       let grossSalary = 0;
+      
+      let computedBasicSalary = 0;
+      let computedOvertimeSalary = 0;
+      let computedHalfDaySalary = 0;
+      let computedNightShiftSalary = 0;
 
       attendances.forEach(att => {
         const dailyRate = worker.dailyWage || 1000;
-        const overtimeRate = worker.overtimeRate || (dailyRate * 1.5); // Fallback to 1.5x if not set, or 1500
+        const overtimeRate = worker.overtimeRate || (dailyRate * 1.5);
 
         const statusUpper = att.status ? att.status.toUpperCase() : '';
         if (statusUpper === 'PRESENT') {
            grossSalary += dailyRate;
+           computedBasicSalary += dailyRate;
            totalDays += 1;
+           presentDays += 1;
         } else if (statusUpper === 'OVERTIME') {
-           grossSalary += Math.max(overtimeRate, 1500);
+           const oRate = Math.max(overtimeRate, 1500);
+           grossSalary += oRate;
+           computedOvertimeSalary += oRate;
            totalDays += 1;
            totalOvertimeHours += 1;
         } else if (statusUpper === 'HALF_DAY' || statusUpper === 'HALF DAY') {
-           grossSalary += dailyRate / 2;
+           grossSalary += 500;
+           computedHalfDaySalary += 500;
            totalDays += 0.5;
+           halfDayDays += 0.5;
+        } else if (statusUpper === 'NIGHT_SHIFT' || statusUpper === 'NIGHT SHIFT') {
+           grossSalary += 1000;
+           computedNightShiftSalary += 1000;
+           totalDays += 1;
+           nightShiftDays += 1;
         }
         
         if (att.overtimeHours && statusUpper !== 'OVERTIME') totalOvertimeHours += att.overtimeHours;
@@ -109,6 +128,8 @@ const generateSalary = async (req, res, next) => {
       let finalIsManuallyEdited = existingRecord ? existingRecord.isManuallyEdited : false;
       let finalBasicSalary = null;
       let finalOvertimeSalary = null;
+      let finalHalfDaySalary = null;
+      let finalNightShiftSalary = null;
 
       if (existingRecord && existingRecord.isManuallyEdited) {
         if (forceRecalculate) {
@@ -121,23 +142,30 @@ const generateSalary = async (req, res, next) => {
             // Retain manual edit, but adjust it mathematically by the difference in attendance
             finalIsManuallyEdited = true;
 
-            const oldTotalDays = Number(existingRecord.totalDays) || 0;
+            const oldPresentDays = Number(existingRecord.presentDays) || 0;
+            const oldHalfDayDays = Number(existingRecord.halfDayDays) || 0;
+            const oldNightShiftDays = Number(existingRecord.nightShiftDays) || 0;
             const oldOvertimeHours = Number(existingRecord.overtimeHours) || 0;
 
-            const diffDays = totalDays - oldTotalDays;
+            const diffPresent = presentDays - oldPresentDays;
+            const diffHalfDay = halfDayDays - oldHalfDayDays;
+            const diffNightShift = nightShiftDays - oldNightShiftDays;
             const diffOvertime = totalOvertimeHours - oldOvertimeHours;
-            const diffPresent = diffDays - diffOvertime;
 
             const dailyRate = worker.dailyWage || 1000;
             const overtimeRate = Math.max(worker.overtimeRate || (dailyRate * 1.5), 1500);
 
-            const currentBasic = existingRecord.basicSalary !== null ? existingRecord.basicSalary : Math.round((existingRecord.grossSalary || 0) - (oldOvertimeHours * overtimeRate));
-            const currentOvertime = existingRecord.overtimeSalary !== null ? existingRecord.overtimeSalary : Math.round(oldOvertimeHours * overtimeRate);
+            const currentBasic = existingRecord.basicSalary !== null ? existingRecord.basicSalary : (oldPresentDays * dailyRate);
+            const currentOvertime = existingRecord.overtimeSalary !== null ? existingRecord.overtimeSalary : (oldOvertimeHours * overtimeRate);
+            const currentHalfDay = existingRecord.halfDaySalary !== null ? existingRecord.halfDaySalary : (oldHalfDayDays * 500);
+            const currentNightShift = existingRecord.nightShiftSalary !== null ? existingRecord.nightShiftSalary : (oldNightShiftDays * 1000);
 
-            finalBasicSalary = Math.max(0, currentBasic + (diffPresent * dailyRate));
-            finalOvertimeSalary = Math.max(0, currentOvertime + (diffOvertime * overtimeRate));
+            finalBasicSalary = presentDays === 0 ? 0 : Math.max(0, currentBasic + (diffPresent * dailyRate));
+            finalOvertimeSalary = totalOvertimeHours === 0 ? 0 : Math.max(0, currentOvertime + (diffOvertime * overtimeRate));
+            finalHalfDaySalary = halfDayDays === 0 ? 0 : Math.max(0, currentHalfDay + (diffHalfDay * 500));
+            finalNightShiftSalary = nightShiftDays === 0 ? 0 : Math.max(0, currentNightShift + (diffNightShift * 1000));
             
-            grossSalary = finalBasicSalary + finalOvertimeSalary;
+            grossSalary = finalBasicSalary + finalOvertimeSalary + finalHalfDaySalary + finalNightShiftSalary;
             finalSalary = Math.max(0, grossSalary - advanceDeduction);
           }
         } else {
@@ -145,7 +173,12 @@ const generateSalary = async (req, res, next) => {
           finalSalary = existingRecord.finalSalary;
           finalBasicSalary = existingRecord.basicSalary;
           finalOvertimeSalary = existingRecord.overtimeSalary;
+          finalHalfDaySalary = existingRecord.halfDaySalary;
+          finalNightShiftSalary = existingRecord.nightShiftSalary;
           totalDays = existingRecord.totalDays !== null ? existingRecord.totalDays : totalDays;
+          presentDays = existingRecord.presentDays !== null ? existingRecord.presentDays : presentDays;
+          halfDayDays = existingRecord.halfDayDays !== null ? existingRecord.halfDayDays : halfDayDays;
+          nightShiftDays = existingRecord.nightShiftDays !== null ? existingRecord.nightShiftDays : nightShiftDays;
           totalOvertimeHours = existingRecord.overtimeHours !== null ? existingRecord.overtimeHours : totalOvertimeHours;
         }
       }
@@ -157,6 +190,9 @@ const generateSalary = async (req, res, next) => {
         },
         update: {
           totalDays,
+          presentDays,
+          halfDayDays,
+          nightShiftDays,
           overtimeHours: totalOvertimeHours,
           grossSalary,
           advanceDeduction,
@@ -164,10 +200,14 @@ const generateSalary = async (req, res, next) => {
           isManuallyEdited: finalIsManuallyEdited,
           ...(finalIsManuallyEdited ? { 
             basicSalary: finalBasicSalary,
-            overtimeSalary: finalOvertimeSalary
+            overtimeSalary: finalOvertimeSalary,
+            halfDaySalary: finalHalfDaySalary,
+            nightShiftSalary: finalNightShiftSalary
           } : {
-            basicSalary: null,
-            overtimeSalary: null
+            basicSalary: computedBasicSalary,
+            overtimeSalary: computedOvertimeSalary,
+            halfDaySalary: computedHalfDaySalary,
+            nightShiftSalary: computedNightShiftSalary
           })
         },
         create: {
@@ -175,8 +215,15 @@ const generateSalary = async (req, res, next) => {
           month: dbMonth,
           year,
           totalDays,
+          presentDays,
+          halfDayDays,
+          nightShiftDays,
           overtimeHours: totalOvertimeHours,
           grossSalary,
+          basicSalary: computedBasicSalary,
+          overtimeSalary: computedOvertimeSalary,
+          halfDaySalary: computedHalfDaySalary,
+          nightShiftSalary: computedNightShiftSalary,
           advanceDeduction,
           finalSalary,
           paymentStatus: 'PENDING'
@@ -239,7 +286,7 @@ const getWorkerSalary = async (req, res, next) => {
   const updateSalary = async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { grossSalary, overtimeHours, advanceDeduction, basicSalary, overtimeSalary, paymentAmount, revertPayments } = req.body;
+      const { grossSalary, overtimeHours, advanceDeduction, basicSalary, overtimeSalary, halfDaySalary, nightShiftSalary, paymentAmount, revertPayments } = req.body;
       
       let record = await prisma.salaryRecord.findUnique({ where: { id }, include: { payments: true } });
       if (!record) return res.status(404).json({ success: false, message: 'Salary record not found' });
@@ -257,6 +304,8 @@ const getWorkerSalary = async (req, res, next) => {
             ...(advanceDeduction !== undefined ? { advanceDeduction } : {}),
             ...(basicSalary !== undefined ? { basicSalary } : {}),
             ...(overtimeSalary !== undefined ? { overtimeSalary } : {}),
+            ...(halfDaySalary !== undefined ? { halfDaySalary } : {}),
+            ...(nightShiftSalary !== undefined ? { nightShiftSalary } : {}),
             finalSalary,
             isManuallyEdited: true
           },

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Search, SlidersHorizontal, ArrowUpDown, Check, X, Clock, HelpCircle, Activity, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Calendar as CalendarIcon } from 'lucide-react';
+import { Search, SlidersHorizontal, ArrowUpDown, Check, X, Clock, HelpCircle, Activity, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Calendar as CalendarIcon, Moon } from 'lucide-react';
 import { Worker, AttendanceRecord } from '../types';
 
 interface AttendanceViewProps {
@@ -8,7 +8,7 @@ interface AttendanceViewProps {
   attendance: AttendanceRecord[];
   onUpdateAttendance: (
     workerId: string,
-    status: 'Present' | 'Absent' | 'Overtime' | 'UpdateTimes',
+    status: 'Present' | 'Absent' | 'Overtime' | 'Half Day' | 'Night Shift' | 'UpdateTimes',
     checkInTimeStr?: string,
     checkOutTimeStr?: string,
     targetDateStr?: string
@@ -205,11 +205,15 @@ export default function AttendanceView({
           const getBadgeType = (st: string) => {
             switch (st) {
               case 'Present':
-                return { text: 'Present', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' };
+                return { text: 'One Shift (1)', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' };
               case 'Absent':
-                return { text: 'Absent', color: 'bg-red-50 text-red-750 border-red-100' };
+                return { text: 'Absent (0)', color: 'bg-red-50 text-red-750 border-red-100' };
               case 'Overtime':
-                return { text: 'Overtime', color: 'bg-indigo-50 text-indigo-700 border-indigo-100' };
+                return { text: 'Overtime (1.5)', color: 'bg-indigo-50 text-indigo-700 border-indigo-100' };
+              case 'Half Day':
+                return { text: 'Half Day (0.5)', color: 'bg-amber-50 text-amber-700 border-amber-100' };
+              case 'Night Shift':
+                return { text: 'Night Shift (1)', color: 'bg-purple-50 text-purple-700 border-purple-100' };
               default:
                 return { text: 'Unmarked', color: 'bg-slate-50 text-slate-500 border-slate-100 border-dashed' };
             }
@@ -273,35 +277,59 @@ export default function AttendanceView({
                   <span
                     className={`px-3 py-1 rounded-full border text-base font-bold flex items-center gap-1 cursor-pointer hover:bg-slate-50 ${badge.color}`}
                     onClick={() => {
-                      // Cycle attendance statuses on badge clicks for high convenience!
                       const nextStat =
                         record.status === 'Present'
-                          ? 'Absent'
-                          : record.status === 'Absent'
-                            ? 'Overtime'
-                            : 'Present';
+                          ? 'Half Day'
+                          : record.status === 'Half Day'
+                            ? 'Absent'
+                            : record.status === 'Absent'
+                              ? 'Overtime'
+                              : record.status === 'Overtime'
+                                ? 'Night Shift'
+                                : 'Present';
                       onUpdateAttendance(w.id, nextStat, undefined, undefined, selectedDate);
                     }}
                   >
                     {record.status === 'Present' && <Check className="w-3.5 h-3.5" />}
                     {record.status === 'Absent' && <X className="w-3.5 h-3.5" />}
+                    {record.status === 'Half Day' && <Clock className="w-3.5 h-3.5" />}
+                    {record.status === 'Overtime' && <Activity className="w-3.5 h-3.5" />}
+                    {record.status === 'Night Shift' && <Moon className="w-3.5 h-3.5" />}
                     {badge.text}
                   </span>
                 </div>
               ) : (
                 /* Unrecorded staff ghost indicators */
-                <div className="flex gap-2 w-full md:w-auto">
+                <div className="flex gap-1.5 w-full md:w-auto flex-wrap">
                   <button
                     onClick={() => onUpdateAttendance(w.id, 'Present', undefined, undefined, selectedDate)}
-                    className="flex-1 md:flex-none px-3 py-1.5 rounded-lg border border-slate-350 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-350 text-slate-500 text-base font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
+                    className="flex-1 md:flex-none px-2 py-1.5 rounded-lg border border-slate-350 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-350 text-slate-500 text-[13px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
                   >
-                    <Check className="w-3 h-3" /> Present
+                    <Check className="w-3 h-3" /> One (1)
+                  </button>
+                  <button
+                    onClick={() => onUpdateAttendance(w.id, 'Half Day', undefined, undefined, selectedDate)}
+                    className="flex-1 md:flex-none px-2 py-1.5 rounded-lg border border-slate-350 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-350 text-slate-500 text-[13px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <Clock className="w-3 h-3" /> Half (0.5)
+                  </button>
+                  <button
+                    onClick={() => onUpdateAttendance(w.id, 'Overtime', undefined, undefined, selectedDate)}
+                    className="flex-1 md:flex-none px-2 py-1.5 rounded-lg border border-slate-350 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-350 text-slate-500 text-[13px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <Activity className="w-3 h-3" /> OT (1.5)
+                  </button>
+                  <button
+                    onClick={() => onUpdateAttendance(w.id, 'Night Shift', undefined, undefined, selectedDate)}
+                    className="flex-1 md:flex-none px-2 py-1.5 rounded-lg border border-slate-350 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-350 text-slate-500 text-[13px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <Moon className="w-3 h-3" /> Night (1)
                   </button>
                   <button
                     onClick={() => onUpdateAttendance(w.id, 'Absent', undefined, undefined, selectedDate)}
-                    className="flex-1 md:flex-none px-3 py-1.5 rounded-lg border border-slate-350 hover:bg-red-50 hover:text-red-700 hover:border-red-350 text-slate-500 text-base font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
+                    className="flex-1 md:flex-none px-2 py-1.5 rounded-lg border border-slate-350 hover:bg-red-50 hover:text-red-700 hover:border-red-350 text-slate-500 text-[13px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
                   >
-                    <X className="w-3 h-3" /> Absent
+                    <X className="w-3 h-3" /> Absent (0)
                   </button>
                 </div>
               )}

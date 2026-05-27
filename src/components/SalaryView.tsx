@@ -8,7 +8,7 @@ interface SalaryViewProps {
   workers: Worker[];
   salaries: SalaryRecord[];
   onToggleSalaryStatus: (id: string, amount?: number, isRevert?: boolean) => void;
-  onEditSalary: (workerId: string, grossPay: number, overtimePay: number, period?: string) => void;
+  onEditSalary: (workerId: string, grossPay: number, overtimePay: number, halfDayPay: number, nightShiftPay: number, period?: string) => void;
   setView: (view: AppView) => void;
 }
 
@@ -22,6 +22,8 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editGrossPay, setEditGrossPay] = useState(0);
   const [editOvertimePay, setEditOvertimePay] = useState(0);
+  const [editHalfDayPay, setEditHalfDayPay] = useState(0);
+  const [editNightShiftPay, setEditNightShiftPay] = useState(0);
 
   // Calculate high-fidelity stats aggregates
   const currentSalaries = salaries.filter(s => s.period.startsWith(selectedMonth) && workers.some(w => w.id === s.workerId));
@@ -29,12 +31,12 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
   // Get all weeks for the selected month, regardless of whether there are salaries
   const weeks = getWeeksForMonthLabel(selectedMonth);
 
-  const totalProjected = currentSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
+  const totalProjected = currentSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0), 0);
   const totalDisbursed = currentSalaries
-    .reduce((acc, curr) => acc + Math.min(curr.grossPay + curr.overtimePay, (curr.paidAmount || (curr.status === 'Paid' ? curr.grossPay + curr.overtimePay : 0))), 0);
+    .reduce((acc, curr) => acc + Math.min(curr.grossPay + curr.overtimePay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0), (curr.paidAmount || (curr.status === 'Paid' ? curr.grossPay + curr.overtimePay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0) : 0))), 0);
   const totalPending = currentSalaries
     .filter((s) => s.status === 'Pending')
-    .reduce((acc, curr) => acc + Math.max(0, curr.grossPay + curr.overtimePay - (curr.paidAmount || 0)), 0);
+    .reduce((acc, curr) => acc + Math.max(0, curr.grossPay + curr.overtimePay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0) - (curr.paidAmount || 0)), 0);
 
   const disbursedPct = Math.min(100, totalProjected > 0 ? Math.round((totalDisbursed / totalProjected) * 100) : 0);
 
@@ -200,9 +202,9 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
               return (wA?.name || '').localeCompare(wB?.name || '');
             });
 
-            const weekProjected = weekSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
-            const weekDisbursed = weekSalaries.reduce((acc, curr) => acc + Math.min(curr.grossPay + curr.overtimePay, (curr.paidAmount || (curr.status === 'Paid' ? curr.grossPay + curr.overtimePay : 0))), 0);
-            const weekPending = weekSalaries.filter((s) => s.status === 'Pending').reduce((acc, curr) => acc + Math.max(0, curr.grossPay + curr.overtimePay - (curr.paidAmount || 0)), 0);
+            const weekProjected = weekSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0), 0);
+            const weekDisbursed = weekSalaries.reduce((acc, curr) => acc + Math.min(curr.grossPay + curr.overtimePay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0), (curr.paidAmount || (curr.status === 'Paid' ? curr.grossPay + curr.overtimePay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0) : 0))), 0);
+            const weekPending = weekSalaries.filter((s) => s.status === 'Pending').reduce((acc, curr) => acc + Math.max(0, curr.grossPay + curr.overtimePay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0) - (curr.paidAmount || 0)), 0);
 
             return (
               <div key={week} className="space-y-3.5">
@@ -223,7 +225,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                   if (!worker) return null;
 
             const isExpanded = expandedId === s.id;
-            const netPay = s.grossPay + s.overtimePay;
+            const netPay = s.grossPay + s.overtimePay + (s.halfDayPay || 0) + (s.nightShiftPay || 0);
 
             return (
               <div
@@ -298,7 +300,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-base">
                         <div>
                           <div className="text-emerald-600 font-bold mb-1 text-2xl">
-                            Basic Salary ({Math.max(0, s.daysWorked - s.overtimeDays)} days)
+                            One Shift ({s.presentDays} days)
                           </div>
                           {editingId === s.id ? (
                             <input 
@@ -310,6 +312,20 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                             />
                           ) : (
                             <div className="font-black text-slate-800 text-3xl md:text-2xl">₹{s.grossPay}</div>
+                          )}
+                        </div>
+                        <div>
+                          <div className="text-amber-500 font-bold mb-1 text-2xl">Half Day ({s.halfDayDays} days)</div>
+                          {editingId === s.id ? (
+                            <input 
+                              type="number" 
+                              step="1"
+                              value={editHalfDayPay} 
+                              onChange={(e) => setEditHalfDayPay(parseInt(e.target.value, 10) || 0)}
+                              className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-base"
+                            />
+                          ) : (
+                            <div className="font-black text-amber-600 text-3xl md:text-2xl">₹{s.halfDayPay}</div>
                           )}
                         </div>
                         <div>
@@ -326,6 +342,20 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                             <div className="font-black text-blue-600 text-3xl md:text-2xl">₹{s.overtimePay}</div>
                           )}
                         </div>
+                        <div>
+                          <div className="text-purple-500 font-bold mb-1 text-2xl">Night Shift ({s.nightShiftDays} days)</div>
+                          {editingId === s.id ? (
+                            <input 
+                              type="number" 
+                              step="1"
+                              value={editNightShiftPay} 
+                              onChange={(e) => setEditNightShiftPay(parseInt(e.target.value, 10) || 0)}
+                              className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-base"
+                            />
+                          ) : (
+                            <div className="font-black text-purple-600 text-3xl md:text-2xl">₹{s.nightShiftPay}</div>
+                          )}
+                        </div>
                       </div>
 
                       <div className="mt-5 border-t border-slate-200/60 pt-3 flex justify-between items-center">
@@ -335,7 +365,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                           {editingId === s.id ? (
                             <button
                               onClick={() => {
-                                onEditSalary(worker.id, editGrossPay, editOvertimePay, s.period);
+                                onEditSalary(worker.id, editGrossPay, editOvertimePay, editHalfDayPay, editNightShiftPay, s.period);
                                 setEditingId(null);
                               }}
                               className="px-5 py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-bold text-lg rounded-xl transition-colors cursor-pointer select-none"
@@ -348,6 +378,8 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                                 setEditingId(s.id as string);
                                 setEditGrossPay(s.grossPay);
                                 setEditOvertimePay(s.overtimePay);
+                                setEditHalfDayPay(s.halfDayPay || 0);
+                                setEditNightShiftPay(s.nightShiftPay || 0);
                               }}
                               className="px-5 py-2.5 border border-slate-200 hover:bg-slate-100 text-slate-600 font-bold text-lg rounded-xl transition-colors cursor-pointer select-none"
                             >
