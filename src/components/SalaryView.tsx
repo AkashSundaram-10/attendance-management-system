@@ -297,7 +297,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                     >
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-base">
                         <div>
-                          <div className="text-slate-400 font-semibold mb-1">
+                          <div className="text-slate-500 font-bold mb-1 text-lg">
                             Basic Salary ({Math.max(0, s.daysWorked - s.overtimeDays)} days)
                           </div>
                           {editingId === s.id ? (
@@ -309,11 +309,11 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                               className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-base"
                             />
                           ) : (
-                            <div className="font-bold text-slate-800">₹{s.grossPay}</div>
+                            <div className="font-black text-slate-800 text-xl md:text-lg">₹{s.grossPay}</div>
                           )}
                         </div>
                         <div>
-                          <div className="text-slate-400 font-semibold mb-1">Overtime ({s.overtimeDays} days)</div>
+                          <div className="text-blue-500 font-bold mb-1 text-lg">Overtime ({s.overtimeDays} days)</div>
                           {editingId === s.id ? (
                             <input 
                               type="number" 
@@ -323,7 +323,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                               className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-base"
                             />
                           ) : (
-                            <div className="font-bold text-emerald-600">+₹{s.overtimePay}</div>
+                            <div className="font-black text-blue-600 text-xl md:text-lg">+₹{s.overtimePay}</div>
                           )}
                         </div>
                       </div>
