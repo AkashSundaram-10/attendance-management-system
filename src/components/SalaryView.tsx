@@ -31,12 +31,12 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
 
   const totalProjected = currentSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
   const totalDisbursed = currentSalaries
-    .reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? curr.grossPay + curr.overtimePay : 0)), 0);
+    .reduce((acc, curr) => acc + Math.min(curr.grossPay + curr.overtimePay, (curr.paidAmount || (curr.status === 'Paid' ? curr.grossPay + curr.overtimePay : 0))), 0);
   const totalPending = currentSalaries
     .filter((s) => s.status === 'Pending')
-    .reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay - (curr.paidAmount || 0), 0);
+    .reduce((acc, curr) => acc + Math.max(0, curr.grossPay + curr.overtimePay - (curr.paidAmount || 0)), 0);
 
-  const disbursedPct = totalProjected > 0 ? Math.round((totalDisbursed / totalProjected) * 100) : 0;
+  const disbursedPct = Math.min(100, totalProjected > 0 ? Math.round((totalDisbursed / totalProjected) * 100) : 0);
 
   // Search & Filter
   const filteredSalaries = currentSalaries.filter((s) => {
@@ -201,8 +201,8 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
             });
 
             const weekProjected = weekSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
-            const weekDisbursed = weekSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? curr.grossPay + curr.overtimePay : 0)), 0);
-            const weekPending = weekSalaries.filter((s) => s.status === 'Pending').reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay - (curr.paidAmount || 0), 0);
+            const weekDisbursed = weekSalaries.reduce((acc, curr) => acc + Math.min(curr.grossPay + curr.overtimePay, (curr.paidAmount || (curr.status === 'Paid' ? curr.grossPay + curr.overtimePay : 0))), 0);
+            const weekPending = weekSalaries.filter((s) => s.status === 'Pending').reduce((acc, curr) => acc + Math.max(0, curr.grossPay + curr.overtimePay - (curr.paidAmount || 0)), 0);
 
             return (
               <div key={week} className="space-y-3.5">
