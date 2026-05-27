@@ -297,7 +297,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                     >
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-base">
                         <div>
-                          <div className="text-slate-500 font-bold mb-1 text-xl">
+                          <div className="text-emerald-600 font-bold mb-1 text-xl">
                             Basic Salary ({Math.max(0, s.daysWorked - s.overtimeDays)} days)
                           </div>
                           {editingId === s.id ? (
