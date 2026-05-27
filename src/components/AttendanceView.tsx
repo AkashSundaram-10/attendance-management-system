@@ -241,7 +241,7 @@ export default function AttendanceView({
               {/* Check in timers */}
               <div className="flex items-center gap-6 bg-slate-50 p-2.5 rounded-xl md:bg-transparent md:p-0">
                 <div className="flex flex-col">
-                  <span className="text-[9px] uppercase font-bold tracking-wider text-[#798097] mb-1">
+                  <span className="text-xs uppercase font-bold tracking-wider text-[#798097] mb-1">
                     Check In
                   </span>
                   <input 
@@ -254,7 +254,7 @@ export default function AttendanceView({
                 </div>
                 <div className="w-px h-6 bg-slate-250 hidden md:block" />
                 <div className="flex flex-col">
-                  <span className="text-[9px] uppercase font-bold tracking-wider text-[#798097] mb-1">
+                  <span className="text-xs uppercase font-bold tracking-wider text-[#798097] mb-1">
                     Check Out
                   </span>
                   <input

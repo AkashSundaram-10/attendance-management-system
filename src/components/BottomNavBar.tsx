@@ -75,7 +75,7 @@ export default function BottomNavBar({ currentView, setView }: BottomNavBarProps
             }`}
           >
             <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[1.8px]'}`} />
-            <span className="text-[10px] uppercase tracking-wider font-semibold mt-1">
+            <span className="text-xs uppercase tracking-wider font-semibold mt-1">
               {item.label}
             </span>
           </button>

@@ -78,7 +78,7 @@ export default function AdvancePaymentsView({
         <div className="col-span-2 bg-[var(--primary-color)] text-white rounded-2xl p-5 shadow-lg shadow-indigo-600/20 relative overflow-hidden flex flex-col justify-between min-h-[140px]">
           <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
           <div>
-            <span className="text-[10px] font-bold text-indigo-150 uppercase tracking-widest opacity-80">
+            <span className="text-xs font-bold text-indigo-150 uppercase tracking-widest opacity-80">
               Total Advances
             </span>
             <h2 className="text-3xl font-black font-display mt-1">
@@ -95,7 +95,7 @@ export default function AdvancePaymentsView({
 
         {/* Pending Recovery */}
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
             <RefreshCw className="w-3.5 h-3.5 text-indigo-600 animate-spin" style={{ animationDuration: '6s' }} /> Given Advances
           </span>
           <span className="text-lg font-black font-display text-slate-800">
@@ -111,7 +111,7 @@ export default function AdvancePaymentsView({
 
         {/* Recovered */}
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
             <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> Recovered
           </span>
           <span className="text-lg font-black font-display text-slate-850">
@@ -174,7 +174,7 @@ export default function AdvancePaymentsView({
                     <p className="font-display font-bold text-slate-850 xs:text-sm">
                       {adv.workerName}
                     </p>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase">
+                    <p className="text-xs text-slate-400 font-bold uppercase">
                       ID: {adv.workerId}
                     </p>
                   </div>
@@ -190,7 +190,7 @@ export default function AdvancePaymentsView({
                         : 'Given';
                     onUpdateAdvanceStatus(adv.id, nextSt);
                   }}
-                  className={`px-3 py-0.5 rounded-full text-[10px] font-bold tracking-wide cursor-pointer transition-all ${
+                  className={`px-3 py-0.5 rounded-full text-xs font-bold tracking-wide cursor-pointer transition-all ${
                     isPending
                       ? 'bg-amber-50 text-amber-700 border border-amber-100'
                       : isRecovered
@@ -207,7 +207,7 @@ export default function AdvancePaymentsView({
 
               <div className="flex items-end justify-between">
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wide leading-none">
+                  <span className="text-xs font-bold text-slate-450 uppercase tracking-wide leading-none">
                     Advance Amount
                   </span>
                   <span className={`text-base font-display font-black text-slate-900 mt-1 ${isRecovered ? 'line-through opacity-50' : ''}`}>
@@ -218,7 +218,7 @@ export default function AdvancePaymentsView({
                   <span className="text-xs font-bold text-slate-600">
                     Bal: ₹{adv.balance.toFixed(2)}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-semibold font-sans mt-0.5">
+                  <span className="text-xs text-slate-400 font-semibold font-sans mt-0.5">
                     {adv.requestedDate}
                   </span>
                 </div>
@@ -260,7 +260,7 @@ export default function AdvancePaymentsView({
 
               <form onSubmit={handleFormSubmit} className="space-y-4 pt-1">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
                     Choose Worker
                   </label>
                   <select
@@ -279,7 +279,7 @@ export default function AdvancePaymentsView({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
                     Advance Amount (₹)
                   </label>
                   <input
@@ -291,7 +291,7 @@ export default function AdvancePaymentsView({
                     onChange={(e) => setAmount(Number(e.target.value))}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none"
                   />
-                  <p className="text-[10px] text-slate-400 leading-normal p-1">
+                  <p className="text-xs text-slate-400 leading-normal p-1">
                     Advance payments are deducted automatically on the next salary release cycle. Limit ₹1,500.
                   </p>
                 </div>

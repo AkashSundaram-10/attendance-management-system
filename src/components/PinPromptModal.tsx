@@ -70,7 +70,7 @@ export default function PinPromptModal({ isOpen, onClose, onSuccess }: PinPrompt
                   placeholder="****"
                   maxLength={4}
                 />
-                {error && <p className="text-[10px] uppercase font-bold tracking-wider text-red-500 text-center animate-pulse">Incorrect PIN. Try again.</p>}
+                {error && <p className="text-xs uppercase font-bold tracking-wider text-red-500 text-center animate-pulse">Incorrect PIN. Try again.</p>}
                 
                 <button
                   type="submit"

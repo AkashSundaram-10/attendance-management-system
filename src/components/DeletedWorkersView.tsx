@@ -109,7 +109,7 @@ export default function DeletedWorkersView({ onRestore, requestSecureAction }: D
                       <h3 className="font-bold text-slate-900">{w.fullName}</h3>
                       <p className="text-xs text-slate-500">Code: {w.workerCode}</p>
                     </div>
-                    <div className="bg-red-50 text-red-600 px-2 py-1 rounded text-[10px] font-bold border border-red-100 flex items-center gap-1">
+                    <div className="bg-red-50 text-red-600 px-2 py-1 rounded text-xs font-bold border border-red-100 flex items-center gap-1">
                       <AlertTriangle className="w-3 h-3" />
                       {daysLeft} days left
                     </div>
@@ -117,11 +117,11 @@ export default function DeletedWorkersView({ onRestore, requestSecureAction }: D
 
                   <div className="bg-slate-50 rounded-lg p-3 grid grid-cols-2 gap-3 mb-4 border border-slate-100">
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">Paid Salary</p>
+                      <p className="text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">Paid Salary</p>
                       <p className="font-bold text-emerald-600">₹{totalPaid.toLocaleString('en-IN')}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">Unpaid Dues</p>
+                      <p className="text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">Unpaid Dues</p>
                       <p className="font-bold text-red-600">₹{totalUnpaid.toLocaleString('en-IN')}</p>
                     </div>
                   </div>

@@ -91,7 +91,7 @@ export default function SettingsView() {
                     alt={style}
                     className="w-10 h-10 rounded-full bg-white shadow-sm"
                   />
-                  <span className="text-[10px] font-bold text-slate-600 capitalize">{style}</span>
+                  <span className="text-xs font-bold text-slate-600 capitalize">{style}</span>
                 </div>
               ))}
             </div>
@@ -106,7 +106,7 @@ export default function SettingsView() {
               <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Bell className="w-5 h-5" /></div>
               <div>
                 <h4 className="text-sm font-bold text-slate-800">Notifications</h4>
-                <p className="text-[10px] text-slate-500">Manage alerts and sounds</p>
+                <p className="text-xs text-slate-500">Manage alerts and sounds</p>
               </div>
             </div>
           </div>
@@ -116,7 +116,7 @@ export default function SettingsView() {
               <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><Shield className="w-5 h-5" /></div>
               <div>
                 <h4 className="text-sm font-bold text-slate-800">Security & PIN</h4>
-                <p className="text-[10px] text-slate-500">Update supervisor PIN</p>
+                <p className="text-xs text-slate-500">Update supervisor PIN</p>
               </div>
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function SettingsView() {
               <div className="p-2 bg-purple-50 text-purple-600 rounded-lg"><Smartphone className="w-5 h-5" /></div>
               <div>
                 <h4 className="text-sm font-bold text-slate-800">Device Sync</h4>
-                <p className="text-[10px] text-slate-500">Connect mobile app</p>
+                <p className="text-xs text-slate-500">Connect mobile app</p>
               </div>
             </div>
           </div>

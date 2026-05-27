@@ -98,14 +98,18 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
       
       const workerSalaries = currentMonthSalaries.filter(s => s.workerId === worker.id);
       let totalAmount = 0;
+      let totalPaid = 0;
       if (workerSalaries.length > 0) {
         totalAmount = workerSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
+        totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || 0), 0);
       } else {
         const otDays = Object.values(dayMarks).filter(s => s === 'Overtime').length;
         const presentDays = daysWorked - otDays;
         totalAmount = (presentDays * worker.dailyWage) + (otDays * 1500);  
+        totalPaid = 0;
       }
       
+      const unpaidAmount = totalAmount - totalPaid;
       overallTotalSalary += totalAmount;
 
       return {
@@ -113,7 +117,9 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
         dayMarks,
         daysWorked,
         otDays: Object.values(dayMarks).filter(s => s === 'Overtime').length,
-        totalAmount
+        totalAmount,
+        totalPaid,
+        unpaidAmount
       };
     });
 
@@ -416,6 +422,35 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
               ₹{tableData.bottomKPI.overallTotalSalary.toLocaleString()}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Individual Worker Salary Details */}
+      <section className="pt-6">
+        <h3 className="text-xl font-display font-black text-slate-800 mb-4">Individual Worker Details</h3>
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden overflow-x-auto no-scrollbar">
+          <table className="w-full text-left border-collapse min-w-[800px]">
+            <thead>
+              <tr className="border-b border-slate-200 bg-slate-50">
+                <th className="px-4 py-4 font-semibold text-base text-slate-800 border-r border-slate-200 w-12 text-center">No.</th>
+                <th className="px-5 py-4 font-semibold text-base text-slate-800 border-r border-slate-200">Worker Name</th>
+                <th className="px-5 py-4 font-semibold text-base text-slate-800 border-r border-slate-200 text-center">Total Salary</th>
+                <th className="px-5 py-4 font-semibold text-base text-slate-800 border-r border-slate-200 text-center">Paid Amount</th>
+                <th className="px-5 py-4 font-semibold text-base text-slate-800 text-center">Unpaid (Balance)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableData.rows.map((row, index) => (
+                <tr key={row.worker.id} className="group border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                  <td className="py-4 px-4 text-base font-medium text-slate-500 text-center border-r border-slate-100">{index + 1}</td>
+                  <td className="py-4 px-5 text-base font-bold text-slate-800 border-r border-slate-100">{row.worker.name}</td>
+                  <td className="py-4 px-5 text-base font-black text-slate-900 text-center border-r border-slate-100">₹{row.totalAmount.toLocaleString()}</td>
+                  <td className="py-4 px-5 text-base font-black text-emerald-600 text-center border-r border-slate-100">₹{row.totalPaid.toLocaleString()}</td>
+                  <td className="py-4 px-5 text-base font-black text-red-600 text-center">₹{row.unpaidAmount.toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 
