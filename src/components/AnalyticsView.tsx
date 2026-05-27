@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { Worker, SalaryRecord, AttendanceRecord } from '../types';
 import { Download, Users, CheckCircle2, XCircle, Clock, Calendar as CalendarIcon, BarChart2, IndianRupee, Info, Check, X } from 'lucide-react';
+import MonthlyCalendar from './MonthlyCalendar';
 
 interface AnalyticsViewProps {
   workers: Worker[];
@@ -454,6 +455,10 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
         </div>
       </section>
 
+      {/* Monthly Calendar */}
+      <section className="mt-8 mb-8">
+        <MonthlyCalendar />
+      </section>
     </motion.div>
   );
 }

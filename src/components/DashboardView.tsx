@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { Users, UserCheck, IndianRupee, Wallet, MoreVertical, ArrowRight } from 'lucide-react';
 import { AppView, Worker, AttendanceRecord, SalaryRecord } from '../types';
 import { getCurrentPeriod } from '../api';
+import MonthlyCalendar from './MonthlyCalendar';
 
 interface DashboardViewProps {
   workers: Worker[];
@@ -403,6 +404,11 @@ export default function DashboardView({
             </tbody>
           </table>
         </div>
+      </section>
+
+      {/* Monthly Calendar */}
+      <section className="mt-8">
+        <MonthlyCalendar />
       </section>
     </motion.div>
   );
