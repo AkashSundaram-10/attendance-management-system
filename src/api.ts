@@ -90,17 +90,29 @@ export const api = {
       const data = await res.json();
       if (!data.data?.workers) return [];
       
-      return data.data.workers.map((w: any) => ({
-        id: w.id,
-        name: w.fullName,
-        role: w.role || 'Worker',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + w.id,
-        status: w.status === 'ACTIVE' ? 'Active' : 'Disabled',
-        phone: w.phone || '',
-        email: '',
-        joinedDate: new Date(w.joiningDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-        dailyWage: w.dailyWage
-      })).sort((a: any, b: any) => a.name.localeCompare(b.name));
+      return data.data.workers.map((w: any) => {
+        const getInitials = (name: string) => {
+          if (!name) return 'WK';
+          const parts = name.trim().split(/\\s+/);
+          if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+          const n = parts[0].toUpperCase();
+          if (n === 'MANIKANDAN') return 'MK';
+          if (n === 'RAJ') return 'RJ';
+          if (n.length > 1) return n[0] + n[n.length - 1]; // first and last
+          return n;
+        };
+        return {
+          id: w.id,
+          name: w.fullName,
+          role: w.role || 'Worker',
+          avatar: `https://ui-avatars.com/api/?name=${getInitials(w.fullName)}&background=random&color=fff&bold=true`,
+          status: w.status === 'ACTIVE' ? 'Active' : 'Disabled',
+          phone: w.phone || '',
+          email: '',
+          joinedDate: new Date(w.joiningDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+          dailyWage: w.dailyWage
+        };
+      }).sort((a: any, b: any) => a.name.localeCompare(b.name));
     } catch (e) {
       console.error(e);
       return [];
