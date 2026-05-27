@@ -297,7 +297,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                     >
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-base">
                         <div>
-                          <div className="text-emerald-600 font-bold mb-1 text-xl">
+                          <div className="text-emerald-600 font-bold mb-1 text-2xl">
                             Basic Salary ({Math.max(0, s.daysWorked - s.overtimeDays)} days)
                           </div>
                           {editingId === s.id ? (
@@ -309,11 +309,11 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                               className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-base"
                             />
                           ) : (
-                            <div className="font-black text-slate-800 text-2xl md:text-xl">₹{s.grossPay}</div>
+                            <div className="font-black text-slate-800 text-3xl md:text-2xl">₹{s.grossPay}</div>
                           )}
                         </div>
                         <div>
-                          <div className="text-blue-500 font-bold mb-1 text-xl">Overtime ({s.overtimeDays} days)</div>
+                          <div className="text-blue-500 font-bold mb-1 text-2xl">Overtime ({s.overtimeDays} days)</div>
                           {editingId === s.id ? (
                             <input 
                               type="number" 
@@ -323,7 +323,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                               className="w-full bg-white border border-slate-300 rounded px-2 py-1 text-base"
                             />
                           ) : (
-                            <div className="font-black text-blue-600 text-2xl md:text-xl">₹{s.overtimePay}</div>
+                            <div className="font-black text-blue-600 text-3xl md:text-2xl">₹{s.overtimePay}</div>
                           )}
                         </div>
                       </div>
@@ -332,20 +332,13 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                         <div className="flex-1"></div>
 
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => alert(`Payslip generated for ${worker.name}. Saved to admin cloud reports.`)}
-                            className="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-100 text-slate-600 font-bold text-base rounded-lg transition-colors cursor-pointer select-none"
-                          >
-                            View Payslip
-                          </button>
-
                           {editingId === s.id ? (
                             <button
                               onClick={() => {
                                 onEditSalary(worker.id, editGrossPay, editOvertimePay, s.period);
                                 setEditingId(null);
                               }}
-                              className="px-3.5 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-bold text-base rounded-lg transition-colors cursor-pointer select-none"
+                              className="px-5 py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-bold text-lg rounded-xl transition-colors cursor-pointer select-none"
                             >
                               Save Edit
                             </button>
@@ -356,7 +349,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                                 setEditGrossPay(s.grossPay);
                                 setEditOvertimePay(s.overtimePay);
                               }}
-                              className="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-100 text-slate-600 font-bold text-base rounded-lg transition-colors cursor-pointer select-none"
+                              className="px-5 py-2.5 border border-slate-200 hover:bg-slate-100 text-slate-600 font-bold text-lg rounded-xl transition-colors cursor-pointer select-none"
                             >
                               Edit Salary
                             </button>
@@ -364,7 +357,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
 
                           {s.status === 'Paid' ? (
                             <span
-                              className="px-3 py-1.5 rounded-lg text-base font-bold cursor-pointer transition-all flex items-center gap-1 bg-slate-100 text-slate-800 hover:bg-slate-200"
+                              className="px-5 py-2.5 rounded-xl text-lg font-bold cursor-pointer transition-all flex items-center gap-2 bg-slate-100 text-slate-800 hover:bg-slate-200"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onToggleSalaryStatus(s.id as string, undefined, true);
@@ -376,7 +369,7 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                             <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                               {(s.paidAmount && s.paidAmount > 0) ? (
                                 <span
-                                  className="px-3 py-1.5 rounded-lg text-base font-bold cursor-pointer transition-all flex items-center gap-1 bg-slate-100 text-slate-800 hover:bg-slate-200"
+                                  className="px-4 py-2 rounded-xl text-lg font-bold cursor-pointer transition-all flex items-center gap-1.5 bg-slate-100 text-slate-800 hover:bg-slate-200"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     onToggleSalaryStatus(s.id as string, undefined, true);
@@ -387,14 +380,14 @@ export default function SalaryView({ workers, salaries, onToggleSalaryStatus, on
                               ) : null}
                               <input
                                 type="number"
-                                className="w-24 bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-base focus:border-[var(--primary-color)] outline-none"
+                                className="w-28 bg-white border border-slate-300 rounded-xl px-3 py-2 text-lg font-bold focus:border-[var(--primary-color)] outline-none"
                                 placeholder={`Max: ${netPay - (s.paidAmount || 0)}`}
                                 id={`pay-${s.id}`}
                                 defaultValue={netPay - (s.paidAmount || 0)}
                                 step="1"
                               />
                               <span
-                                className="px-3 py-1.5 rounded-lg text-base font-bold cursor-pointer transition-all flex items-center gap-1 bg-[var(--primary-color)] text-white hover:bg-[#6c61f2] shadow-md shadow-[var(--primary-color)]/20"
+                                className="px-5 py-2.5 rounded-xl text-lg font-bold cursor-pointer transition-all flex items-center gap-2 bg-[var(--primary-color)] text-white hover:bg-[#6c61f2] shadow-md shadow-[var(--primary-color)]/20"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   const el = document.getElementById(`pay-${s.id}`) as HTMLInputElement;
