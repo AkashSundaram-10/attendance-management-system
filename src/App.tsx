@@ -47,22 +47,26 @@ export default function App() {
 
   const activeWorker = workers.find((w) => w.id === selectedWorkerId) || workers[0] || {} as Worker;
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     // Initial fetch from backend
-    api.getWorkers().then((fetchedWorkers) => {
+    Promise.all([
+      api.getWorkers(),
+      api.getAttendance(),
+      api.generateSalary(new Date().toISOString()).then(() => api.getSalaries())
+    ]).then(([fetchedWorkers, fetchedAttendance, fetchedSalaries]) => {
       setWorkers(fetchedWorkers);
       if (fetchedWorkers.length > 0 && !fetchedWorkers.find(w => w.id === selectedWorkerId)) {
         setSelectedWorkerId(fetchedWorkers[0].id);
       }
-    });
-    api.getAttendance().then((fetchedAttendance) => {
       setAttendance(fetchedAttendance);
+      setSalaries(fetchedSalaries);
+    }).catch((e) => {
+      alert("Failed to fetch/generate initial records: " + e.message);
+    }).finally(() => {
+      setIsLoading(false);
     });
-    
-    api.generateSalary(new Date().toISOString())
-      .then(() => api.getSalaries())
-      .then((fetchedSalaries) => setSalaries(fetchedSalaries))
-      .catch((e) => alert("Failed to fetch/generate salaries: " + e.message));
   }, []);
 
   // Callback to add a new worker
@@ -295,6 +299,16 @@ export default function App() {
 
   // Check if shell layout triggers
   const hideShell = currentView === 'splash' || currentView === 'login';
+
+  if (!hideShell && isLoading) {
+    return (
+      <div className="min-h-screen bg-[#f6f9ff] flex flex-col items-center justify-center font-sans">
+        <div className="w-16 h-16 border-4 border-indigo-200 border-t-[var(--primary-color)] rounded-full animate-spin"></div>
+        <h2 className="mt-6 text-2xl font-bold text-slate-800">Please wait...</h2>
+        <p className="text-slate-500 mt-2">Loading your data and records</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#f6f9ff] min-h-screen text-slate-900 flex">
