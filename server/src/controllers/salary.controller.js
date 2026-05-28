@@ -82,8 +82,8 @@ const generateSalary = async (req, res, next) => {
         } else if (statusUpper === 'HALF_DAY' || statusUpper === 'HALF DAY') {
            grossSalary += 500;
            computedHalfDaySalary += 500;
-           totalDays += 0.5;
-           halfDayDays += 0.5;
+           totalDays += 1;
+           halfDayDays += 1;
         } else if (statusUpper === 'NIGHT_SHIFT' || statusUpper === 'NIGHT SHIFT') {
            grossSalary += 1000;
            computedNightShiftSalary += 1000;

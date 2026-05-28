@@ -31,8 +31,8 @@ export default function DashboardView({
   const currentMonthStr = getCurrentPeriod().split(' | ')[0];
   const currentMonthSalaries = salaries.filter(s => s.period.startsWith(currentMonthStr) && workers.some(w => w.id === s.workerId));
 
-  const totalSalaryProjected = currentMonthSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
-  const pendingSalaries = currentMonthSalaries.filter(s => s.status === 'Pending').reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay - (curr.paidAmount || 0), 0);
+  const totalSalaryProjected = currentMonthSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0), 0);
+  const pendingSalaries = currentMonthSalaries.filter(s => s.status === 'Pending').reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0) - (curr.paidAmount || 0), 0);
 
   // Format Indian Rupee
   const formatINR = (amount: number) => {
@@ -53,11 +53,11 @@ export default function DashboardView({
   // Recent payments aggregated by worker for the current month
   const recentPaymentsList = workers.map(worker => {
     const workerSalaries = currentMonthSalaries.filter(s => s.workerId === worker.id);
-    const totalGross = workerSalaries.reduce((acc, curr) => acc + curr.grossPay, 0);
+    const totalGross = workerSalaries.reduce((acc, curr) => acc + curr.grossPay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0), 0);
     const totalOvertime = workerSalaries.reduce((acc, curr) => acc + curr.overtimePay, 0);
     const totalAdvance = workerSalaries.reduce((acc, curr) => acc + curr.advanceDeduction, 0);
     const totalNetPay = totalGross + totalOvertime - totalAdvance;
-    const totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? (curr.grossPay + curr.overtimePay - curr.advanceDeduction) : 0)), 0);
+    const totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? (curr.grossPay + curr.overtimePay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0) - curr.advanceDeduction) : 0)), 0);
 
     // Status Logic
     let status = 'Pending';
@@ -108,11 +108,11 @@ export default function DashboardView({
   workers.forEach(worker => {
     const workerSalaries = currentMonthSalaries.filter(s => s.workerId === worker.id);
     if (workerSalaries.length === 0) return;
-    const totalGross = workerSalaries.reduce((acc, curr) => acc + curr.grossPay, 0);
+    const totalGross = workerSalaries.reduce((acc, curr) => acc + curr.grossPay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0), 0);
     const totalOvertime = workerSalaries.reduce((acc, curr) => acc + curr.overtimePay, 0);
     const totalAdvance = workerSalaries.reduce((acc, curr) => acc + curr.advanceDeduction, 0);
     const totalNetPay = totalGross + totalOvertime - totalAdvance;
-    const totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? (curr.grossPay + curr.overtimePay - curr.advanceDeduction) : 0)), 0);
+    const totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || (curr.status === 'Paid' ? (curr.grossPay + curr.overtimePay + (curr.halfDayPay || 0) + (curr.nightShiftPay || 0) - curr.advanceDeduction) : 0)), 0);
 
     if (totalNetPay > 0 && totalPaid >= totalNetPay) paidCount++;
     else if (totalPaid > 0) partialCount++;

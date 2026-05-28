@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Worker, SalaryRecord, AttendanceRecord } from '../types';
 import { Download, Users, CheckCircle2, XCircle, Clock, Calendar as CalendarIcon, BarChart2, IndianRupee, Info, Check, X } from 'lucide-react';
 import MonthlyCalendar from './MonthlyCalendar';
+import { getCurrentPeriod } from '../api';
 
 interface AnalyticsViewProps {
   workers: Worker[];
@@ -80,15 +81,23 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
           dayMarks[dObj.dateStr] = record.status;
           if (record.status === 'Present') {
             daysWorked += 1;
-            totalPresentCount++;
+            totalPresentCount += 1;
           }
           else if (record.status === 'Overtime') {
             daysWorked += 1; 
-            totalOvertimeCount++;
-            totalPresentCount++; 
+            totalOvertimeCount += 1;
+            totalPresentCount += 1; 
+          }
+          else if (record.status === 'Half Day') {
+            daysWorked += 1; // Physical day presence counts as 1 for the display
+            totalPresentCount += 1;
+          }
+          else if (record.status === 'Night Shift') {
+            daysWorked += 1;
+            totalPresentCount += 1;
           }
           else if (record.status === 'Absent') {
-            totalAbsentCount++;
+            totalAbsentCount += 1;
           }
         } else {
           dayMarks[dObj.dateStr] = null;
@@ -100,15 +109,29 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
       const workerSalaries = currentMonthSalaries.filter(s => s.workerId === worker.id);
       let totalAmount = 0;
       let totalPaid = 0;
-      if (workerSalaries.length > 0) {
-        totalAmount = workerSalaries.reduce((acc, curr) => acc + curr.grossPay + curr.overtimePay, 0);
-        totalPaid = workerSalaries.reduce((acc, curr) => acc + (curr.paidAmount || 0), 0);
-      } else {
-        const otDays = Object.values(dayMarks).filter(s => s === 'Overtime').length;
-        const presentDays = daysWorked - otDays;
-        totalAmount = (presentDays * worker.dailyWage) + (otDays * 1500);  
-        totalPaid = 0;
-      }
+
+      // Iterate through each of the 4 weeks shown in this analytics view
+      weeks.forEach(week => {
+        // Get the period string for this week by checking the first day of the week
+        const utcDate = new Date(Date.UTC(week[0].dateObj.getFullYear(), week[0].dateObj.getMonth(), week[0].dateObj.getDate()));
+        const weekPeriod = getCurrentPeriod(utcDate);
+        const weekSalary = workerSalaries.find(s => s.period === weekPeriod);
+
+        if (weekSalary) {
+          // If a salary record exists for this week, use its generated/edited totals
+          totalAmount += weekSalary.grossPay + weekSalary.overtimePay + (weekSalary.halfDayPay || 0) + (weekSalary.nightShiftPay || 0);
+          totalPaid += weekSalary.paidAmount || 0;
+        } else {
+          // If no salary record exists yet, calculate the ungenerated attendance dynamically
+          const weekStatuses = week.map(dObj => dayMarks[dObj.dateStr]);
+          const otDays = weekStatuses.filter(s => s === 'Overtime').length;
+          const nightDays = weekStatuses.filter(s => s === 'Night Shift').length;
+          const halfDays = weekStatuses.filter(s => s === 'Half Day').length;
+          const presentDays = weekStatuses.filter(s => s === 'Present').length;
+          
+          totalAmount += (presentDays * worker.dailyWage) + (otDays * Math.max(worker.overtimeRate || (worker.dailyWage * 1.5), 1500)) + (nightDays * 1000) + (halfDays * 500);
+        }
+      });
       
       const unpaidAmount = totalAmount - totalPaid;
       overallTotalSalary += totalAmount;
@@ -157,7 +180,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
     if (status === 'Present') return <span className="text-base font-black text-emerald-600">1</span>;
     if (status === 'Overtime') return <span className="text-base font-black text-indigo-600">1.5</span>;
     if (status === 'Half Day') return <span className="text-base font-black text-amber-600">0.5</span>;
-    if (status === 'Night Shift') return <span className="text-base font-black text-purple-600">1</span>;
+    if (status === 'Night Shift') return <span className="text-base font-black text-purple-600">2</span>;
     
     const todayStr = new Date().toISOString().split('T')[0];
     if (dateStr > todayStr) {

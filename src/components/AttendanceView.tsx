@@ -213,7 +213,7 @@ export default function AttendanceView({
               case 'Half Day':
                 return { text: 'Half Day (0.5)', color: 'bg-amber-50 text-amber-700 border-amber-100' };
               case 'Night Shift':
-                return { text: 'Night Shift (1)', color: 'bg-purple-50 text-purple-700 border-purple-100' };
+                return { text: 'Night Shift (2)', color: 'bg-purple-50 text-purple-700 border-purple-100' };
               default:
                 return { text: 'Unmarked', color: 'bg-slate-50 text-slate-500 border-slate-100 border-dashed' };
             }
@@ -323,7 +323,7 @@ export default function AttendanceView({
                     onClick={() => onUpdateAttendance(w.id, 'Night Shift', undefined, undefined, selectedDate)}
                     className="flex-1 md:flex-none px-2 py-1.5 rounded-lg border border-slate-350 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-350 text-slate-500 text-[13px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
                   >
-                    <Moon className="w-3 h-3" /> Night (1)
+                    <Moon className="w-3 h-3" /> Night (2)
                   </button>
                   <button
                     onClick={() => onUpdateAttendance(w.id, 'Absent', undefined, undefined, selectedDate)}

@@ -261,7 +261,7 @@ export const api = {
       return data.data.map((s: any) => {
         const paidAmount = s.payments ? s.payments.reduce((acc: number, curr: any) => acc + curr.amountPaid, 0) : 0;
         const overtimePay = s.overtimeSalary ?? Math.round((s.overtimeHours || 0) * 1500);
-        const halfDayPay = s.halfDaySalary ?? (s.halfDayDays ? s.halfDayDays * 2 * 500 : 0);
+        const halfDayPay = s.halfDaySalary ?? (s.halfDayDays ? s.halfDayDays * 500 : 0);
         const nightShiftPay = s.nightShiftSalary ?? (s.nightShiftDays ? s.nightShiftDays * 1000 : 0);
         const grossPay = s.basicSalary ?? Math.round((s.grossSalary || 0) - overtimePay - halfDayPay - nightShiftPay);
         const advanceDeduction = Math.round(s.advanceDeduction || 0);
