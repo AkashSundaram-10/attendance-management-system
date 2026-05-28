@@ -24,7 +24,7 @@ const createWorker = async (req, res, next) => {
 
 const getWorkers = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, search = '', status } = req.query;
+    const { page = 1, limit = 50, search = '', status } = req.query;
     
     const pageNumber = parseInt(page);
     const limitNumber = parseInt(limit);
