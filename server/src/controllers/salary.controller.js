@@ -8,19 +8,17 @@ const generateSalary = async (req, res, next) => {
 
     const getWeek = (date) => {
       const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-      const dayNum = d.getUTCDay() || 7;
-      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-      const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-      return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1)/7);
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + yearStart.getUTCDay() + 1) / 7);
     };
 
     let startDate, endDate, dbMonth = month;
 
     if (targetDate) {
       const d = new Date(targetDate);
-      const day = d.getUTCDay() || 7;
+      const day = d.getUTCDay();
       startDate = new Date(d);
-      startDate.setUTCDate(d.getUTCDate() - day + 1);
+      startDate.setUTCDate(d.getUTCDate() - day);
       startDate.setUTCHours(0, 0, 0, 0);
 
       endDate = new Date(startDate);

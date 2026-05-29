@@ -27,15 +27,15 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
     setSelectedYear(parseInt(e.target.value, 10));
   };
 
-  // Generate exactly 28 days starting from the FIRST Monday of the selected month
+  // Generate exactly 28 days starting from the FIRST Sunday of the selected month
   const { daysArray, weeks } = useMemo(() => {
-    let firstMonday = 1;
-    while (new Date(selectedYear, selectedMonth, firstMonday).getDay() !== 1) {
-      firstMonday++;
+    let firstSunday = 1;
+    while (new Date(selectedYear, selectedMonth, firstSunday).getDay() !== 0) {
+      firstSunday++;
     }
 
     const arr = [];
-    const startDayObj = new Date(selectedYear, selectedMonth, firstMonday);
+    const startDayObj = new Date(selectedYear, selectedMonth, firstSunday);
     
     for (let i = 0; i < 28; i++) {
       const d = new Date(startDayObj);

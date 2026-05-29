@@ -2,10 +2,8 @@ export const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/a
 
 export const getWeek = (date: Date) => {
   const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-  const dayNum = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-  return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1)/7);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + yearStart.getUTCDay() + 1) / 7);
 };
 
 export const getCurrentPeriod = (date = new Date()) => {
@@ -13,11 +11,9 @@ export const getCurrentPeriod = (date = new Date()) => {
 };
 
 export const getMonthWeekLabel = (weekNo: number, year: number) => {
-  const simple = new Date(Date.UTC(year, 0, 1 + (weekNo - 1) * 7));
-  const dow = simple.getUTCDay() || 7;
-  const isoStart = simple;
-  if (dow <= 4) isoStart.setUTCDate(simple.getUTCDate() - dow + 1);
-  else isoStart.setUTCDate(simple.getUTCDate() + 8 - dow);
+  const yearStart = new Date(Date.UTC(year, 0, 1));
+  const startOffset = -yearStart.getUTCDay(); // Go back to Sunday
+  const isoStart = new Date(Date.UTC(year, 0, 1 + startOffset + (weekNo - 1) * 7));
   
   const isoEnd = new Date(isoStart);
   isoEnd.setUTCDate(isoStart.getUTCDate() + 6);
@@ -26,7 +22,12 @@ export const getMonthWeekLabel = (weekNo: number, year: number) => {
   const startFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(isoStart);
   const endFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(isoEnd);
   
-  const weekOfMonth = Math.ceil(isoStart.getUTCDate() / 7) || 1;
+  // Week of the month based on Sunday-Saturday
+  const firstDayOfMonth = new Date(Date.UTC(isoStart.getUTCFullYear(), isoStart.getUTCMonth(), 1));
+  const firstSunday = new Date(firstDayOfMonth);
+  firstSunday.setUTCDate(firstDayOfMonth.getUTCDate() - firstDayOfMonth.getUTCDay());
+  const weekOfMonth = Math.ceil((((isoStart.getTime() - firstSunday.getTime()) / 86400000) + 1) / 7);
+
   return `${monthName} ${isoStart.getUTCFullYear()} | ${startFormat} - ${endFormat} (Week ${weekOfMonth})`;
 };
 
