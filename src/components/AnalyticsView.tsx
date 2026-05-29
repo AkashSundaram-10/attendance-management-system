@@ -27,17 +27,27 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
     setSelectedYear(parseInt(e.target.value, 10));
   };
 
-  // Generate exactly 28 days starting from the FIRST Sunday of the selected month
+  // Generate days based on the weeks that "belong" to this month (majority days).
+  // A week belongs to this month if its Wednesday falls in this month.
   const { daysArray, weeks } = useMemo(() => {
-    let firstSunday = 1;
-    while (new Date(selectedYear, selectedMonth, firstSunday).getDay() !== 0) {
-      firstSunday++;
+    let firstWednesday = 1;
+    while (new Date(selectedYear, selectedMonth, firstWednesday).getDay() !== 3) {
+      firstWednesday++;
     }
+    
+    const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+    let lastWednesday = daysInMonth;
+    while (new Date(selectedYear, selectedMonth, lastWednesday).getDay() !== 3) {
+      lastWednesday--;
+    }
+    
+    const numWeeks = ((lastWednesday - firstWednesday) / 7) + 1;
+    const totalDays = numWeeks * 7;
 
     const arr = [];
-    const startDayObj = new Date(selectedYear, selectedMonth, firstSunday);
+    const startDayObj = new Date(selectedYear, selectedMonth, firstWednesday - 3);
     
-    for (let i = 0; i < 28; i++) {
+    for (let i = 0; i < totalDays; i++) {
       const d = new Date(startDayObj);
       d.setDate(startDayObj.getDate() + i);
       arr.push({
@@ -49,12 +59,10 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
       });
     }
 
-    const wks = [
-      arr.slice(0, 7),
-      arr.slice(7, 14),
-      arr.slice(14, 21),
-      arr.slice(21, 28)
-    ];
+    const wks = [];
+    for (let w = 0; w < numWeeks; w++) {
+      wks.push(arr.slice(w * 7, (w + 1) * 7));
+    }
 
     return { daysArray: arr, weeks: wks };
   }, [selectedMonth, selectedYear]);
@@ -364,7 +372,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
                 const isWeekend = dObj.dateObj.getDay() === 0;
                 const dayName = dObj.dateObj.toLocaleString('en-US', { weekday: 'short' });
                 return (
-                  <th key={dObj.dateStr} className={`py-3 min-w-[50px] font-semibold text-center border-r ${isWeekend ? 'bg-red-50/50 text-red-500' : 'text-slate-600'} ${idx === 6 || idx === 13 || idx === 20 || idx === 27 ? 'border-r-slate-200' : 'border-slate-100'}`}>
+                  <th key={dObj.dateStr} className={`py-3 min-w-[50px] font-semibold text-center border-r ${isWeekend ? 'bg-red-50/50 text-red-500' : 'text-slate-600'} ${(idx + 1) % 7 === 0 ? 'border-r-slate-200' : 'border-slate-100'}`}>
                     <div className="text-xl font-bold">{dObj.day}</div>
                     <div className="text-base font-bold opacity-70 uppercase tracking-tighter">{dayName}</div>
                   </th>
@@ -381,7 +389,7 @@ export default function AnalyticsView({ workers, salaries, attendance, onUpdateA
                 {daysArray.map((dObj, idx) => (
                   <td 
                     key={dObj.dateStr} 
-                    className={`p-1.5 border-r text-center transition-colors ${idx === 6 || idx === 13 || idx === 20 || idx === 27 ? 'border-r-slate-200' : 'border-slate-100'}`}
+                    className={`p-1.5 border-r text-center transition-colors ${(idx + 1) % 7 === 0 ? 'border-r-slate-200' : 'border-slate-100'}`}
                   >
                     <div className="w-10 h-10 mx-auto flex items-center justify-center rounded">
                       {getStatusIcon(row.dayMarks[dObj.dateStr], dObj.dateStr)}

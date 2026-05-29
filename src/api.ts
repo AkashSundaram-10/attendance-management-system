@@ -2,12 +2,18 @@ export const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/a
 
 export const getWeek = (date: Date) => {
   const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  d.setUTCDate(d.getUTCDate() - d.getUTCDay()); // Go to Sunday
+  
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + yearStart.getUTCDay() + 1) / 7);
+  yearStart.setUTCDate(yearStart.getUTCDate() - yearStart.getUTCDay()); // Go back to first Sunday
+  
+  return Math.round((d.getTime() - yearStart.getTime()) / (7 * 86400000)) + 1;
 };
 
 export const getCurrentPeriod = (date = new Date()) => {
-  return getMonthWeekLabel(getWeek(date), date.getUTCFullYear());
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  d.setUTCDate(d.getUTCDate() - d.getUTCDay()); // Go to Sunday
+  return getMonthWeekLabel(getWeek(d), d.getUTCFullYear());
 };
 
 export const getMonthWeekLabel = (weekNo: number, year: number) => {
@@ -18,17 +24,24 @@ export const getMonthWeekLabel = (weekNo: number, year: number) => {
   const isoEnd = new Date(isoStart);
   isoEnd.setUTCDate(isoStart.getUTCDate() + 6);
 
-  const monthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(isoStart);
+  // The month that "owns" this week is the one that has the majority of the days (>= 4 days).
+  // The 4th day of a Sun-Sat week is Wednesday (+3 days from Sunday).
+  const midWeek = new Date(isoStart);
+  midWeek.setUTCDate(isoStart.getUTCDate() + 3);
+
+  const monthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(midWeek);
   const startFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(isoStart);
   const endFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(isoEnd);
   
-  // Week of the month based on Sunday-Saturday
-  const firstDayOfMonth = new Date(Date.UTC(isoStart.getUTCFullYear(), isoStart.getUTCMonth(), 1));
-  const firstSunday = new Date(firstDayOfMonth);
-  firstSunday.setUTCDate(firstDayOfMonth.getUTCDate() - firstDayOfMonth.getUTCDay());
-  const weekOfMonth = Math.ceil((((isoStart.getTime() - firstSunday.getTime()) / 86400000) + 1) / 7);
+  // Week of the month based on Wednesday
+  let firstWednesday = 1;
+  while (new Date(Date.UTC(midWeek.getUTCFullYear(), midWeek.getUTCMonth(), firstWednesday)).getUTCDay() !== 3) {
+    firstWednesday++;
+  }
+  const firstSunday = new Date(Date.UTC(midWeek.getUTCFullYear(), midWeek.getUTCMonth(), firstWednesday - 3));
+  const weekOfMonth = Math.round((isoStart.getTime() - firstSunday.getTime()) / (7 * 86400000)) + 1;
 
-  return `${monthName} ${isoStart.getUTCFullYear()} | ${startFormat} - ${endFormat} (Week ${weekOfMonth})`;
+  return `${monthName} ${midWeek.getUTCFullYear()} | ${startFormat} - ${endFormat} (Week ${weekOfMonth})`;
 };
 
 export const getWeeksForMonthLabel = (monthStr: string) => {

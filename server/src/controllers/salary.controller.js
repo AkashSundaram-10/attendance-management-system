@@ -8,11 +8,13 @@ const generateSalary = async (req, res, next) => {
 
     const getWeek = (date) => {
       const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+      d.setUTCDate(d.getUTCDate() - d.getUTCDay());
       const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-      return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + yearStart.getUTCDay() + 1) / 7);
+      yearStart.setUTCDate(yearStart.getUTCDate() - yearStart.getUTCDay());
+      return Math.round((d.getTime() - yearStart.getTime()) / (7 * 86400000)) + 1;
     };
 
-    let startDate, endDate, dbMonth = month;
+    let startDate, endDate, dbMonth = month, dbYear = year;
 
     if (targetDate) {
       const d = new Date(targetDate);
@@ -25,7 +27,8 @@ const generateSalary = async (req, res, next) => {
       endDate.setUTCDate(startDate.getUTCDate() + 6);
       endDate.setUTCHours(23, 59, 59, 999);
       
-      dbMonth = getWeek(d);
+      dbMonth = getWeek(startDate);
+      dbYear = startDate.getUTCFullYear();
     } else {
       endDate.setUTCHours(23, 59, 59, 999);
     }
@@ -120,7 +123,7 @@ const generateSalary = async (req, res, next) => {
       let finalSalary = Math.max(0, grossSalary - advanceDeduction);
 
       const existingRecord = await prisma.salaryRecord.findUnique({
-        where: { workerId_month_year: { workerId: worker.id, month: dbMonth, year } }
+        where: { workerId_month_year: { workerId: worker.id, month: dbMonth, year: dbYear } }
       });
 
       let finalIsManuallyEdited = existingRecord ? existingRecord.isManuallyEdited : false;
@@ -181,54 +184,33 @@ const generateSalary = async (req, res, next) => {
         }
       }
 
-      // Save record
-      const record = await prisma.salaryRecord.upsert({
-        where: {
-          workerId_month_year: { workerId: worker.id, month: dbMonth, year }
-        },
-        update: {
-          totalDays,
-          presentDays,
-          halfDayDays,
-          nightShiftDays,
-          overtimeHours: totalOvertimeHours,
-          grossSalary,
-          advanceDeduction,
-          finalSalary,
-          isManuallyEdited: finalIsManuallyEdited,
-          ...(finalIsManuallyEdited ? { 
-            basicSalary: finalBasicSalary,
-            overtimeSalary: finalOvertimeSalary,
-            halfDaySalary: finalHalfDaySalary,
-            nightShiftSalary: finalNightShiftSalary
-          } : {
-            basicSalary: computedBasicSalary,
-            overtimeSalary: computedOvertimeSalary,
-            halfDaySalary: computedHalfDaySalary,
-            nightShiftSalary: computedNightShiftSalary
-          })
-        },
-        create: {
-          workerId: worker.id,
-          month: dbMonth,
-          year,
-          totalDays,
-          presentDays,
-          halfDayDays,
-          nightShiftDays,
-          overtimeHours: totalOvertimeHours,
-          grossSalary,
-          basicSalary: computedBasicSalary,
-          overtimeSalary: computedOvertimeSalary,
-          halfDaySalary: computedHalfDaySalary,
-          nightShiftSalary: computedNightShiftSalary,
-          advanceDeduction,
-          finalSalary,
-          paymentStatus: 'PENDING'
-        }
+      const recordData = {
+        workerId: worker.id,
+        month: dbMonth,
+        year: dbYear,
+        totalDays: totalDays,
+        presentDays,
+        halfDayDays,
+        nightShiftDays,
+        overtimeHours: totalOvertimeHours,
+        grossSalary,
+        basicSalary: finalIsManuallyEdited ? finalBasicSalary : computedBasicSalary,
+        overtimeSalary: finalIsManuallyEdited ? finalOvertimeSalary : computedOvertimeSalary,
+        halfDaySalary: finalIsManuallyEdited ? finalHalfDaySalary : computedHalfDaySalary,
+        nightShiftSalary: finalIsManuallyEdited ? finalNightShiftSalary : computedNightShiftSalary,
+        advanceDeduction,
+        finalSalary,
+        isManuallyEdited: finalIsManuallyEdited,
+        paymentStatus: 'PENDING'
+      };
+
+      const upsertedRecord = await prisma.salaryRecord.upsert({
+        where: { workerId_month_year: { workerId: worker.id, month: dbMonth, year: dbYear } },
+        update: recordData,
+        create: recordData
       });
 
-      results.push(record);
+      results.push(upsertedRecord);
     }
 
     sendSuccess(res, 200, 'Salaries generated successfully', results);
